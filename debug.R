@@ -1,64 +1,92 @@
-
-
-# names for boundary box list
-dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
-
-# empty boundaty box list
-bbList <- 
-  matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
-  data.frame() 
-
-# function to extract boundary boxes of each city and fill into bbList
-createBB <- function(in_file){
+dlOSM <- function(in_vector, # list of gpkg files 
+                  out_path  # output directory
+){
+  # load packages
+  require(dplyr)
   
-  # generate city tag
-  cityTag <-
-    strsplit(in_file, "/")[[1]][4] %>% 
-    substr(1,5) 
+  # Set overpass API to use 
+  api_list <- c('http://overpass-api.de/api/interpreter',
+                'https://lz4.overpass-api.de/api/interpreter',
+                'https://z.overpass-api.de/api/interpreter',
+                'https://overpass.kumi.systems/api/interpreter'
+                )
   
-  # OSM proj4 string    
-  p <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
+  api_to_use <- sample(1:length(api_list), 1)
   
-  # create boundary layer
+  osmdata::set_overpass_url(api_list[api_to_use]) 
+  
+  # create boundary box (bbox)
   bb <- 
-    ## load UA city gpkg, layer 2 for boundary
-    in_file %>%
-    sf::read_sf(layer = rgdal::ogrListLayers(.)[2]) %>%
-    ## transform to OSM projection
-    sf::st_transform(., p) %>% 
-    sf::as_Spatial() %>% 
-    ## create boundary box (bbox)
-    sp::bbox()
+    matrix(in_vector[2:5] %>% unlist(), 
+           nrow = 2, ncol = 2, byrow = T,
+           dimnames = list(c('x', 'y'), c('min', 'max'))
+    )
   
-  # get length of bbox edges
-  a <- bb[1, 2] - bb[1, 1]
-  b <- bb[2, 2] - bb[2, 1]
+  # download OSM data for boundary layer
+    try({
+      buildings <-
+      bb %>% 
+        ## create boundary box
+        sp::bbox() %>%
+        ## create OSM query
+        osmdata::opq() %>% 
+        ## add desired feature to query
+        osmdata::add_osm_feature(., 
+                                 key = "building") %>% 
+        ## download OSM data
+        osmdata::osmdata_sp() 
+    }, silent = T)
   
-  # create min, max and mid points for x and y
-  xmin <- bb[1, 1]   
-  xmax <- bb[1, 2]
-  ymin <- bb[2, 1]
-  ymax <- bb[2, 2]
-  xmid <- bb[1, 1] + (a / 2)   
-  ymid <- bb[2, 1] + (b / 2)   
+  # check if download worked
+  if (!exists('buildings')) return(message("Download failed!"))
   
-  # check if bbox is too big
-  if (
-    a * b < 1
-    # if not too big: fill bbox values into bbox list
-  ) bbList <-
-    data.frame(cityTag, 
-               xmin, xmax, 
-               ymin, ymax) %>%
-    dplyr::bind_rows(bbList
-    # if too big: split bbox into 4 equal parts
-    ) else bbList <-
-    data.frame('cityTag' = paste0(cityTag, 
-                                  c('_a', '_b', '_c', '_d')),
-               'xmin' = c(xmin, xmid, xmin, xmid),    # xmin
-               'xmax' = c(xmid, xmax, xmid, xmax),    # xmax
-               'ymin' = c(ymid, ymid, ymin, ymin),    # ymin
-               'ymax' = c(ymax, ymax, ymid, ymid)) %>%# ymax
-                 dplyr::bind_rows(bbList)
-               
+  # select polygons from osm data
+  bPolygons <- buildings$osm_polygons
+  
+  # kill queries
+  killLink <- paste0(api_to_use,
+                     '/kill_my_queries')
+  shell.exec(killLink)
+  
+  # remove buildings object
+  rm (buildings)
+  gc()
+  
+  # convert FIDs from numeric to character
+  FIDs <- 
+    bPolygons@polygons %>% 
+    names() %>% 
+    as.character()
+  
+  bPolygons <- 
+    sp::spChFIDs(bPolygons, FIDs)
+  ################################################################################
+  # kick out most of the columns of @data
+  bPolygons@data <-
+    bPolygons@data[1]
+  ################################################################################
+  # generate parameters for write OGR 
+  ## output destination
+  dsn <-
+    paste0(out_path,
+           in_vector[1],
+           ".gpkg")
+  
+  ## layer name
+  lyr = "buildings"
+  
+  # write to file
+  rgdal::writeOGR(bPolygons,
+                  dsn = dsn,
+                  layer = lyr,
+                  driver = "GPKG",
+                  overwrite_layer = T)
+  
+  Sys.sleep(60)
 }
+
+
+
+bbList <- 
+  bbList %>% 
+  mutate(size = (xmax - xmin) * (ymax - ymin))

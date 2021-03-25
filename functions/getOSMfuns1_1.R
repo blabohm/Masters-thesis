@@ -16,7 +16,9 @@ bb2df <-
 # convert a data frame to a boundary box
 df2bb <- 
   function(BBox_df){
-    matrix(BBox_df %>% unlist(), 
+    matrix(BBox_df %>%
+             select(xmin:ymax) %>% 
+             unlist(), 
            nrow = 2, ncol = 2, byrow = T,
            dimnames = list(c('x', 'y'), c('min', 'max'))
     )}
@@ -117,63 +119,105 @@ namify0 <-
 
 
 ################################################################################
-# get status of overpass API link
-APIstatus <- 
+# get number of free slots from an overpass API
+getFreeSlots <- 
   function(APIlink) {
-    require(dplyr, quietly = T)
-    status <-
-      APIlink %>% 
+    APIlink %>% 
       sub('interpreter', 'status', .) %>% 
       httr::GET() %>% 
-      httr::http_status(.) %>%
-      .$category
-    
-    return(status)
+      httr::content() %>% 
+      strsplit("\n") %>% 
+      unlist() %>% 
+      grep("available", ., 
+           value = TRUE) %>% 
+      substr(1,1) %>% 
+      as.numeric()
   }
 
-
-################################################################################
-# select a working API
-getAPI <-
-  function(url_list, waitTime) {
-    # set n to 1 to check first position in API list
-    n <- 1
-    # retrieve first API link
-    Link <- url_list[n]
-    # check status
-    status_check <- APIstatus(Link)
+# select API with most free slots or wait if no slots available
+APIselect <- function(api_list) {
+  
+  api_list <- 
+    api_list %>% 
+    mutate(slots = 
+             lapply(interpreter, getFreeSlots) %>% 
+             unlist()) %>% 
+    arrange(desc(slots))
+  
+  while (sum(api_list$slots) == 0) {
+    Sys.sleep(180)
     
-    # keep checking status of all API links until one is not busy anymore
-    while (status_check != "Success") {
-      
-      # kill open queries
-      killLink <- 
-        sub('interpreter', 
-            'kill_my_queries', 
-            Link)
-      
-      httr::GET(killLink)
-      
-      # check next API link
-      n <- n + 1
-      # reset n to one if last element was reached and wait
-      if (n >= length(url_list) + 1) {
-        n <- 1
-        status_check <- "Failure"
-        
-        Sys.sleep(waitTime)
-        
-      } else {
-        
-        Link <- url_list[n]
-        
-        status_check <- APIstatus(Link)
-      }
-    }
-    # return working API link
-    return(Link)
-    
+    api_list <- 
+      api_list %>% 
+      mutate(slots = 
+               lapply(interpreter, getFreeSlots) %>% 
+               unlist()) %>% 
+      arrange(desc(slots))
   }
+  
+  return(api_list$interpreter[1])
+}
+
+
+
+# get status of overpass API link
+
+# APIstatus <- 
+#   function(APIlink) {
+#     require(dplyr, quietly = T)
+#     status <-
+#       APIlink %>% 
+#       sub('interpreter', 'status', .) %>% 
+#       httr::GET() %>% 
+#       httr::http_status(.) %>%
+#       .$category
+#     
+#     return(status)
+#   }
+# 
+# 
+# ################################################################################
+# # select a working API
+# getAPI <-
+#   function(url_list, waitTime) {
+#     # set n to 1 to check first position in API list
+#     n <- 1
+#     # retrieve first API link
+#     Link <- url_list[n]
+#     # check status
+#     status_check <- APIstatus(Link)
+#     
+#     # keep checking status of all API links until one is not busy anymore
+#     while (status_check != "Success") {
+#       
+#       # kill open queries
+#       killLink <- 
+#         sub('interpreter', 
+#             'kill_my_queries', 
+#             Link)
+#       
+#       httr::GET(killLink)
+#       
+#       # check next API link
+#       n <- n + 1
+#       # reset n to one if last element was reached and wait
+#       if (n >= length(url_list) + 1) {
+#         n <- 1
+#         status_check <- "Failure"
+#         
+#         Sys.sleep(waitTime)
+#         
+#       } else {
+#         
+#         Link <- url_list[n]
+#         
+#         status_check <- APIstatus(Link)
+#       }
+#     }
+#     # return working API link
+#     return(Link)
+#     
+#   }
 
 
 ################################################################################
@@ -190,9 +234,10 @@ check.up <- function(file_list,
   
   n <-
     file_list %>% 
-#    namify() %>% 
+    #    namify() %>% 
     as_tibble() %>% 
-    mutate(key = "x")
+    mutate(key = "x",
+           priority = row_number())
   
   m <-
     out_dir %>% 
@@ -202,10 +247,14 @@ check.up <- function(file_list,
     mutate(key = "x")
   
   df <-
-    merge(n, m, by = "value", all = T) %>%
+    merge(n, m, by = "value", 
+          all.x = TRUE) %>%
     transmute(interval = value,
               file_list = key.x,
-              joined_files = key.y)
+              joined_files = key.y,
+              priority = priority) %>% 
+    arrange(priority) %>% 
+    select(-priority)
   
   
   if (
@@ -228,67 +277,89 @@ check.up <- function(file_list,
 ################################################################################
 # function to extract boundary boxes of each city and fill into bbList
 
-createBB <- function(in_file){
-  suppressWarnings({
-    
-    # generate city tag
-    cityTag <-
-      in_file %>%
-      get_code()
-    
-    # OSM proj4 string    
-    p <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
-    
-    # create boundary layer
-    bb <- 
+createBB <- function(in_file, bboxList, tSize = .8
+){
+  require(dplyr)
+  
+  
+  # generate city tag
+  cityTagString <-
+    in_file %>%
+    get_code()
+  
+  # OSM proj4 string    
+  p <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
+  
+  # create boundary box layer
+  bb <- 
+    # supress warnings of discarded WGS_1984 argument from input
+    suppressWarnings({
+      
       ## load UA city gpkg, layer 2 for boundary
       in_file %>%
-      sf::read_sf(layer = rgdal::ogrListLayers(.)[2]) %>%
-      ## transform to OSM projection
-      sf::st_transform(., p) %>% 
-      sf::as_Spatial(.) %>% 
-      ## create boundary box (bbox)
-      sp::bbox(.)
+        sf::read_sf(layer = rgdal::ogrListLayers(.)[2]) %>%
+        ## transform to OSM projection
+        sf::st_transform(., p) %>% 
+        sf::as_Spatial(.) %>% 
+        ## create boundary box (bbox)
+        sp::bbox(.)
+      
+    })
+  
+  # check if bbox is too big
+  if (bbSize(bb) < tSize) {
+    # if not too big: fill bbox values into bbox list
+    bboxList <-
+      bb %>% 
+      bb2df() %>% 
+      data.frame("cityTag" = cityTagString, 
+                 .) %>%
+      dplyr::bind_rows(bboxList, .) %>% 
+      return()
     
-    # get length of bbox edges
-    a <- bb[1, 2] - bb[1, 1]
-    b <- bb[2, 2] - bb[2, 1]
+  } else { 
+    # if too big: split bbox into 4 equal parts
+    bbSplitDf <-
+      bb %>% 
+      splitBB() %>% 
+      data.frame("cityTag" =  paste0(cityTagString, 
+                                     c('_a', '_b', '_c', '_d')),
+                 .)
     
-    # create min, max and mid points for x and y
-    xmin <- bb[1, 1]   
-    xmax <- bb[1, 2]
-    ymin <- bb[2, 1]
-    ymax <- bb[2, 2]
-    xmid <- bb[1, 1] + (a / 2)   
-    ymid <- bb[2, 1] + (b / 2)   
-     
-    # get size of resulting box
-    a2 <- xmid - xmin
-    b2 <- ymid - ymin
-    
-    # check if bbox is too big
-    if (a * b < 1) {
-      # if not too big: fill bbox values into bbox list
-      bbList <-
-        data.frame(cityTag, 
-                   xmin, xmax, 
-                   ymin, ymax) %>%
-        dplyr::bind_rows(bbList, .
-        ) %>% return()
-    } else { 
-      # if too big: split bbox into 4 equal parts
-      bbList <-
-        data.frame('cityTag' = paste0(cityTag, 
-                                      c('_a', '_b', '_c', '_d')),
-                   'xmin' = c(xmin, xmid, xmin, xmid),    # xmin
-                   'xmax' = c(xmid, xmax, xmid, xmax),    # xmax
-                   'ymin' = c(ymid, ymid, ymin, ymin),    # ymin
-                   'ymax' = c(ymax, ymax, ymid, ymid)) %>%# ymax
-        dplyr::bind_rows(bbList, .) %>% 
+    # now check if the resulting bbox is still too big
+    if (bbSize(bbSplitDf[1,]) < tSize) {
+      # if size is ok, bind to bblist
+      bboxList <-
+        bbSplitDf %>% 
+        dplyr::bind_rows(bboxList, .) %>% 
         return()
+    } else {
+      
+      bbListTemp <- 
+        matrix(ncol = 5, nrow = 0, dimnames = dfNames) %>% 
+        data.frame() 
+      
+      #if size is too big, split again, then bind to bblist
+      for (i in 1:nrow(bbSplitDf)) {
+        bbListTemp <-
+          bbSplitDf[i,] %>% 
+          splitBB() %>% 
+          dplyr::bind_rows(bbListTemp, .)
+      }
+      
+      bboxList <-
+        bbListTemp %>% 
+        mutate(cityTag = paste0(cityTagString, 
+                                c(rep('_a', 4), rep('_b', 4), 
+                                  rep('_c', 4),rep('_d', 4)), 
+                                rep(1:4, 4))) %>% 
+        dplyr::bind_rows(bboxList, .) %>% 
+        return()  
     }
-  })
+  }
 }
+
+
 
 
 ################################################################################
@@ -297,13 +368,13 @@ dlOSM <- function(in_vector, # list of gpkg files
                   out_path,  # output directory
                   # list of API links
                   api_list = c('http://overpass-api.de/api/interpreter',
-                      'https://lz4.overpass-api.de/api/interpreter',
-                      'https://z.overpass-api.de/api/interpreter',
-                      'https://overpass.kumi.systems/api/interpreter')
+                               'https://lz4.overpass-api.de/api/interpreter',
+                               'https://z.overpass-api.de/api/interpreter',
+                               'https://overpass.kumi.systems/api/interpreter')
 ){
   # load packages
   require(dplyr)
-
+  
   
   # set overpass API url to use
   interpreter <-
