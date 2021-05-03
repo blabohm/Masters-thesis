@@ -13,9 +13,12 @@ priority_df <-
 comp_df <- 
   read.csv("C:/Users/labohben/Documents/GitHub/MA/UA_names_2006_compatible.csv")
 
+# Data directory
+dataDir <- "E:/UA2018/"
+
 # generate list of input files
 in_list <-
-  "E:/UA2012" %>% 
+  dataDir %>% 
   list.files(recursive = T,
              pattern = ".gpkg$",
              full.names = T) %>% 
@@ -23,16 +26,20 @@ in_list <-
   mutate(code = namify(value)) %>% 
   merge(priority_df,
         by = "code",
-        all.y = T) %>% 
+        all.x = T) %>% 
   merge(comp_df,
         by = "code",
         all.y = T) %>% 
   arrange(priority)
+
+in_list <-
+  in_list %>% 
+  filter(priority < 2)
   
 
 # output directory
 out_path <-
-  "E:/temp/"
+  "E:/osm_buildings/"
 
 # names for boundary box (bbox) list
 dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
@@ -42,8 +49,9 @@ dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
 
 # empty bbox list
 bbList <- 
-  matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
-  data.frame() 
+  tibble()
+  # matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
+  # data.frame() 
 
 # set up progress bar
 pb <- txtProgressBar(min = 0, max = nrow(in_list), 
@@ -71,9 +79,20 @@ to_do <-
 #pb <- txtProgressBar(min = 0, max = nrow(bbList[to_do,]), 
 #                     initial = 0, style = 3)
 #stepi <- 0
+# list of API links
+api_list <- dplyr::tibble(interpreter = 
+                            c('http://overpass-api.de/api/interpreter',
+                              'https://lz4.overpass-api.de/api/interpreter',
+                              'https://z.overpass-api.de/api/interpreter'#,
+                              #'https://overpass.kumi.systems/api/interpreter'
+                            ),
+                          nTry = c(0, 0, 0)) # manipulate to have second decision
+
 
 # apply download function
 for (i in to_do) {
+  print(i)
+  
   dlOSM(in_vector = bbList[i,], 
         out_path = out_path,
         OSMkey = "building")

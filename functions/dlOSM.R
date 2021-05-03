@@ -1,79 +1,60 @@
-in_vector <- bbList[to_do[24],]
+in_vector <- bbList[to_do[1],]
 OSMkey = "building"
+OSMkey = "way"
 
+################################################################################
+# create function to download OSM files:
 dlOSM <- function(in_vector, # list of gpkg files 
                   out_path,  # output directory
-                  OSMkey,
-                  # list of API links
-                  api_list = dplyr::tibble(interpreter = 
-                                      c('http://overpass-api.de/api/interpreter',
-                                        'https://lz4.overpass-api.de/api/interpreter',
-                                        'https://z.overpass-api.de/api/interpreter'#,
-                                        #'https://overpass.kumi.systems/api/interpreter'
-                                      ))
+                  OSMkey
 ){
   # load packages
   require(dplyr)
   
-#  while (!exists('OSMdownload')){
-  # set overpass API url to use
+  # set overpass API to use
   interpreter <- APIselect(api_list = api_list)
-  
   osmdata::set_overpass_url(interpreter) 
-  
   
   # create boundary box (bbox)
   bb <- 
     df2bb(in_vector) %>% 
     round(digits = 5)
   
+  ## output destination
+  dsn <-
+    paste0(out_path,
+           in_vector$cityTag,
+           ".gpkg")
+  
   # message
   message(paste("Commencing download of: ", in_vector$cityTag,
-                "\n at: ", interpreter))
+                "at: ", interpreter))
+  
   # download OSM data for boundary layer
   try({    
-    OSMdownload <-
-      bb %>% 
+    bb %>% 
       ## create OSM query
       osmdata::opq() %>% 
       ## add desired feature to query
       osmdata::add_osm_feature(., 
-                               key = OSMkey) %>% #<<<<<<<<--------------
-    ## download OSM data
-    #osmdata::osmdata_xml(filename = "E:/temp_test/test1.xml")
-    osmdata::osmdata_sf(.) 
-  }, silent = T)
- # }
-  
-  # # check if download worked
-  if (
-    !exists('buildings')
-  ) return(
-    {message(
-      paste0("\n Download failed at: ",
-             interpreter))
-
-      Sys.sleep(360)
-    }
-  ) else try({
-  
-
-    ################################################################################
-    # generate parameters for write OGR 
-    ## output destination
-    dsn <-
-      paste0(out_path,
-             in_vector$cityTag,
-             ".gpkg")
-
-    # write to file
-    OSMdownload$osm_polygons %>% 
+                               key = OSMkey) %>% 
+      ## download OSM data
+      osmdata::osmdata_sf(.) %>%
+      .$osm_polygons %>% 
       select(osm_id, building, amenity) %>% 
       sf::st_write(dsn = dsn, layer = OSMkey)
     
-    # remove buildings object
-    rm(OSMdownload)
-    gc()})
+    # garbage collector
+    gc()
+    
+  }, silent = T)
+  
+   # write to file
+  if (file.exists(dsn)){
+    message("Download successful.")
+  } else ({
+    message("Download failed. Proceeding to next area.")
+  })
 }
 
 # select polygons from osm data

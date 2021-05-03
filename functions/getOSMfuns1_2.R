@@ -28,7 +28,7 @@ df2bb <-
 # get size of a boundary box
 bbSize <-
   function(BBox){
-    if (dim(BBox)[1] == 1) {
+    if (dim(BBox) %>% .[1] == 1) {
       BBox <-
         BBox %>% 
         select(xmin:ymax) %>% 
@@ -48,7 +48,7 @@ bbSize <-
 splitBB <- 
   function(BBox){
     
-    if (dim(BBox)[1] == 1) {
+    if (dim(BBox) %>% first() == 1) {
       BBox <-
         BBox %>% 
         select(xmin:ymax) %>% 
@@ -133,10 +133,15 @@ getFreeSlots <-
         grep("available", ., 
              value = TRUE) %>% 
         substr(1,1) %>% 
-        as.numeric()
+        as.numeric() %>% 
+        .[1]
     })
-    if (exists("noSlots")) {
+    if (exists("nSlots")) {
+      if (length(nSlots == nrow(api_list))) {
       return(nSlots)
+        } else {
+        return(0)
+      }
     } else {
       return(0)
     }
@@ -152,7 +157,9 @@ APIselect <- function(api_list) {
              unlist()) %>% 
     arrange(desc(slots))
   
-  while (sum(api_list$slots) == 0) {
+  while (sum(api_list$slots, na.rm = T) < 1) {
+    
+    message("Waiting for API slot.")
     Sys.sleep(180)
     
     api_list <- 
@@ -285,7 +292,7 @@ check.up <- function(file_list,
 ################################################################################
 # function to extract boundary boxes of each city and fill into bbList
 
-createBB <- function(in_file, bboxList, tSize = .8
+createBB <- function(in_file, bboxList, tSize = .25
 ){
   require(dplyr)
   
@@ -311,7 +318,6 @@ createBB <- function(in_file, bboxList, tSize = .8
         sf::as_Spatial(.) %>% 
         ## create boundary box (bbox)
         sp::bbox(.)
-      
     })
   
   # check if bbox is too big
@@ -325,46 +331,30 @@ createBB <- function(in_file, bboxList, tSize = .8
       dplyr::bind_rows(bboxList, .) %>% 
       return()
     
-  } else { 
-    # if too big: split bbox into 4 equal parts
-    bbSplitDf <-
-      bb %>% 
-      splitBB() %>% 
-      data.frame("cityTag" =  paste0(cityTagString, 
-                                     c('_a', '_b', '_c', '_d')),
-                 .)
+  } else {
+    bbTemp <- 
+      bb2df(bb) %>% 
+      mutate(cityTag = cityTagString)
     
-    # now check if the resulting bbox is still too big
-    if (bbSize(bbSplitDf[1,]) < tSize) {
-      # if size is ok, bind to bblist
-      bboxList <-
-        bbSplitDf %>% 
-        dplyr::bind_rows(bboxList, .) %>% 
-        return()
-    } else {
+    while (bbSize(bbTemp[1,]) > tSize) {
       
-      bbListTemp <- 
-        matrix(ncol = 5, nrow = 0, dimnames = dfNames) %>% 
-        data.frame() 
-      
-      #if size is too big, split again, then bind to bblist
-      for (i in 1:nrow(bbSplitDf)) {
-        bbListTemp <-
-          bbSplitDf[i,] %>% 
+      for (i in 1:nrow(bbTemp)) {
+        bbTemp <-
+          bbTemp[i,] %>% 
           splitBB() %>% 
-          dplyr::bind_rows(bbListTemp, .)
+          dplyr::bind_rows(bbTemp, .)
       }
       
-      bboxList <-
-        bbListTemp %>% 
-        mutate(cityTag = paste0(cityTagString, 
-                                c(rep('_a', 4), rep('_b', 4), 
-                                  rep('_c', 4),rep('_d', 4)), 
-                                rep(1:4, 4))) %>% 
-        dplyr::bind_rows(bboxList, .) %>% 
-        return()  
+      bbTemp <- 
+        bbTemp %>% 
+        filter(is.na(cityTag)) %>% 
+        mutate(cityTag = paste0(cityTagString, "_", row_number()))
     }
-  }
+    bboxList <-
+      bbTemp %>% 
+      bind_rows(bboxList, .) %>% 
+      return()
+  } 
 }
 
 
@@ -374,62 +364,55 @@ createBB <- function(in_file, bboxList, tSize = .8
 # create function to download OSM files:
 dlOSM <- function(in_vector, # list of gpkg files 
                   out_path,  # output directory
-                  OSMkey,
-                  # list of API links
-                  api_list = dplyr::tibble(interpreter = 
-                                             c('http://overpass-api.de/api/interpreter',
-                                               'https://lz4.overpass-api.de/api/interpreter',
-                                               'https://z.overpass-api.de/api/interpreter'#,
-                                               #'https://overpass.kumi.systems/api/interpreter'
-                                             ))
+                  OSMkey
 ){
   # load packages
   require(dplyr)
   
-  while (!exists('OSMdownload')){
-    # set overpass API url to use
-    interpreter <- APIselect(api_list = api_list)
-    
-    osmdata::set_overpass_url(interpreter) 
-    
-    
-    # create boundary box (bbox)
-    bb <- 
-      df2bb(in_vector) %>% 
-      round(digits = 5)
-    
-    # download OSM data for boundary layer
-    try({    
-      OSMdownload <-
-        bb %>% 
-        ## create OSM query
-        osmdata::opq() %>% 
-        ## add desired feature to query
-        osmdata::add_osm_feature(., 
-                                 key = OSMkey) %>% #<<<<<<<<--------------
-      ## download OSM data
-      #osmdata::osmdata_xml(filename = "E:/temp_test/test1.xml")
-      osmdata::osmdata_sf(.) 
-    }, silent = T)
-  }
+  # set overpass API to use
+  interpreter <- APIselect(api_list = api_list)
+  osmdata::set_overpass_url(interpreter) 
   
+  # create boundary box (bbox)
+  bb <- 
+    df2bb(in_vector) %>% 
+    round(digits = 5)
   
-  ################################################################################
-  # generate parameters for write OGR 
   ## output destination
   dsn <-
     paste0(out_path,
            in_vector$cityTag,
            ".gpkg")
   
-  # write to file
-  OSMdownload$osm_polygons %>% 
-    select(osm_id, building, amenity) %>% 
-    sf::st_write(dsn = dsn, layer = OSMkey)
+  # message
+  message(paste("Commencing download of: ", in_vector$cityTag,
+                "at: ", interpreter))
   
-  # remove buildings object
-  rm(OSMdownload)
-  gc()
+  # download OSM data for boundary layer
+  try({    
+    bb %>% 
+      ## create OSM query
+      osmdata::opq() %>% 
+      ## add desired feature to query
+      osmdata::add_osm_feature(., 
+                               key = OSMkey) %>% 
+      ## download OSM data
+      osmdata::osmdata_sf(.)  %>%
+      .$osm_polygons %>% 
+      select(osm_id, building, amenity) %>% 
+      sf::st_write(dsn = dsn, layer = OSMkey)
+    
+    # garbage collector
+    gc()
+    
+  }, silent = T)
+  
+  # write to file
+  if (file.exists(dsn)){
+    message("Download successful.")
+  } else ({
+    message("Download failed. Proceeding to next area.")
+  })
 }
 
 
