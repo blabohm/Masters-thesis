@@ -3,7 +3,7 @@
 library(dplyr)
 
 # load functions
-source("C:/Users/labohben/Documents/GitHub/MA/functions/getOSMfuns1_2.R")
+source("C:/Users/labohben/Documents/GitHub/MA/functions/getOSMfuns1_3.R")
 
 # priority table
 priority_df <- 
@@ -56,38 +56,42 @@ OSMkey <- "building"
 # out_path <- "E:/osm_barriers/"
 # OSMkey <- "barrier"
 # names for boundary box (bbox) list
-dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
+#dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
 
 
 ################################################################################
 
-# empty bbox list
-bbList <- 
-  tibble()
-  # matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
-  # data.frame() 
-
-# set up progress bar
-pb <- txtProgressBar(min = 0, max = nrow(in_list), 
-                     initial = 0, style = 3)
-stepi <- 0
-
-# create list of bboxes
-for (in_file in in_list$value) {
-  bbList <- createBB(in_file = in_file,
-                     bboxList = bbList) %>% 
-    na.omit()
-  # for progress bar
-  stepi <- stepi + 1
-  setTxtProgressBar(pb, stepi)
-}
- 
-# check which files to download
-to_do <- 
-  check.up(bbList$cityTag, out_path)
+# # empty bbox list
+# bbList <- 
+#   tibble()
+#   # matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
+#   # data.frame() 
+# 
+# # set up progress bar
+# pb <- txtProgressBar(min = 0, max = nrow(in_list), 
+#                      initial = 0, style = 3)
+# stepi <- 0
+# 
+# # target Size of boundary boxes
+# targetSize <- .05
+# 
+# # create list of bboxes
+# for (in_file in in_list$value) {
+#   bbList <- createBB(in_file = in_file,
+#                      bboxList = bbList, 
+#                      tSize = targetSize) %>% 
+#     na.omit()
+#   # for progress bar
+#   stepi <- stepi + 1
+#   setTxtProgressBar(pb, stepi)
+# }
+#  
+# # check which files to download
+# to_do <- 
+#   check.up(bbList$cityTag, out_path)
 
 ################################################################################
-
+  
 # set up progress bar
 #pb <- txtProgressBar(min = 0, max = nrow(bbList[to_do,]), 
 #                     initial = 0, style = 3)
@@ -101,7 +105,8 @@ api_list <- dplyr::tibble(interpreter =
                             ),
                           nTry = c(0, 0, 0)) # manipulate to have second decision
 
-
+#while (length(to_do) > 0) {
+  
 # apply download function
 for (i in to_do) {
   print(i)
@@ -114,50 +119,62 @@ for (i in to_do) {
 #  setTxtProgressBar(pb, stepi)
   }
 
-
 # cut failed downloads into even smaller pieces and repeat process:
-bbListNew <-
-  tibble()
-
-bbListNew <-
-  splitBBdf(bbList[to_do,], bbListNew, 0.1)
-
-to_do <- 
-  check.up(bbListNew$cityTag, out_path)
-
-# apply download function
-for (i in to_do) {
-  print(i)
-  
-  dlOSM(in_vector = bbListNew[i,], 
-        out_path = out_path,
-        OSMkey = OSMkey)
-  # for progress bar
-  #  stepi <- stepi + 1
-  #  setTxtProgressBar(pb, stepi)
-}
-
-# cut failed downloads into even smaller pieces and repeat process:
-
-bbListNew1 <- tibble()
-  
-bbListNew1 <-
-  splitBBdf(bbListNew[to_do,], bbListNew1, 0.05)
-
-to_do <- 
-  check.up(bbListNew1$cityTag, out_path)
-
-# apply download function
-for (i in to_do) {
-  print(i)
-  
-  dlOSM(in_vector = bbListNew1[i,], 
-        out_path = out_path,
-        OSMkey = OSMkey)
-  # for progress bar
-  #  stepi <- stepi + 1
-  #  setTxtProgressBar(pb, stepi)
-}
+# empty data frame for later results
+# bbListNew <-
+#   tibble()
+# 
+# # cut remaining
+# bbListNew <-
+#   splitBBdf(bb = bbList[to_do,],
+#             bboxList = bbListNew, 
+#             tSize = targetSize)
+# 
+# bbList <- bbListNew
+# 
+# to_do <- 
+#   check.up(bbListNew$cityTag, out_path)
+# 
+# targetSize <- targetSize / 5
+# 
+# }
+# 
+# 
+# 
+# 
+# # apply download function
+# for (i in to_do) {
+#   print(i)
+#   
+#   dlOSM(in_vector = bbListNew[i,], 
+#         out_path = out_path,
+#         OSMkey = OSMkey)
+#   # for progress bar
+#   #  stepi <- stepi + 1
+#   #  setTxtProgressBar(pb, stepi)
+# }
+# 
+# # cut failed downloads into even smaller pieces and repeat process:
+# 
+# bbListNew1 <- tibble()
+#   
+# bbListNew1 <-
+#   splitBBdf(bbListNew[to_do,], bbListNew1, 0.05)
+# 
+# to_do <- 
+#   check.up(bbListNew1$cityTag, out_path)
+# 
+# # apply download function
+# for (i in to_do) {
+#   print(i)
+#   
+#   dlOSM(in_vector = bbListNew1[i,], 
+#         out_path = out_path,
+#         OSMkey = OSMkey)
+#   # for progress bar
+#   #  stepi <- stepi + 1
+#   #  setTxtProgressBar(pb, stepi)
+# }
 
 ################################################################################
 # system.time(

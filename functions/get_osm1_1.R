@@ -72,10 +72,14 @@ pb <- txtProgressBar(min = 0, max = nrow(in_list),
                      initial = 0, style = 3)
 stepi <- 0
 
+# target Size of boundary boxes
+targetSize <- .05
+
 # create list of bboxes
 for (in_file in in_list$value) {
   bbList <- createBB(in_file = in_file,
-                     bboxList = bbList) %>% 
+                     bboxList = bbList, 
+                     tSize = targetSize) %>% 
     na.omit()
   # for progress bar
   stepi <- stepi + 1
@@ -87,7 +91,7 @@ to_do <-
   check.up(bbList$cityTag, out_path)
 
 ################################################################################
-
+  
 # set up progress bar
 #pb <- txtProgressBar(min = 0, max = nrow(bbList[to_do,]), 
 #                     initial = 0, style = 3)
@@ -101,7 +105,8 @@ api_list <- dplyr::tibble(interpreter =
                             ),
                           nTry = c(0, 0, 0)) # manipulate to have second decision
 
-
+while (length(to_do) > 0) {
+  
 # apply download function
 for (i in to_do) {
   print(i)
@@ -114,16 +119,28 @@ for (i in to_do) {
 #  setTxtProgressBar(pb, stepi)
   }
 
-
 # cut failed downloads into even smaller pieces and repeat process:
+# empty data frame for later results
 bbListNew <-
   tibble()
 
+# cut remaining
 bbListNew <-
-  splitBBdf(bbList[to_do,], bbListNew, 0.1)
+  splitBBdf(bb = bbList[to_do,],
+            bboxList = bbListNew, 
+            tSize = targetSize)
+
+bbList <- bbListNew
 
 to_do <- 
   check.up(bbListNew$cityTag, out_path)
+
+targetSize <- targetSize / 5
+
+}
+
+
+
 
 # apply download function
 for (i in to_do) {
