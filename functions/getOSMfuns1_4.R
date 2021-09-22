@@ -80,7 +80,9 @@ splitBB <-
 ################################################################################
 # for splitting the bboxes of an entire data-frame with columns:
 # cityTag, xmin, xmax, ymin, ymax
-splitBBdf <- function(bb, bboxList, tSize){
+splitBBdf <- function(bb){
+  
+  bbTempDf <- tibble()
   
   for (x in 1:nrow(bb)) {
     
@@ -88,25 +90,21 @@ splitBBdf <- function(bb, bboxList, tSize){
     
     cityTagString <- bbTemp$cityTag
     
-    while (bbSize(bbTemp[1,]) > tSize) {
-      
-      for (i in 1:nrow(bbTemp)) {
-        bbTemp <-
-          bbTemp[i,] %>% 
-          splitBB() %>% 
-          dplyr::bind_rows(bbTemp, .)
-      }
-      
-      bbTemp <- 
-        bbTemp %>% 
-        filter(is.na(cityTag)) %>% 
-        mutate(cityTag = paste0(cityTagString, "_", row_number()))
-    }
-    bboxList <-
+    bbTemp <-
       bbTemp %>% 
-      bind_rows(bboxList, .) 
+      splitBB() %>% 
+      dplyr::bind_rows(bbTemp, .)
+    
+    bbTemp <- 
+      bbTemp %>% 
+      filter(is.na(cityTag)) %>% 
+      mutate(cityTag = paste0(cityTagString, "_", row_number()))
+    
+    bbTempDf <-
+      bbTemp %>% 
+      bind_rows(bbTempDf, .) 
   }
-  return(bboxList)
+  return(bbTempDf)
 }
 ################################################################################
 # get the 5 character city code from a directory
@@ -128,7 +126,7 @@ get_code0 <-
       strsplit("/") %>% 
       unlist() %>% 
       grep("[[:alpha:]]{2}\\d{3}\\D", ., value = TRUE) %>% 
-      gsub("\\.gpkg", "", .)
+      gsub("\\.gpkg|\\.txt", "", .)
   }
 
 
@@ -152,7 +150,7 @@ namify0 <-
 ################################################################################
 # get number of free slots from an overpass API
 getFreeSlots <- 
-  function(APIlink) {
+  function(APIlink, N) {
     try({
       nSlots <-
         APIlink %>% 
@@ -168,7 +166,7 @@ getFreeSlots <-
         .[1]
     })
     if (exists("nSlots")) {
-      if (length(nSlots == nrow(api_list))) {
+      if (length(nSlots == N)) {
       return(nSlots)
         } else {
         return(0)
@@ -181,22 +179,24 @@ getFreeSlots <-
 # select API with most free slots or wait if no slots available
 APIselect <- function(api_list) {
   
+  N <- nrow(api_list)
+  
   api_list <- 
     api_list %>% 
     mutate(slots = 
-             lapply(interpreter, getFreeSlots) %>% 
+             lapply(interpreter, getFreeSlots, N) %>% 
              unlist()) %>% 
     arrange(desc(slots))
   
   while (sum(api_list$slots, na.rm = T) < 1) {
     
     message("Waiting for API slot.")
-    Sys.sleep(180)
+    Sys.sleep(30)
     
     api_list <- 
       api_list %>% 
       mutate(slots = 
-               lapply(interpreter, getFreeSlots) %>% 
+               lapply(interpreter, getFreeSlots, N) %>% 
                unlist()) %>% 
       arrange(desc(slots))
   }
@@ -295,6 +295,7 @@ check.up <- function(file_list,
   df <-
     merge(n, m, by = "value", 
           all.x = TRUE) %>%
+    distinct() %>% 
     transmute(interval = value,
               file_list = key.x,
               joined_files = key.y,
@@ -321,9 +322,12 @@ check.up <- function(file_list,
 # FUNCTIONS NEEDED TO CHECK WHICH TILES STILL HAVE TO BE DOWNLOADED
 ################################################################################
 # set crs to wgs84
+wgs84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
+
+
 set.WGS <- function(x){
   wgs84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
-  st_crs(x) <- wgs84 
+  sf::st_crs(x) <- wgs84 
   x
 }
 
@@ -413,10 +417,10 @@ check.up2 <- function(id,
   
   # check if city is already downloaded completely
   if (!grepl("_1|_2|_3|_4", bbDirectories) %>% any()) {
-    paste(id, "fully downloaded.") %>% 
-      message()
-    return(NULL) 
-  } else {
+    paste0(id, "fully downloaded.") %>% 
+      message() %>% 
+      return()
+  }
   # create empty sf object
   bbDF <- sf::st_sf(sf::st_sfc())
   
@@ -436,74 +440,91 @@ check.up2 <- function(id,
   #for (i in 1:3) {
   for (i in 1:nrows) {
     
-    # load files and generate bboxes  
+    # Try to load downloaded files and generate bboxes 
     bbTemp <-
-      bbDirectories[i] %>%
-      sf::read_sf() %>%
-      sf::st_bbox() %>% 
-      bb2poly()
+      tryCatch({
+        bbDirectories[i] %>%
+          sf::read_sf() %>%
+          sf::st_bbox() %>% 
+          bb2poly()
+      }, error = function(cond) {
+        message(paste("File does not seem to exist or is broken:", 
+                      bbDirectories[i]))
+        message("Here's the original error message:")
+        message(cond)
+        message("Trying to delete file.")
+        try(unlink(bbDirectories[i]))
+        return(NULL)
+      })
     
-    # create plot
-    p <-
-      p + 
-      geom_sf(data = bbTemp, 
-              col = "green", 
-              fill = "green")
-    print(p)
-    
-    # calculate the amount of times that bbTemp X/Y fits into bbTotal X/Y
-    # side lengths of bbox:
-    a <- bbox$xmax - bbox$xmin
-    b <- bbox$ymax - bbox$ymin
-    
-    bbMatrix <-
-      bbTemp %>% 
-      sf::st_bbox() 
-    
-    # side lengths of bbTemp
-    a1 <- bbMatrix$xmax - bbMatrix$xmin
-    b1 <- bbMatrix$ymax - bbMatrix$ymin
-    
-    # calculate number of tiles in X and Y direction
-    X <- (a / a1) %>% round()
-    Y <- (b / b1) %>% round()
-    
-    # return the centroid of bbTemp
-    bbDF <- 
-      sf::st_centroid(bbTemp) %>%
-      sf::st_buffer(dist = .25 * a1) %>% 
-      mutate(id = i,
-             x = X,
-             y = Y) %>% 
-      rbind(bbDF, .)
+    if (is.null(bbTemp)) {
+      message("Proceeding...") %>% 
+        return()
+    } else {
+      # create plot
+      p <-
+        p + 
+        geom_sf(data = bbTemp, 
+                col = "green", 
+                fill = "green")
+      print(p)
+      
+      # calculate the amount of times that bbTemp X/Y fits into bbTotal X/Y
+      # side lengths of bbox:
+      a <- bbox$xmax - bbox$xmin
+      b <- bbox$ymax - bbox$ymin
+      
+      bbMatrix <-
+        bbTemp %>% 
+        sf::st_bbox() 
+      
+      # side lengths of bbTemp
+      a1 <- bbMatrix$xmax - bbMatrix$xmin
+      b1 <- bbMatrix$ymax - bbMatrix$ymin
+      
+      # calculate number of tiles in X and Y direction
+      X <- (a / a1) %>% round()
+      Y <- (b / b1) %>% round()
+      
+      # return the centroid of bbTemp
+      bbDF <- 
+        bbTemp %>%
+        sf::st_buffer(dist = -.1 * a1) %>% 
+        mutate(id = i,
+               x = X,
+               y = Y) %>% 
+        rbind(bbDF, .)
+    }
   }
   
   # load boundary layer to check if tiles are inside city boundaries
   wgs84 <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs +towgs84=0,0,0"
   boundaryTemp <-
     boundaryDirectory %>% 
-    st_read(layer = rgdal::ogrListLayers(.)[2]) %>% 
+    st_read(layer = rgdal::ogrListLayers(.)[2], 
+            quiet = TRUE) %>% 
     # MUST BE TRANSFORMED!
     sf::st_transform(., wgs84)
   
   # create grid and check which tiles are not covered
   bbGrid <-
-    sf::st_make_grid(bbTotal, n = c(max(bbDF$x),max(bbDF$y))) %>% 
-    sf::st_sf() %>% 
-    filter(!sf::st_intersects(., sf::st_union(bbDF), sparse = FALSE)) %>%   
-    ############################################################################
-  # split bb
-  
-  #bbGrid2 <-
-  splitBBdf2(bb = .$geometry) %>% 
-    bb.geomcol() %>% 
-    set.WGS() %>% 
-    # check if splitted bb are inside city boundary
-    filter(st_intersects(., boundaryTemp, sparse = FALSE))
-  
+    tryCatch({
+      sf::st_make_grid(bbTotal, n = c(max(bbDF$x),max(bbDF$y))) %>% 
+        sf::st_sf() %>% 
+        filter(!sf::st_intersects(., sf::st_union(bbDF), sparse = FALSE)) %>%   
+        splitBBdf2(bb = .$geometry) %>% 
+        bb.geomcol() %>% 
+        set.WGS() %>% 
+        # check if splitted bb are inside city boundary
+        filter(st_intersects(., boundaryTemp, sparse = FALSE))
+    }, error = function(cond) {
+      message("Checking for not covered tiles yielded following error:")
+      message(cond)
+      return(NULL)
+    })
   # if city is complete: Union all tiles, write to single file and save rest to
   # backup directory
-  if (nrow(bbGrid) == 0) {
+  if (is.null(bbGrid)) {
     
     # user communication
     paste0(id, " fully downloaded. Writing results to ", 
@@ -519,6 +540,7 @@ check.up2 <- function(id,
     file.copy(bbDirectories, paste0(fileDirectory, "backup"))
     file.remove(bbDirectories)
     
+    return(NULL)
   } else {
     # gather bboxes in df and pass to download
     outDF <- 
@@ -537,10 +559,8 @@ check.up2 <- function(id,
     }  
   }
   return(outDF)
-  }
 }
 
-################################################################################
 ################################################################################
 # CREATE BOUNDARY BOXES AND DOWNLOAD OSM DATA
 ################################################################################
@@ -611,9 +631,7 @@ createBB <- function(in_file, bboxList, tSize = .25
   } 
 }
 
-
-
-
+################################################################################
 ################################################################################
 # create function to download OSM files:
 dlOSM <- function(in_vector, # list of gpkg files 
@@ -624,13 +642,17 @@ dlOSM <- function(in_vector, # list of gpkg files
   require(dplyr)
   
   # set overpass API to use
-  interpreter <- APIselect(api_list = api_list)
+  interpreter <- APIselect(api_list = dplyr::tibble(interpreter = 
+                                                      c('http://overpass-api.de/api/interpreter',
+                                                        'https://lz4.overpass-api.de/api/interpreter',
+                                                        'https://z.overpass-api.de/api/interpreter'#,
+                                                        #'https://overpass.kumi.systems/api/interpreter'
+                                                      )))
   osmdata::set_overpass_url(interpreter) 
   
   # create boundary box (bbox)
   bb <- 
-    df2bb(in_vector) %>% 
-    round(digits = 5)
+    df2bb(in_vector) 
   
   ## output destination
   dsn <-
@@ -642,57 +664,252 @@ dlOSM <- function(in_vector, # list of gpkg files
   message(paste("Commencing download of: ", in_vector$cityTag,
                 "at: ", interpreter))
   
-  # download OSM data for boundary layer
-  # check if download is polygons or lines
-  if (grepl("way", OSMkey)) {
-  
-  try({    
-    bb %>% 
-      ## create OSM query
-      osmdata::opq() %>% 
-      ## add desired feature to query
-      osmdata::add_osm_feature(., 
-                               key = OSMkey) %>% 
-      ## download OSM data
-      osmdata::osmdata_sf(.)  %>%
-      .$osm_lines %>% 
-      select(osm_id, highway, foot, footway, side, sidewalk, cycleway) %>% 
-      sf::st_write(dsn = dsn, layer = OSMkey)
-    
-    # garbage collector
-    gc()
-    
-  }, silent = T)
-    } else {
-  
-  try({    
-    bb %>% 
-      ## create OSM query
-      osmdata::opq() %>% 
-      ## add desired feature to query
-      osmdata::add_osm_feature(., 
-                               key = OSMkey) %>% 
-      ## download OSM data
-      osmdata::osmdata_sf(.)  %>%
-      .$osm_polygons %>% 
-      select(osm_id, building, amenity) %>% 
-      sf::st_write(dsn = dsn, layer = OSMkey)
-    
-    # garbage collector
-    gc()
-    
-  }, silent = T)
-      }
+  OSMdownloader(bb, OSMkey, dsn)
   
   # check if file exists
   if (file.exists(dsn)) {
-    message("Download successful.")
-  } else ({
-    message("Download failed. Proceeding to next area.")
-  })
+    
+    message("Proceeding...")
+    
+  } else {
+    
+    message("Nothing to write.")
+    
+  }
 }
 
+################################################################################
+
+# column selector function for HIGHWAY layers
+includeHighway <- function(OSMsf) {
+  
+  require(dplyr)
+  
+  OSMsf %>% 
+    select(contains("id"), 
+           contains("way"), 
+           contains("foot"), 
+           contains("side"), 
+           contains("cycle")) %>% 
+    return()
+  
+}
+
+# column selector function for BUILDING layers
+includeBuilding <- function(OSMsf) {
+  
+  require(dplyr)
+  
+  OSMsf %>% 
+    select(contains("id"), 
+           contains("build"), 
+           contains("amenity"), 
+           contains("value")) %>% 
+    return()
+  
+}
+
+# column selector function for BARRIER layers
+includeBarriers <- function(OSMsf) {
+  
+  require(dplyr)
+  
+  OSMsf %>% 
+    select(contains("id"), 
+           contains("barrier"), 
+           contains("access")) %>% 
+    return()
+  
+}
+
+# function to exclude problematic columns
+exclude <- function(OSMsf) {
+  
+  require(dplyr)
+  
+  OSMsf %>% 
+    select(- contains("fid"),- 
+             contains("wiki"), 
+           - contains("object"), 
+           - matches("[.]")) %>% 
+    return()
+}
 
 ################################################################################
-################################################################################
+# OSM Downloader function to be called in the dlOSM function
+OSMdownloader <- function(bb, key, dsn) {
+  # download OSM data for boundary layer
+  OSMtemp <-
+    tryCatch({
+      bb %>% 
+        ## create OSM query
+        osmdata::opq() %>% 
+        ## add desired feature to query
+        osmdata::add_osm_feature(., 
+                                 key = key) %>% 
+        ## download OSM data
+        osmdata::osmdata_sf(.) 
+    }, error = function(e) {
+      message("Download failed. Original error message:")
+      message(e)
+      return(NULL)
+    })
+  
+  if (!is.null(OSMtemp)) tryCatch({
+    
+    message("Download successful.")
+    
+    # check for osm key and filter for columns (not all OSM columns work for
+    # st_write)
+    if (grepl("way", key)) {
+      
+      #if (!is.null(OSMtemp$osm_points)) {
+      #  OSMtemp$osm_points %>% 
+      #    includeBarriers() %>% 
+      #    exclude() %>% 
+      #    sf::st_write(dsn = dsn, layer = "osm_points", 
+      #                 append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_lines)) {
+        OSMtemp$osm_lines %>% 
+          includeHighway() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_lines", 
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multilines)) {
+        OSMtemp$osm_multilines %>% 
+          includeHighway() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_multilines", 
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_polygons)) {
+        OSMtemp$osm_polygons %>% 
+          includeHighway() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_polygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multipolygons)) {
+        OSMtemp$osm_multipolygons %>% 
+          includeHighway() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_multipolygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      #clean up
+      rm(OSMtemp)
+      # garbage collector
+      gc()
+      
+    }
+    
+    if (grepl("build", key)) {
+      
+      # points only seem to give nodes of building polygons
+      #if (!is.null(OSMtemp$osm_points)) {
+      #  OSMtemp$osm_points %>% 
+      #   includeBuilding() %>% 
+      #   exclude() %>%      
+      #   sf::st_write(dsn = dsn, layer = "osm_points", append=FALSE)}
+      
+      if (!is.null(OSMtemp$osm_lines)) {
+        OSMtemp$osm_lines %>% 
+          includeBuilding() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_lines",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multilines)) {
+        OSMtemp$osm_multilines %>% 
+          includeBuilding() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_multilines",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_polygons)) {
+        OSMtemp$osm_polygons %>% 
+          includeBuilding() %>% 
+          exclude() %>%  
+          sf::st_write(dsn = dsn, layer = "osm_polygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multipolygons)) {
+        OSMtemp$osm_multipolygons %>% 
+          includeBuilding() %>% 
+          exclude() %>%  
+          sf::st_write(dsn = dsn, layer = "osm_multipolygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      #clean up
+      rm(OSMtemp)
+      # garbage collector
+      gc()
+      
+    }   
+    
+    if (grepl("barrier", key)) {
+      
+      if (!is.null(OSMtemp$osm_points)) {
+        OSMtemp$osm_points %>%          
+          includeBarriers() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_points", 
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_lines)) {
+        OSMtemp$osm_lines %>% 
+          includeBarriers() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_lines",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multilines)) {
+        OSMtemp$osm_multilines %>% 
+          includeBarriers() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_multilines",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_polygons)) {
+        OSMtemp$osm_polygons %>% 
+          includeBarriers() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_polygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      if (!is.null(OSMtemp$osm_multipolygons)) {
+        OSMtemp$osm_multipolygons %>% 
+          includeBarriers() %>% 
+          exclude() %>% 
+          sf::st_write(dsn = dsn, layer = "osm_multipolygons",
+                       append = FALSE, quiet = TRUE)}
+      
+      #clean up
+      rm(OSMtemp)
+      # garbage collector
+      gc()
+      
+    }
+  }, error = function(e){
+    
+    message(e)
+    message("..")
+    
+    if (file.exists(dsn)) {
+      message("Something went wrong during file creation.")
+      message("Deleting output.")
+      unlink(dsn, force = TRUE)
+    }
+    
+    if (!file.exists(dsn)) {
+      message("Area does not seem to contain desired data.")
+      message("Writing placeholder file.")
+      
+      dsn <- gsub("gpkg", "txt", dsn)
+      write(bb, dsn, append = FALSE)}
+    
+  })
+}
 ################################################################################

@@ -3,7 +3,7 @@
 library(dplyr)
 
 # load functions
-source("C:/Users/labohben/Documents/GitHub/MA/functions/getOSMfuns1_3.R")
+source("C:/Users/labohben/Documents/GitHub/MA/functions/getOSMfuns1_4.R")
 
 # priority table
 priority_df <- 
@@ -11,7 +11,7 @@ priority_df <-
 
 # UA 2006 compatible
 comp_df <- 
-  read.csv("Z:/UA/master_table.csv") %>% 
+  read.csv("C:/Users/labohben/Documents/GitHub/MA/master_table.csv") %>% 
   filter(!is.na(UA2006), 
          !is.na(UA2012), 
          !is.na(UA2018)) %>% 
@@ -40,223 +40,135 @@ in_list <-
   in_list %>% 
   filter(priority < 2)
   
+in_list <-
+  in_list %>% 
+  filter(NAME == "LEIPZIG")
 # OR
 # use boundary layer:
-# in_list <-
-#   "E:/citiesEurope/Cities.shp" %>% 
-#   sf::st_read()
-
-# output directory
-out_path <- "E:/osm_buildings/"
-OSMkey <- "building"
-
-#out_path <- "E:/osm_paths/"
-#OSMkey <- "highway"
-
-# out_path <- "E:/osm_barriers/"
-# OSMkey <- "barrier"
-# names for boundary box (bbox) list
-#dfNames <- list(NULL, c("cityTag", "xmin", "xmax", "ymin", "ymax"))
+ # in_list <-
+ #   "E:/citiesEurope/Cities.shp" %>% 
+ #   sf::st_read()
 
 
 ################################################################################
 
-# # empty bbox list
-# bbList <- 
-#   tibble()
-#   # matrix(ncol = 5, nrow = 1, dimnames = dfNames) %>% 
-#   # data.frame() 
-# 
-# # set up progress bar
-# pb <- txtProgressBar(min = 0, max = nrow(in_list), 
-#                      initial = 0, style = 3)
-# stepi <- 0
-# 
-# # target Size of boundary boxes
-# targetSize <- .05
-# 
-# # create list of bboxes
-# for (in_file in in_list$value) {
-#   bbList <- createBB(in_file = in_file,
-#                      bboxList = bbList, 
-#                      tSize = targetSize) %>% 
-#     na.omit()
-#   # for progress bar
-#   stepi <- stepi + 1
-#   setTxtProgressBar(pb, stepi)
-# }
-#  
-# # check which files to download
-# to_do <- 
-#   check.up(bbList$cityTag, out_path)
+# empty bbox list
+bbList <-
+  tibble()
+
+# set up progress bar
+pb <- txtProgressBar(min = 0, max = nrow(in_list),
+                     initial = 0, style = 3)
+stepi <- 0
+
+# target Size of boundary boxes
+targetSize <- .2
+
+# create list of bboxes
+for (in_file in in_list$value) {
+  bbList <- createBB(in_file = in_file,
+                     bboxList = bbList,
+                     tSize = targetSize) %>%
+    na.omit()
+  # for progress bar
+  stepi <- stepi + 1
+  setTxtProgressBar(pb, stepi)
+}
+
+# check which files to download
+to_do <-
+  check.up(bbList$cityTag, out_path)
 
 ################################################################################
   
-# set up progress bar
-#pb <- txtProgressBar(min = 0, max = nrow(bbList[to_do,]), 
-#                     initial = 0, style = 3)
-#stepi <- 0
 # list of API links
 api_list <- dplyr::tibble(interpreter = 
                             c('http://overpass-api.de/api/interpreter',
                               'https://lz4.overpass-api.de/api/interpreter',
                               'https://z.overpass-api.de/api/interpreter'#,
                               #'https://overpass.kumi.systems/api/interpreter'
-                            ),
-                          nTry = c(0, 0, 0)) # manipulate to have second decision
+                            )) 
 
-#while (length(to_do) > 0) {
-  
 # apply download function
 for (i in to_do) {
-  print(i)
+  paste(i, "of", max(to_do)) %>% 
+    print()
   
-  dlOSM(in_vector = bbList[i,], 
+  # BUILDINGS
+  dlOSM(in_vector = bbList[i,], # vector containing xmin, xmax, ymin, ymax, cityTag
+        out_path = "E:/osm_buildings/",
+        OSMkey = "building")
+}
+
+for (i in to_do) {
+  paste(i, "of", max(to_do)) %>% 
+    print()
+  # PATHS
+  dlOSM(in_vector = bbList[i,], # vector containing xmin, xmax, ymin, ymax, cityTag
+        out_path = "E:/osm_paths/",
+        OSMkey = "highway")
+}
+
+for (i in to_do) {
+  paste(i, "of", max(to_do)) %>% 
+    print()  
+  # BARRIERS
+  dlOSM(in_vector = bbList[i,], # vector containing xmin, xmax, ymin, ymax, cityTag
+        out_path = "E:/osm_barriers/",
+        OSMkey = "barrier")
+}
+
+# second iteration - try splitting and downloading again
+# check which bbox tiles were downloaded
+to_do <-
+  check.up(bbList$cityTag, out_path)
+
+# split remaining tiles
+bbList2 <-
+  bbList[to_do,] %>% 
+  splitBBdf()
+
+# check if resulting tiles were already downloaded
+to_do <-
+  check.up(bbList2$cityTag, out_path)
+
+# download 
+for (i in to_do) {
+  paste(i, "of", max(to_do)) %>% 
+    print()
+  
+  dlOSM(in_vector = bbList2[i,], 
         out_path = out_path,
         OSMkey = OSMkey)
-  # for progress bar
-#  stepi <- stepi + 1
-#  setTxtProgressBar(pb, stepi)
-  }
+}
 
-# cut failed downloads into even smaller pieces and repeat process:
-# empty data frame for later results
-# bbListNew <-
-#   tibble()
-# 
-# # cut remaining
-# bbListNew <-
-#   splitBBdf(bb = bbList[to_do,],
-#             bboxList = bbListNew, 
-#             tSize = targetSize)
-# 
-# bbList <- bbListNew
-# 
-# to_do <- 
-#   check.up(bbListNew$cityTag, out_path)
-# 
-# targetSize <- targetSize / 5
-# 
-# }
-# 
-# 
-# 
-# 
-# # apply download function
-# for (i in to_do) {
-#   print(i)
-#   
-#   dlOSM(in_vector = bbListNew[i,], 
-#         out_path = out_path,
-#         OSMkey = OSMkey)
-#   # for progress bar
-#   #  stepi <- stepi + 1
-#   #  setTxtProgressBar(pb, stepi)
-# }
-# 
-# # cut failed downloads into even smaller pieces and repeat process:
-# 
-# bbListNew1 <- tibble()
-#   
-# bbListNew1 <-
-#   splitBBdf(bbListNew[to_do,], bbListNew1, 0.05)
-# 
-# to_do <- 
-#   check.up(bbListNew1$cityTag, out_path)
-# 
-# # apply download function
-# for (i in to_do) {
-#   print(i)
-#   
-#   dlOSM(in_vector = bbListNew1[i,], 
-#         out_path = out_path,
-#         OSMkey = OSMkey)
-#   # for progress bar
-#   #  stepi <- stepi + 1
-#   #  setTxtProgressBar(pb, stepi)
-# }
+
 
 ################################################################################
-# system.time(
-# # write to file
-# sf::st_write(sf::st_as_sf(p1),
-#              dsn = "E:/temp/buildings5.gpkg",
-#              append = FALSE
-#              #layer = lyr,
-#              #driver = "GPKG"
-#              )
-# )
-# debugging
-# test@polygons$x_55913888@ID <- 
-#   test@polygons$x_55913888@ID %>% 
-#   paste0("x_",.)
-# 
-# p2 <- 
-#   p1 %>% 
-#   #  as(., "SpatialPolygonsDataFrame") #%>% 
-#   sp::SpatialPolygonsDataFrame(.,
-#                                data = p1@data)
-# 
-# b1 <- 
-#   sp::SpatialPointsDataFrame(buildings$osm_polygons,
-#                              data = buildings$osm_polygons@data)
-# b2 <- 
-#     p1 %>% 
-# #  as(., "SpatialPolygonsDataFrame") #%>% 
-#   sp::SpatialPolygonsDataFrame(.,
-#                                data = buildings$osm_polygons@data)
-# 
-# b1@data <- b1@data[1]
-# 
-# dsn = "E:/temp/buildings2.gpkg"
-# lyr = "buildings"
-# writeOGR(b2,
-#          dsn = dsn,
-#          layer = lyr,
-#          driver = "GPKG",
-#          overwrite_layer = T)
+# check if all tiles were downloaded correctly
+bbList3 <-
+  tibble()
 
-#   b1 <-
-#   sf::st_read("E:/temp/buildings.osm", layer = "osm_polygons")
-# b2 <-
-#   b1 %>% 
-#   as(., "Spatial")
-# 
-# 
-# 
-# writeOGR(b2,
-#          dsn = "E:/temp/buildings.gpkg",
-#          layer = "buildings",
-#          driver = "GPKG",
-#          overwrite_layer = T)
+for (i in 1:nrow(in_list)) {
+  paste(i, "of", nrow(in_list)) %>%
+    print()
+  
+  bbox <- bboxFromUA(in_list$value[i])
+  
+  bbList3 <-
+  check.up2(id = in_list$code[i],
+            fileDirectory = out_path,
+            bbox = bbox,
+            boundaryDirectory = in_list$value[i]) %>% 
+    bind_rows(bbList3, .)
+}
+  
+# apply download function for failed downloads
+for (i in 1:nrow(in_list)) {
+  paste(i, "of", nrow(in_list)) %>%
+    print()
 
-# b2 <-
-#   buildings %>% 
-#   trim_osmdata(boundary)
-
-# test <- 
-#   getbb("Tirana")  %>% 
-#   opq() %>% 
-#   add_osm_feature(., 
-#                   key = "building"#, 
-#                   #value = "building"#, 
-#                   #bbox = bbox(.)
-#   ) %>% 
-#   osmdata_sp()
-
-
-# buildings$bbox %>% 
-#   strsplit(",") %>% 
-#   unlist() %>% 
-#   as.numeric() %>% 
-#   matrix(nrow = 2) %>% 
-#   plot()
-# 
-# test$bbox %>% 
-#   strsplit(",") %>% 
-#   unlist() %>% 
-#   as.numeric() %>% 
-#   matrix(nrow = 2) %>% 
-#   points(., add = T, col = "red")
-# 
-# get_overpass_url()
+  dlOSM2(in_vector = in_list[i,],
+         out_path = out_path,
+         OSMkey = OSMkey)
+}

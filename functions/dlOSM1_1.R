@@ -36,6 +36,23 @@ dlOSM <- function(in_vector, # list of gpkg files
   message(paste("Commencing download of: ", in_vector$cityTag,
                 "at: ", interpreter))
   
+  OSMdownloader(bb, key, dsn)
+  
+  # check if file exists
+  if (file.exists(dsn)) {
+    
+    message("Proceeding...")
+    
+  } else {
+    
+    message("Nothing to write.")
+    
+  }
+}
+
+
+################################################################################
+OSMdownloader <- function(bb, key, dsn) {
   # download OSM data for boundary layer
   OSMtemp <-
     tryCatch({
@@ -121,7 +138,7 @@ dlOSM <- function(in_vector, # list of gpkg files
       # select(contains("id"), contains("build"), contains("amenity"),
       #        # try to exclude columns:
       #        - contains("fid"),- contains("wiki"), - matches("[.]")) %>%      
-        #    sf::st_write(dsn = dsn, layer = "osm_points", append=FALSE)}
+      #    sf::st_write(dsn = dsn, layer = "osm_points", append=FALSE)}
       
       if (!is.null(OSMtemp$osm_lines)) {
         OSMtemp$osm_lines %>% 
@@ -228,18 +245,5 @@ dlOSM <- function(in_vector, # list of gpkg files
       write(bb, dsn, append = FALSE)}
     
   })
-  
-  # check if file exists
-  if (file.exists(dsn)) {
-    
-    message("Proceeding...")
-    
-  } else {
-    
-    message("Nothing to write.")
-    
-  }
 }
-
-
 ################################################################################
