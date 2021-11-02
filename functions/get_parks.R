@@ -16,7 +16,9 @@ land_use <- st_read(gpkg, lr$name[1])
 # FILTER 
 parks <-
   land_use %>% 
-  filter(code_2018 %in% c(14100, 31000)) 
+  filter(code_2018 %in% c(14100, 31000)) %>% 
+  select(contains("identifier"),
+         contains("area"))
 
 # WRITE TO FILE
 parks %>% 
@@ -26,10 +28,12 @@ parks %>%
 # parks <-
 #   st_read("E:/temp/parks.gpkg")
 parks <-
-  st_read("E:/temp/vali_parks.gpkg")
+  # st_read("E:/temp/vali_parks.gpkg")
+  st_read(park_file) %>% 
+  st_intersection(core)
 
 # BUFFER PARKS BY x METERS
-x <- 10
+x <- 0
 
 parks_buffered <- 
   parks %>% 
@@ -37,24 +41,127 @@ parks_buffered <-
   #st_union() %>% 
   st_cast("MULTILINESTRING")# %>%
   #st_sf()
-
-parks_buffered %>% 
-  st_write("E:/temp/parks_buffered_10m.gpkg", append = FALSE)
+ 
+# parks_buffered %>% 
+#   st_write("E:/temp/parks_buffered_10m.gpkg", append = FALSE)
 
 # FILTER WALKABLE PATHS
-paths <- 
-  st_read("E:/temp/paths.gpkg")
+# paths <- 
+#   st_read("E:/temp/paths.gpkg")
 
 paths_filtered <-
   paths %>% 
   filter(!grepl("primary", highway)) %>% 
   filter(!grepl("trunk", highway)) %>% 
   filter(!grepl("motorway", highway)) %>% 
-  st_transform(etrs89)
+  st_transform(3035)
 
 paths_filtered %>% 
   select(osm_id, highway) %>% 
   st_write("E:/temp/paths_filtered.gpkg", append = FALSE)
+
+# paths_filtered <-
+#   st_read("E:/temp/paths_filtered.gpkg")
+
+
+#paths_barriers <- st_difference(paths_filtered, barriers_buffered)
+
+
+# parks_buffered <- 
+#   st_read("E:/temp/parks_buffered_5m.gpkg")
+
+
+st_crs(highway_clean) <- 3035
+
+system.time({
+park_entries <-
+  st_intersection(parks_buffered, highway_clean)
+})
+
+b <- 5
+
+system.time({
+  
+  while (
+    parks %>% 
+    filter(!(identifier %in% unique(park_entries$identifier))) %>% 
+    nrow() > 0
+  ) {
+    park_entries <- 
+      parks %>% 
+      filter(!(identifier %in% unique(park_entries$identifier))) %>% 
+      st_buffer(b) %>% 
+      st_cast("MULTILINESTRING") %>% 
+      st_intersection(highway_clean) %>% 
+      bind_rows(park_entries)
+    
+    if (b <= 50) {b <- b + 5
+    } else if (b <= 100) {b <- b + 10
+    } else if (b <= 200) {b <- b + 25
+    } else {b <- b + 50}
+  }
+})
+
+park_entries %>% 
+  #st_cast("POINT") %>% 
+  st_write("C:/Berlin/park_entries.gpkg", append = FALSE)
+
+################################################################################
+
+gcp <- 
+  read.csv("E:/gcp/Park_entries_001.csv") %>%
+  select(lon, lat, name) %>% 
+  st_as_sf(coords = c("lon", "lat"),
+           crs = 4326)
+
+st_write(gcp, "E:/temp/gcp.gpkg", append = FALSE)
+
+
+gcp <- 
+  read.csv("E:/temp/gcp.csv") %>% 
+  mutate(X = round(X, 5),
+         Y = round(Y, 5)) %>% 
+  select(X, Y, name) %>% 
+  st_as_sf(coords = c("X", "Y"), crs = 4326)
+
+
+
+  
+################################################################################
+
+park_entries <- st_read("E:/temp/park_entries.gpkg")
+park_entries_5m <- st_read("E:/temp/park_entries_5m.gpkg")
+park_entries_10m <- st_read("E:/temp/park_entries_10m.gpkg")
+
+
+park_entries %>% 
+  st_difference(barriers_buffered) %>% 
+  st_write("E:/temp/park_entries_filtered")
+
+park_entries_5m  %>% 
+  st_difference(barriers_buffered) %>% 
+  st_write("E:/temp/park_entries_5m_filtered")
+
+park_entries_10m  %>% 
+  st_difference(barriers_buffered) %>% 
+  st_write("E:/temp/park_entries_10m_filtered")
+
+
+
+
+parks_buffered <-
+  st_read("E:/temp/parks_buffered_5m.gpkg")
+
+diss <-
+  parks_buffered %>% 
+  st_union() %>% 
+  st_cast("LINESTRING")
+test <- st_cast(diss, "POLYGON")
+
+write_sf(diss, "E:/temp/parks_dissolved.gpkg")
+
+
+
 ################################################################################
 
 # FIND KEYS FOR HIGHWAY FILTER
@@ -116,78 +223,3 @@ paths_filtered %>%
 #   
 # barriers_buffered %>% 
 # st_write("E:/temp/barriers_buffered.gpkg", append = FALSE)
-
-paths_filtered <-
-  st_read("E:/temp/paths_filtered.gpkg")
-
-
-#paths_barriers <- st_difference(paths_filtered, barriers_buffered)
-
-
-parks_buffered <- 
-  st_read("E:/temp/parks_buffered_5m.gpkg")
-
-
-system.time({
-park_entries <-
-  st_intersection(parks_buffered, paths_filtered)
-})
-
-
-park_entries %>% 
-  #st_cast("POINT") %>% 
-  st_write("E:/temp/park_entries_10m.gpkg", append = FALSE)
-
-################################################################################
-
-gcp <- 
-  read.csv("E:/gcp/Park_entries_001.csv") %>%
-  select(lon, lat, name) %>% 
-  st_as_sf(coords = c("lon", "lat"),
-           crs = 4326)
-
-st_write(gcp, "E:/temp/gcp.gpkg", append = FALSE)
-
-
-gcp <- 
-  read.csv("E:/temp/gcp.csv") %>% 
-  mutate(X = round(X, 5),
-         Y = round(Y, 5)) %>% 
-  select(X, Y, name) %>% 
-  st_as_sf(coords = c("X", "Y"), crs = 4326)
-
-
-
-  
-################################################################################
-
-park_entries <- st_read("E:/temp/park_entries.gpkg")
-park_entries_5m <- st_read("E:/temp/park_entries_5m.gpkg")
-park_entries_10m <- st_read("E:/temp/park_entries_10m.gpkg")
-
-
-park_entries %>% 
-  st_difference(barriers_buffered) %>% 
-  st_write("E:/temp/park_entries_filtered")
-
-park_entries_5m  %>% 
-  st_difference(barriers_buffered) %>% 
-  st_write("E:/temp/park_entries_5m_filtered")
-
-park_entries_10m  %>% 
-  st_difference(barriers_buffered) %>% 
-  st_write("E:/temp/park_entries_10m_filtered")
-
-
-
-
-parks_buffered <-
-  st_read("E:/temp/parks_buffered_5m.gpkg")
-
-diss <-
-  parks_buffered %>% 
-  st_union() %>% 
-  st_cast("LINESTRING")
-test <- st_cast(diss, "POLYGON")
-
-write_sf(diss, "E:/temp/parks_dissolved.gpkg")

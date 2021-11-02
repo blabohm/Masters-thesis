@@ -1,23 +1,30 @@
-if(!"remotes" %in% installed.packages()) {
-  install.packages("remotes")
-}
+city_dir <- "C:/Berlin/berlin_cent.gpkg"
+coreFile <- "C:/Berlin/DE001L1_BERLIN_UA2018_v013.gpkg"
+park_file <- "C:/Berlin/parks.gpkg"
 
-cran_pkgs = c(
-  "sf",
-  "tidygraph",
-  "igraph",
-  "osmdata",
-  "dplyr",
-  "tibble",
-  "ggplot2",
-  "units",
-  "tmap",
-  "rgrass7",
-  "link2GI",
-  "nabor"
-)
+highway_clean <- st_read("C:/Berlin/highway_clean.gpkg")
 
-remotes::install_cran(cran_pkgs)
+
+# if(!"remotes" %in% installed.packages()) {
+#   install.packages("remotes")
+# }
+# 
+# cran_pkgs = c(
+#   "sf",
+#   "tidygraph",
+#   "igraph",
+#   "osmdata",
+#   "dplyr",
+#   "tibble",
+#   "ggplot2",
+#   "units",
+#   "tmap",
+#   "rgrass7",
+#   "link2GI",
+#   "nabor"
+# )
+# 
+# remotes::install_cran(cran_pkgs)
 
 library(sf)
 library(tidygraph)
@@ -34,19 +41,23 @@ library(nabor)
 
 source("D:/rgrass7-setup-win-osgeo4w.R")
 
-coreFile <- "D:/UA2018/DE001L1_BERLIN_UA2018_v012/Data/DE001L1_BERLIN_UA2018_v012.gpkg"
 
 core <- 
   st_layers(coreFile)$name[3] %>% 
   st_read(dsn = coreFile, layer = .) %>% 
-  st_buffer(5000) %>% 
   st_transform(3035)
 
 highway <- 
-  "D:/temp/paths_filtered.gpkg" %>% 
+  highway_file %>% 
   st_read() %>% 
   select(highway) %>% 
+  st_intersection(core %>% st_buffer(5000))
+
+cityCent <- 
+  st_read(city_dir) %>% 
+  st_transform(3035) %>% 
   st_intersection(core)
+
 
  # ggplot(data = highway) + 
 #   geom_sf()
@@ -94,4 +105,3 @@ highway_clean <- readVECT('highway_cleaned') %>%
   select(-cat)
 
 
-highway_clean %>% write_sf("D:/temp/highway_clean.gpkg")

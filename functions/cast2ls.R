@@ -39,7 +39,7 @@ uniteLayers <- function(gpkg) {
     st_layers() %>% 
     .$name
   
-  if (grepl("points", layernames) && length(layernames) == 1) {
+  if (grepl("points", layernames) & length(layernames) == 1) {
     message("...") %>% 
       return()
   } else {
