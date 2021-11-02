@@ -140,7 +140,9 @@ out_df %>%
   geom_line(aes(y = value)) +
   geom_abline(data = mean_line, aes(intercept = value, slope = 0), 
               color = "red") +
-  facet_wrap(. ~ name, scales = "free")
+  facet_wrap(. ~ name, scales = "free") +
+  labs(x = "buffer size [m]", y = "percent [%]",
+       title = "Accuracy statistics: park entries")
 
   
 
