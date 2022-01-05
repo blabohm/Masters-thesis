@@ -51,10 +51,6 @@ unionCity <- function(osm_dir,
                       network_dir,
                       cityCode) {
   
-  # urban atlas (ua) residential classes
-  res_class <- c(11100, 11210, 11220, 
-                 11230, 11240, 11300)
-  
   # load UA file and filter residential classes
   ua <- loadUAres(ua_dir, cityCode)
   
@@ -69,15 +65,13 @@ unionCity <- function(osm_dir,
   tempList <- 
     uniteLayers(osm_file = osm_list[1],
                 ua = ua,
-                network = network,
-                res_class = res_class)
+                network = network)
   
   for (osm_file in osm_list[2:length(osm_list)]) {
     tempList <-
       uniteLayers(osm_file = osm_file, 
                   ua = ua,
-                  network = network,
-                  res_class = res_class) %>% 
+                  network = network) %>% 
       bind_rows(tempList, .)
   }
   distinct(tempList) %>% 
@@ -90,7 +84,6 @@ unionCity <- function(osm_dir,
 
 uniteLayers <- function(osm_file, 
                         ua, 
-                        res_class,
                         network) {
   
   layernames <-
@@ -104,19 +97,18 @@ uniteLayers <- function(osm_file,
   
   network_tile <-
     network %>% 
-    getNetworkTile()
+    getNetworkTile(networkLayer = ., OSMtile = osmBuild)
   
-  tempdf <- centPop(osm_file = osm_file, ua = ua, 
-                    layername = layernames[1],
-                    res_class = res_class,
+  tempdf <- centPop(osm_file = osmBuild, 
+                    ua = ua, 
                     network_tile)
   
   if (length(layernames) > 1) {
     
     tempdf <- 
-      centPop(osm_file = osm_file, ua = ua, 
-              layername = layernames[2],
-              res_class = res_class,
+      OSMloader(osm_file, layernames[2]) %>% 
+      centPop(osm_file = osm_file,
+              ua = ua, 
               network_tile) %>% 
       bind_rows(tempdf, .) }
   
@@ -125,23 +117,7 @@ uniteLayers <- function(osm_file,
 
 
 ################################################################################
-# CENTROIDS, POPULATION, SNAP
-centPop <- function(osm_file, 
-                    ua, 
-                    layername,
-                    res_class,
-                    network_tile) {
-  
-  OSMloader(osm_file, layername) %>% 
-    getPop(ua, res_class) %>% 
-    snap2Network(network_tile) %>% 
-    return()
-  
-}
-
-
-################################################################################
-
+# LOAD UA FILE AND FILTER FOR RESIDENTIAL
 loadUAres <- function(ua_dir, city_code, crs = 3035) {
   
   require(dplyr)
@@ -174,11 +150,18 @@ loadUAres <- function(ua_dir, city_code, crs = 3035) {
 }
 
 
+
 ################################################################################
-# GET NETWORK DATA INSIDE OSM BOUNDARY BOX
-getNetworkTile <- function(networkLayer, OSMtile) {
+# CENTROIDS, POPULATION, SNAP
+centPop <- function(osm_file, 
+                    ua, 
+                    network_tile) {
   
-  OSMtile %>% st_bbox() 
+  OSMloader(osm_file, layername, ua) %>% 
+    getPop() %>% 
+    snap2Network(network_tile) %>% 
+    return()
+  
 }
 
 
@@ -186,8 +169,9 @@ getNetworkTile <- function(networkLayer, OSMtile) {
 # LOAD NETWORK FILE
 loadNetwork <- function(network_dir, crs = 3035) {
   
+  message("loading osm network... \n")
   network_dir %>% 
-    st_read() %>% 
+    st_read(quiet = TRUE) %>% 
     select(highway) %>% 
     st_transform(3035) %>% 
     distinct() %>% 
@@ -199,34 +183,52 @@ loadNetwork <- function(network_dir, crs = 3035) {
 ################################################################################
 # OSM LOADER
 
-OSMloader <- function(osm_file, layername) {
+OSMloader <- function(osm_file, 
+                      layername,
+                      ua) {
+  
+  message("loading osm buildings... \n")
+  
+  not_res <- c("^mall$", "train_station", "garages", "hospital",
+               "parking", "sports_centre", "university", "gas_station",
+               "school", "hall", "government", "prison", "sports_hall",
+               "carport", "garbage", "waste")
+  
   # load osm file, add area and join with ua 
   if (grepl("osm_multipolygons", layername)) {
     osm <-
-      st_read(osm_file, layername) %>% 
+      st_read(osm_file, layername, quiet = TRUE) %>% 
       st_make_valid() %>%
       st_cast("POLYGON") 
   } else if (grepl("osm_polygons", layername)) {
     osm <- 
-      st_read(osm_file, layername) 
+      st_read(osm_file, layername, quiet = TRUE) 
   }
+  
+  message("filtering osm buildings... \n")
   osm %>% 
-    select(matches("buidling$"))
-  return()
+    st_transform(3035) %>% 
+    st_join(ua) %>% 
+    filter(!is.na(code_2018)) %>% 
+    filter(!(building %in% not_res)) %>% 
+    select(Pop2018, identifier, code_2018) %>% 
+    return()
+  
 }
 
 
 ################################################################################
 # GET POP
 
-getPop <- function(osm, ua, res_class) {
+getPop <- function(osm) {
+  
   # add area column
   osm <- 
     osm %>% 
     st_make_valid() %>% 
-    mutate(area = st_area(.)) %>% 
-    st_join(y = ua)
+    mutate(area = st_area(.))
   
+  message("sum osm areas in each ua polygon... \n")
   # sum osm areas in each ua polygon (by ua identifier)
   area_df <- 
     osm %>% 
@@ -234,6 +236,7 @@ getPop <- function(osm, ua, res_class) {
     group_by(identifier) %>% 
     summarise(area_sum = sum(area))
   
+  message("calculate Population per building by building area... \n")
   # calculate Population per building by building area
   pop_sf <-
     osm %>% 
@@ -244,6 +247,7 @@ getPop <- function(osm, ua, res_class) {
            Pop2018, identifier, code_2018) %>% 
     st_point_on_surface() 
   
+  message("calculate population per building by average pop / area / ua... \n")
   # calculate population per building by average pop / area / ua class
   pop_df <-
     pop_sf %>% 
@@ -266,10 +270,50 @@ getPop <- function(osm, ua, res_class) {
     return()
 }
 
+################################################################################
+# GET NETWORK DATA INSIDE OSM BOUNDARY BOX
+getNetworkTile <- function(networkLayer, OSMtile) {
+  
+  bb <- 
+    OSMtile %>% 
+    st_bbox() %>% 
+    st_as_sfc()
+  
+  st_crs(bb) <- st_crs(3035)
+  
+      networkLayer %>% 
+      st_intersection(bb) %>% 
+      return()
+      
+}
+
 
 ################################################################################
 # SNAP
+
+st_snap_points = function(x, y, max_dist = 1000) {
+  
+  if (inherits(x, "sf")) n = nrow(x)
+  if (inherits(x, "sfc")) n = length(x)
+  
+  out = do.call(c,
+                lapply(seq(n), function(i) {
+                  nrst = st_nearest_points(st_geometry(x)[i], y)
+                  nrst_len = st_length(nrst)
+                  nrst_mn = which.min(nrst_len)
+                  if (as.vector(nrst_len[nrst_mn]) > max_dist) return(st_geometry(x)[i])
+                  return(st_cast(nrst[nrst_mn], "POINT")[2])
+                })
+  )
+  return(out)
+}
+
 snap2Network <- function(osm, network) {
   
+  networkTile <- 
+    getNetworkTile(networkLayer = network,
+                   OSMtile = osm)
+  
+  system.time({test <- st_snap_points(osm, networkTile)})
   
 }
