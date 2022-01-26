@@ -5,14 +5,14 @@
 
 # INPUT:
 # - OSM BUILDING TILE
-# - UA 2018
+# - UA 2018 LAND-USE DATA
 # - OSM NETWORK
 
 # OUTPUT:
 # - BUILDING ENTRIES (TILE) SNAPPED TO NETWORK
 
 ################################################################################
-# STEPS:
+# OVERVIEW:
 # 1. READ UA 2018 DATA
 # 2. READ OSM BUILDING TILE
 # 3. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
@@ -25,21 +25,33 @@
 
 # LOAD PACKAGES AND FUNCTIONS
 library(dplyr)
-source()
+getwd() %>%
+  paste0("/tool/Module 2 - data preparation/functions/") %>%
+  list.files(pattern = "2[A-Za-z].*\\.R", full.names = TRUE) %>%
+  for (file in .) source(file)
+
+################################################################################
+# INPUT VALUES FOR TESTING CODE
+# DATA DIRECTORIES FOR UA AND OSM DATA
+osm_dir <-  "D:/Berlin/osm_buildings_temp/"
+ua_dir <- "D:/Berlin/UA2018/"
+# FUA CITY CODE
+cityCode <- "DE001"
+osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE)[12]
 
 ################################################################################
 
 # 1. READ UA 2018 DATA
 #    -> FILTER FOR RESIDENTIAL AREAS
-UAresidential <- loadUAres()
+UAresidential <- UAresLoader(ua_dir)
 
 # 2. READ OSM BUILDING TILE
 #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
 #    -> UNITE LAYERS IF NECESSARY
-OSMbuildings <-
-  OSMloader(osm_file = osm_directory) %>%
+OSMbuildings <- osm_file %>%
+  OSMloader()# %>%
 
-# 3. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
+  # 3. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
   OSMfilter(osm_buildings = ., ua_res = UAresidential)
 
 # 4. ADD POPULATION FROM URBAN ATLAS

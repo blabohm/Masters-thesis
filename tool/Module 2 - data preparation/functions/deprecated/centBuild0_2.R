@@ -16,7 +16,7 @@ ua_dir <- "C:/Berlin/UA2018/"
 # osm_outdir <- "Y:/openstreetmap/osm_buildings/"
 cityCode <- "DE001"
 
-# osm_file <- osm_file <- osm_list[11]
+# osm_file <- osm_list[11]
 # osm_file <- osm_list[4]
 
 # layername <- layernames[2]
