@@ -14,10 +14,12 @@
 #
 ################################################################################
 # FUNCTIONS:
-# 1. loadUAres
+# 1. UAresLoader
 #    -> LOAD URBAN ATLAS RESIDENTIAL AREAS
 # 2. OSMloader
-#    -> LOAD OSM DATA AN UNITING LAYERS
+#    -> LOAD OSM BUILDINGS - UNITING LAYERS
+# 3. networkLoader
+#    -> LOAD NETWORK AND CLIP TO TILE + 100 m BUFFER
 #
 ################################################################################
 # 1. LOAD URBAN ATLAS RESIDENTIAL AREAS
@@ -28,9 +30,9 @@
 # crs: DESIRED CRS; DEFAULT IS ETRS3035
 # res_class: DESIRED UA RESIDENTIAL CLASSES PROVIDED AS A STRING OF NUMBERS;
 # DEFAULT: ALL UA RESIDENTIAL CLASSES
-loadUAres <- function(ua_dir, city_code,
-                      crs = 3035, res_class = c(11100, 11210, 11220,
-                                                11230, 11240, 11300)) {
+UAresLoader <- function(ua_dir, city_code,
+                        crs = 3035, res_class = c(11100, 11210, 11220,
+                                                  11230, 11240, 11300)) {
   #required packages
   require(dplyr)
   require(sf)
@@ -51,5 +53,47 @@ loadUAres <- function(ua_dir, city_code,
     select(Pop2018, identifier, code_2018)
   return(ua)}
 
-# 2. READ UA 2018 DATA
-#    -> FILTER FOR RESIDENTIAL AREAS
+
+################################################################################
+# 2. LOAD OSM BUILDINGS - UNITING LAYERS
+OSMloader <- function(osm_file) {
+  message("loading osm buildings... \n")
+  # get name of OSM building layers (only using polygon and multipolygon layers)
+  lr <- osm_file %>%
+    st_layers(.) %>%
+    .$name %>%
+    grep("poly", ., ignore.case = TRUE, value = TRUE)
+  # load individual layers
+  for (i in lr) {
+    # load OSM file and combine layers
+    if (grepl("osm_multipolygons", i)) {
+      tmp <- osm_file %>%
+        st_read(i, quiet = TRUE) %>%
+        st_make_valid() %>%
+        st_cast("POLYGON")
+    } else if (grepl("osm_polygons", i)) {
+      tmp <- st_read(osm_file, i, quiet = TRUE)}
+    if (i == first(lr)) osm <- tmp else osm <- bind_rows(osm, tmp)}
+  # delete temporary object
+  rm(tmp)
+  message("filtering osm buildings... \n")
+  # transform to EPSG 3035 and select necessary columns
+  osm %>%
+    st_transform(3035) %>%
+    select(Pop2018, identifier, code_2018) %>%
+    return()}
+
+
+################################################################################
+# 3. LOAD NETWORK AND CLIP TO TILE + 100 m BUFFER
+networkLoader <- function(network_dir, crs = 3035) {
+  message("loading osm network... \n")
+  network_dir %>%
+    st_read(quiet = TRUE) %>%
+    select(highway) %>%
+    st_transform(3035) %>%
+    distinct() %>%
+    return()}
+
+
+################################################################################

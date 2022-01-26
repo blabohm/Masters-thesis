@@ -34,6 +34,7 @@ source()
 UAresidential <- loadUAres()
 
 # 2. READ OSM BUILDING TILE
+#    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
 #    -> UNITE LAYERS IF NECESSARY
 OSMbuildings <-
   OSMloader(osm_file = osm_directory) %>%
