@@ -85,7 +85,7 @@ OSMloader <- function(osm_file, crs = 3035) {
   # transform to EPSG 3035 and drop columns
   osm %>%
     st_transform(crs) %>%
-    select(geom) %>%
+    select(building, geom) %>%
     return() }
 
 

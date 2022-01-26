@@ -37,7 +37,7 @@ osm_dir <-  "D:/Berlin/osm_buildings_temp/"
 ua_dir <- "D:/Berlin/UA2018/"
 # FUA CITY CODE
 cityCode <- "DE001"
-osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE)[12]
+osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE)[11]
 
 ################################################################################
 
@@ -49,19 +49,21 @@ UAresidential <- UAresLoader(ua_dir)
 #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
 #    -> UNITE LAYERS IF NECESSARY
 OSMbuildings <- osm_file %>%
-  OSMloader()# %>%
-
+  OSMloader() %>%
   # 3. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
-  OSMfilter(osm_buildings = ., ua_res = UAresidential)
-
+  OSMfilter(UAresidential) %>%
 # 4. ADD POPULATION FROM URBAN ATLAS
 #    -> 1. FROM UA POLYGON
 #    -> 2. FROM AVERAGE POP / AREA IN TILE (IF NO POP INFO AT POLYGON)
+  OSMpop()
+
+
 
 # 5. ADD BUILDING ID
-#    -> LETTER FOR TILE NUMBER + NROW()
+#    -> IDENTIFIER + NUMBER
 # 6. CONVERT TO BUILDING CENTROID
 #    -> POINT ON SURFACE
 # 7. READ OSM NETWORK
 #    -> SNAP BUILDING CENTROIDS TO NETWORK
 # 8. OUTPUT TO TEMP
+
