@@ -26,12 +26,12 @@
 
 UAresLoader <- function(ua_dir, city_code,
                         crs = 3035, res_class = c(11100, 11210, 11220,
-                                                  11230, 11240, 11300)) {
+                                                  11230, 11240, 11300))
+{
   # required packages
   require(dplyr)
   require(sf)
-  # user communication
-  message("\n loading residential areas... \n")
+
   # get ua file with right code
   ua_file <- ua_dir %>%
     list.files(pattern = cityCode,
@@ -41,13 +41,16 @@ UAresLoader <- function(ua_dir, city_code,
                recursive = TRUE)
   # get name of UA land-use layer
   lr <- st_layers(ua_file)$name[1]
+  # user communication
+  message("\n loading residential areas... \n")
   # load UA file and filter residential classes
   ua <- ua_file %>%
     st_read(lr, quiet = TRUE) %>%
     filter(code_2018 %in% res_class) %>%
     st_transform(crs) %>%
     select(Pop2018, identifier, code_2018)
-  return(ua)}
+  return(ua)
+}
 
 
 ################################################################################
@@ -58,15 +61,16 @@ UAresLoader <- function(ua_dir, city_code,
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-OSMloader <- function(osm_file, crs = 3035) {
+OSMloader <- function(osm_file, crs = 3035)
+{
   # required packages
   require(dplyr)
   require(sf)
-  # user communication
-  message("\n loading osm buildings... \n")
   # get name of OSM building layers (only using polygon and multipolygon layers)
   lr <- st_layers(osm_file)$name %>%
     grep("poly", ., ignore.case = TRUE, value = TRUE)
+  # user communication
+  message("\n loading osm buildings... \n")
   # load individual layers
   for (i in lr) {
     # load OSM file and combine layers
@@ -86,7 +90,8 @@ OSMloader <- function(osm_file, crs = 3035) {
   osm %>%
     st_transform(crs) %>%
     select(building, geom) %>%
-    return() }
+    return()
+}
 
 
 ################################################################################
@@ -97,18 +102,21 @@ OSMloader <- function(osm_file, crs = 3035) {
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-networkLoader <- function(network_dir, crs = 3035) {
+networkLoader <- function(network_dir, osm_buildings = NULL, crs = 3035)
+{
   #required packages
   require(dplyr)
   require(sf)
   # user communication
   message("\n loading osm network... \n")
-  network_dir %>%
+  net <- network_dir %>%
     st_read(quiet = TRUE) %>%
     select(highway) %>%
-    st_transform(crs) %>%
-    distinct() %>%
-    return()}
+    st_transform(crs)
+  if (!is.null(osm_buildings)) {
+    st_filter(net, sfc2bb(osm_buildings), .predicate = st_intersects) %>%
+      return() } else return(net)
+}
 
 
 ################################################################################

@@ -1,3 +1,55 @@
+################################################################################
+# MODULE 2 - DATA PREPARATION
+# PART 4 - NETWORK BLENDING
+# 4c - OPERATOR FUNCTIONS
+# AUTHOR: BENJAMIN LABOHM, BERLIN, 2022
+################################################################################
+#
+# FUNCTIONS:
+# 1. sfc2bb
+#    -> Return a boundary box polygon for intersection
+# 2. snapPointsToLines
+#    -> Snap points to lines while preserving attributes
+# 3. snapPTLsf
+#    -> wrapper around snapPointsToLines for sf objects
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+# GET BBOX
+
+sfc2bb <- function(sfc_object)
+    {
+    require(sf)
+    require(dplyr)
+    bb <- st_bbox(sfc_object)
+
+    list(rbind(c(bb$xmin, bb$ymin),
+               c(bb$xmax, bb$ymin),
+               c(bb$xmax, bb$ymax),
+               c(bb$xmin, bb$ymax),
+               c(bb$xmin, bb$ymin))) %>%
+      sf::st_polygon() %>%
+      sf::st_sfc() %>%
+      sf::st_sf() %>%
+      return()
+  }
+
+
+################################################################################
+# SNAP POINTS TO LINES - by stackoverflow user Alvin_z
+# REQUIRED SETTINGS:
+# points: sfc-object with geometry type 'POINT'
+# lines: sfc-object with geometry type 'LINESTRING'
+# OPTIONAL SETTINGS:
+# maxDist: maximum distance
+# withAttrs: should attributes be preserved?
+# idField: field representing id
+################################################################################
+
 snapPointsToLines <-  function(points, lines, maxDist = NA, withAttrs = TRUE, idField = NA)
 {
   require(maptools, quietly = TRUE)
@@ -10,6 +62,8 @@ snapPointsToLines <-  function(points, lines, maxDist = NA, withAttrs = TRUE, id
     withAttrs = FALSE
   if (is(points, "SpatialPointsDataFrame") == FALSE && withAttrs == TRUE)
     stop("A SpatialPointsDataFrame object is needed! Please set withAttrs as FALSE.")
+
+
   d = rgeos::gDistance(points, lines, byid = TRUE)
   if (!is.na(maxDist)) {
     distToLine <- apply(d, 2, min, na.rm = TRUE)
@@ -57,4 +111,34 @@ snapPointsToLines <-  function(points, lines, maxDist = NA, withAttrs = TRUE, id
                        row.names = names(nearest_line_index))
   SpatialPointsDataFrame(coords = t(mNewCoords), data = df,
                          proj4string = CRS(proj4string(points)))
+}
+
+
+################################################################################
+# WRAPPER FOR SNAPPING SF OBJECTS
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+
+snapPTLsf <- function(points_sf, lines_sf, crs = 3035)
+  {
+  # convert points to sp object
+  x <-
+    points_sf %>%
+    st_cast("POINT") %>%
+    as_Spatial()
+
+  # convert lines to sp object
+  y <-
+    lines_sf %>%
+    st_cast("LINESTRING") %>%
+    as_Spatial()
+
+  output <- snapPointsToLines(points = x, lines = y, withAttrs = TRUE) %>%
+    st_as_sf() %>%
+    st_transform(crs)
+
+  return(output)
 }
