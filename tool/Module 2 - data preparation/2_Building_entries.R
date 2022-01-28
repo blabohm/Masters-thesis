@@ -33,20 +33,20 @@
 buildingPrep <- function(osm_directory, ua_directory, city_code)
 {
   # LOAD PACKAGES AND FUNCTIONS
-  require(dplyr)
+  require(dplyr, quietly = TRUE)
   getwd() %>%
     paste0("/tool/Module 2 - data preparation/functions/") %>%
-    list.files(pattern = "2[A-Za-z].*\\.R", full.names = TRUE) %>%
+    list.files(pattern = "2-2[A-Za-z].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # GET OSM FILE DIRECTORY
-  osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE)[11]
+  osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE) ##file select#############################################
   # 1. READ UA 2018 DATA
   #    -> FILTER FOR RESIDENTIAL AREAS
   UAresidential <- UAresLoader(ua_dir)
   # 2. READ OSM BUILDING TILE
   #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
   #    -> UNITE LAYERS IF NECESSARY
-  OSMbuildings <- osm_file %>%
+  osm_file %>%
     OSMloader() %>%
     # 3. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
     OSMfilter(UAresidential) %>%
@@ -56,5 +56,6 @@ buildingPrep <- function(osm_directory, ua_directory, city_code)
     OSMpop() %>%
     # 5. ADD BUILDING ID
     #    -> IDENTIFIER + NUMBER
-    OSMbuildID()
+    OSMbuildID() %>%
+    return()
 }
