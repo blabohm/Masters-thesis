@@ -42,7 +42,9 @@ cityBoundary <- boundaryLoader(boundaryFile, cityCode)
 # LIST NETWORK TILES FOR FUA CODE
 netTiles <- listTiles(netTileDir, cityCode)
 # LOAD AND COMBINE NETWORK TILES
-network <- combinator(netTiles, cityBoundary)
-# CLEAN NETWORK
-#    -> DOUBLE ENTRIES
-#    -> UNCONNECTED EDGES
+network <- combinator(netTiles, cityBoundary) %>%
+  # CLEAN NETWORK
+  #    -> DOUBLE ENTRIES
+  #    -> UNCONNECTED EDGES
+  networkCleaner(network)
+

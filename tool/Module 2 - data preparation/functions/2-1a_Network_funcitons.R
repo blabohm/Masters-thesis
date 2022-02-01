@@ -57,6 +57,7 @@ listTiles <- function(network_tile_directory, city_code)
     pull(path)
 }
 
+
 ################################################################################
 # 1. FUNCTION DESCRIPTION (SHORT)
 # REQUIRED SETTINGS:
@@ -70,8 +71,9 @@ combinator <- function(file_list, boundary = NULL, crs = 3035)
   # load packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-  # make sure output is empty
-  outSF <- NULL
+  # temp directory for output
+  tmpOut <- paste0(tempdir(), "\\tmp-path.gpkg")
+  if(dir.exists(tmpOut)) unlink(tmpOut)
   # iterate through files
   for (file in file_list) {
     # check layers
@@ -86,39 +88,49 @@ combinator <- function(file_list, boundary = NULL, crs = 3035)
     isIn <- ifelse(is.null(boundary), TRUE,
                    any(st_intersects(tmp$geom, boundary, sparse = FALSE)))
     # combine
-    if (isIn) outSF <- ifelse(is.null(outSF),
-                              st_read(file, quiet = TRUE),
-                              st_read(file, quiet = TRUE) %>%
-                                bind_rows(outSF)) }
+    if (isIn) tmp %>%
+      select(highway = matches("^highway$")) %>%
+      filter(!grepl("motorway", highway)) %>%
+      st_write(dsn = tmpOut, layer = "osm_paths",
+               quiet = TRUE, append = TRUE)}
+  # clear temp object
   rm(tmp)
-  return(outSF)
+  # read output and return
+  output <- tmpOut %>%
+    st_read(quiet = TRUE) %>%
+    st_filter(boundary, .pred = st_intersects)
+  unlink(tmpOut)
+  return(output)
 }
 
 
 ################################################################################
-library(dplyr)
-library(sf)
-library(igraph)
-library(tidygraph)
-library(sfnetworks)
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
 
-baseDir <- "C:/Berlin/"
+networkCleaner <- function(network, crs = 3035)
+{
+  require(dplyr)
+  require(sf)
+  require(sfnetworks)
 
-net_clean <-
-  paste0(baseDir, "network_clean.gpkg") %>%
-  st_read(quiet = TRUE) %>%
-  select(highway) %>%
-  st_transform(3035) %>%
-  distinct() %>%
-  st_cast("LINESTRING") %>%
-  as_sfnetwork() %>%
-  filter(group_components() == 1) %>%
-  activate("edges") %>%
-  as_tibble() %>%
-  st_as_sf() %>%
-  st_geometry() %>%
-  lapply(function(x) round(x, 0)) %>%
-  st_sfc(crs = 3035) %>%
-  as_sfnetwork() %>%
-  convert(to_spatial_smooth) %>%
-  convert(to_spatial_subdivision)
+  network %>%
+    distinct() %>%
+    st_cast("LINESTRING") %>%
+    as_sfnetwork() %>%
+    filter(group_components() == 1) %>%
+    activate("edges") %>%
+    as_tibble() %>%
+    st_as_sf() %>%
+    st_geometry() %>%
+    lapply(function(x) round(x, 0)) %>%
+    st_sfc(crs = 3035) %>%
+    as_sfnetwork() %>%
+    convert(to_spatial_smooth) %>%
+    convert(to_spatial_subdivision) %>%
+    return()
+}
