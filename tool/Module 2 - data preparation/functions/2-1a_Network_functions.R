@@ -1,13 +1,21 @@
 ################################################################################
-# MODULE 'NUMBER' - MODULE NAME
-# PART 'NUMBER' - SUBMODULE NAME
-# PART 'NUMBER' + letter - FUNCTIONS THEME
+# MODULE 2 - DATA PREPARATION
+# PART 1 - NETWORK CLEANING
+# 1a - NETWORK FUNCTIONS
 # AUTHOR: BENJAMIN LABOHM, BERLIN, 2022
 ################################################################################
 #
 # FUNCTIONS:
-# 1. FUNCTION NAME
-#    -> Function description
+# 1. LOAD BOUNDARY FILE
+#    -> Select city boundary by URAU-style city code
+#    -> Buffer with 1 km
+# 2. LIST NETWORK TILES
+#    -> List files in network tile directory matching city code
+# 3. LOAD AND COMBINE FILES FROM FILE LIST
+#    -> Remove motorways
+# 4. CLEANING NETWORK
+#    -> Remove double entries, round coordinates, remove pseudo- and
+#       unconnected edges, subdivide edges at unconnected nodes
 #
 ################################################################################
 # 1. LOAD BOUNDARY FILE
@@ -39,10 +47,8 @@ boundaryLoader <- function(boundary_file, city_code, crs = 3035)
 
 ################################################################################
 # 2. LIST NETWORK TILES
-# REQUIRED SETTINGS:
-# setting_name: Setting description
-# OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
+# network_tile_directory: string of network tile directory
+# city_code: string of city code
 ################################################################################
 
 listTiles <- function(network_tile_directory, city_code)
@@ -59,11 +65,12 @@ listTiles <- function(network_tile_directory, city_code)
 
 
 ################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
+# 3. LOAD AND COMBINE FILES FROM FILE LIST
 # REQUIRED SETTINGS:
-# setting_name: Setting description
+# file_list: vector of network tile file locations
 # OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
+# boundary: city boundary for intersection with network tile - DEFAULT NULL
+# crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
 combinator <- function(file_list, boundary = NULL, crs = 3035)
@@ -105,32 +112,36 @@ combinator <- function(file_list, boundary = NULL, crs = 3035)
 
 
 ################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
+# 4. CLEANING NETWORK
 # REQUIRED SETTINGS:
-# setting_name: Setting description
+# network: sfc object of class LINESTRING containing city network
 # OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
+# crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
 networkCleaner <- function(network, crs = 3035)
 {
-  require(dplyr)
-  require(sf)
-  require(sfnetworks)
-
+  # load packages
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  require(tidygraph, quietly = TRUE)
+  require(sfnetworks, quietly = TRUE)
+  # network cleaning
   network %>%
+    # remove double entries
     distinct() %>%
+    # make sure no MULTILINESTRINGS in network
     st_cast("LINESTRING") %>%
-    as_sfnetwork() %>%
-    filter(group_components() == 1) %>%
-    activate("edges") %>%
-    as_tibble() %>%
-    st_as_sf() %>%
     st_geometry() %>%
+    # make sure point coordinates match
     lapply(function(x) round(x, 0)) %>%
     st_sfc(crs = 3035) %>%
     as_sfnetwork() %>%
-    convert(to_spatial_smooth) %>%
+    # subdivide edges at interior points
     convert(to_spatial_subdivision) %>%
+    # remove pseudo nodes
+    convert(to_spatial_smooth) %>%
+    # remove unconnected edges
+    filter(group_components() == 1) %>%
     return()
 }

@@ -4,6 +4,7 @@
 ################################################################################
 
 # INPUT:
+# - CITY CODE (CHARACTER STRING WITH FIRST 5 DIGITS OF URAU CODE)
 # - NETWORK TILES FOR FUA
 # - BOUNDARY LAYER OF CITY CORE
 
@@ -23,28 +24,35 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES FOR UA AND OSM DATA
-boundaryFile <- "E:/citiesEurope/Cities.shp"
-netTileDir <- "E:/osm_paths/"
-# FUA CITY CODE
-cityCode <- "DE001"
-
-#buildingEntries(osm_directory = osm_dir, ua_directory = ua_dir,
-#                city_code = cityCode)
+# boundaryFile <- "E:/citiesEurope/Cities.shp"
+# netTileDir <- "E:/osm_paths/"
+# # FUA CITY CODE
+# cityCode <- "DE001"
+#
+# net <- networkPrep(network_tile_dir = netTileDir,
+#                    boundary_file = boundaryFile,
+#                    city_code = cityCode)
 ################################################################################
-# LOAD PACKAGES AND FUNCTIONS
-require(dplyr, quietly = TRUE)
-getwd() %>%
-  paste0("/tool/Module 2 - data preparation/functions/") %>%
-  list.files(pattern = "2-1[A-Za-z].*\\.R", full.names = TRUE) %>%
-  for (file in .) source(file)
-# LOAD CITY CORE BOUNDARY
-cityBoundary <- boundaryLoader(boundaryFile, cityCode)
-# LIST NETWORK TILES FOR FUA CODE
-netTiles <- listTiles(netTileDir, cityCode)
-# LOAD AND COMBINE NETWORK TILES
-network <- combinator(netTiles, cityBoundary) %>%
-  # CLEAN NETWORK
-  #    -> DOUBLE ENTRIES
-  #    -> UNCONNECTED EDGES
-  networkCleaner(network)
 
+networkPrep <- function(network_tile_dir, boundary_file, city_code)
+{
+  # LOAD PACKAGES AND FUNCTIONS
+  require(dplyr, quietly = TRUE)
+  getwd() %>%
+    paste0("/tool/Module 2 - data preparation/functions/") %>%
+    list.files(pattern = "2-1[A-Za-z].*\\.R", full.names = TRUE) %>%
+    for (file in .) source(file)
+  # LOAD CITY CORE BOUNDARY
+  cityBoundary <- boundaryLoader(boundary_file = boundary_file,
+                                 city_code = city_code)
+  # LIST NETWORK TILES FOR FUA CODE
+  listTiles(network_tile_directory = network_tile_dir,
+            city_code = city_code) %>%
+    # LOAD AND COMBINE NETWORK TILES
+    combinator(file_list = ., boundary = cityBoundary) %>%
+    # CLEAN NETWORK
+    #    -> DOUBLE ENTRIES
+    #    -> UNCONNECTED EDGES
+    networkCleaner() %>%
+    return()
+}

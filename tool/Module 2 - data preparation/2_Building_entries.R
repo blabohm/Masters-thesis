@@ -39,10 +39,10 @@ buildingPrep <- function(osm_directory, ua_directory, city_code)
     list.files(pattern = "2-2[A-Za-z].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # GET OSM FILE DIRECTORY
-  osm_file <- list.files(osm_dir, pattern = cityCode, full.names = TRUE) ##file select#############################################
+  osm_file <- list.files(osm_directory, pattern = city_code, full.names = TRUE) ##file select#############################################
   # 1. READ UA 2018 DATA
   #    -> FILTER FOR RESIDENTIAL AREAS
-  UAresidential <- UAresLoader(ua_dir)
+  UAresidential <- UAresLoader(ua_directory)
   # 2. READ OSM BUILDING TILE
   #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
   #    -> UNITE LAYERS IF NECESSARY
