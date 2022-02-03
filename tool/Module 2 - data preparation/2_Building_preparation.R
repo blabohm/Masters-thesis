@@ -1,6 +1,6 @@
 ################################################################################
 # MODULE 2 - DATA PREPARATION
-# PART 2 - BUILDING ENTRIES
+# PART 2 - BUILDING PREPARATION
 ################################################################################
 # INPUT:
 # - OSM BUILDING TILE
@@ -8,7 +8,7 @@
 # - OSM NETWORK
 #
 # OUTPUT:
-# - BUILDING ENTRIES (TILE) SNAPPED TO NETWORK
+# - BUILDINGS POLYGONS (TILE)
 ################################################################################
 # OVERVIEW:
 # 1. READ UA 2018 DATA
