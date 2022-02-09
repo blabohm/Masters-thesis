@@ -4,7 +4,7 @@
 ################################################################################
 
 # INPUT:
-# - UA GREEN SPACE LAYER FOR ALL CITIES CREATED IN MODULE 1b
+# - UA BOUNDARY BOX LAYER FOR ALL CITIES CREATED IN MODULE 1b
 # OR
 # - UA FILE DIRECTORY FOR ALL CITIES (EXECUTES MODULE 1b)
 # - NETWORK
@@ -14,7 +14,9 @@
 
 ################################################################################
 # OVERVIEW:
-# LOAD PARK POLYGONS OR EXECUTE MODULE 1b
+# LOAD CITY POLYGON LAYER
+#   -> Check for proximity to other cities
+#   -> Load green spaces of resulting cities
 # LOAD NETWORK (IF NECESSARY)
 # DETECT PARK ENTRIES
 ################################################################################
