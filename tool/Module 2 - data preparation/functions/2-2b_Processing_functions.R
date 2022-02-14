@@ -16,13 +16,105 @@
 #    -> Add building ID
 #
 ################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+
+cityBoundLoader <- function(city_boundaries, city_code = NULL, buffer_dist = 0,
+                            code_string = "FUA_CO", crs = 3035)
+{
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+
+  if (class(city_boundaries) == "character")  {
+    cityBound <- st_read(city_boundaries, quiet = TRUE) } else {
+      cityBound <- city_boundaries }
+  # User communication
+  message("Load city boundary")
+
+  cityBound <- cityBound %>%
+    select(code = matches(code_string)) %>%
+    mutate(code = substr(code, 1, 5)) %>%
+    st_transform(crs)
+
+  if (is.null(city_code)) return(cityBound) else {
+    cityBound %>%
+      filter(code %in% city_code) %>%
+      st_buffer(buffer_dist) %>%
+      return() }
+}
+
+
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+# GET BBOX
+
+sfc2bb <- function(sfc_object, crs = 3035)
+{
+  require(sf)
+  require(dplyr)
+  bb <- st_bbox(sfc_object)
+
+  list(rbind(c(bb$xmin, bb$ymin),
+             c(bb$xmax, bb$ymin),
+             c(bb$xmax, bb$ymax),
+             c(bb$xmin, bb$ymax),
+             c(bb$xmin, bb$ymin))) %>%
+    sf::st_polygon() %>%
+    sf::st_sfc() %>%
+    sf::st_sf(crs = crs) %>%
+    return()
+}
+
+
+################################################################################
 # 1. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
 # REQUIRED SETTINGS:
 # osm_buildings: OSM buildings as sfc_object with geometry type POLYGON
 # ua_residential: UA residential as sfc_object with geometry type POLYGON
 ################################################################################
 
-OSMfilter <- function(osm_buildings, ua_residential)
+proximity_checker <- function(city_boundary, osm_file, city_code, crs = 3035)
+{
+  # Load required packages
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+
+  # User communication
+  message("Checking proximity")
+  tmpDf <- tibble()
+  for (i in osm_file) {
+    # Filter for desired city
+    lyr_tbl <- st_layers(i)
+    x <- which.max(lyr_tbl$features)
+    lyr1 <- lyr_tbl$name[x]
+    c <- st_read(i, layer = lyr1, quiet = TRUE) %>%
+      st_transform(crs) %>%
+      sfc2bb(crs = crs)
+    # Check for proximity of other cities
+    if(any(st_intersects(c$geom, cityBound, sparse = FALSE)))
+      tmpDf <- tibble(tile_dir = i) %>%
+      bind_rows(tmpDf)
+  }
+  return(tmpDf)
+}
+
+################################################################################
+# 1. FILTER OSM BUILDINGS FOR INSIDE UA RESIDENTIAL POLYGONS
+# REQUIRED SETTINGS:
+# osm_buildings: OSM buildings as sfc_object with geometry type POLYGON
+# ua_residential: UA residential as sfc_object with geometry type POLYGON
+################################################################################
+
+OSMfilter <- function(osm_buildings, ua_residential, city_boundaries)
 {
   # required packages
   require(dplyr)
@@ -36,6 +128,7 @@ OSMfilter <- function(osm_buildings, ua_residential)
   message("\n filtering OSM buildings... \n")
   # filtering
   osm_buildings %>%
+    st_filter(cityBound, .pred = st_intersects) %>%
     st_join(ua_residential) %>%
     # filter OSM buildings inside UA residential polygons
     filter(!is.na(code_2018)) %>%

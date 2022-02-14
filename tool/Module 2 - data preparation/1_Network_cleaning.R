@@ -24,14 +24,14 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES FOR UA AND OSM DATA
-# boundaryFile <- "E:/citiesEurope/Cities.shp"
-# netTileDir <- "E:/osm_paths/"
+boundaryFile <- "E:/citiesEurope/Cities.shp"
+netTileDir <- "E:/osm_paths/"
 # # FUA CITY CODE
-# cityCode <- "DE001"
-#
-# net <- networkPrep(network_tile_dir = netTileDir,
-#                    boundary_file = boundaryFile,
-#                    city_code = cityCode)
+cityCode <- "DE001"
+
+net <- networkPrep(network_tile_dir = netTileDir,
+                   boundary_file = boundaryFile,
+                   city_code = cityCode)
 ################################################################################
 
 networkPrep <- function(network_tile_dir, boundary_file, city_code)
