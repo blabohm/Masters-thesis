@@ -185,6 +185,7 @@ OSMpop <- function(osm_buildings)
     mutate(population = ifelse(population == 0 & pop_by_area > population,
                                pop_by_area, population)) %>%
     select(identifier, population) %>%
+    filter(population > 0) %>%
     return()
 }
 
