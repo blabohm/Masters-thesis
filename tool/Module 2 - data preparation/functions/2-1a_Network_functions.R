@@ -27,22 +27,22 @@
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-boundaryLoader <- function(boundary_file, city_code, crs = 3035)
-{
-  # load packages
-  require(dplyr, quietly = TRUE)
-  require(sf, quietly = TRUE)
-  # laod boundary file
-  boundary_file %>%
-    st_read(quiet = TRUE) %>%
-    select(code = matches("URAU_COD")) %>%
-    # filter for city core polygon
-    filter(substr(code, 1, 5) %in% city_code) %>%
-    st_cast("POLYGON") %>%
-    st_buffer(1000) %>%
-    st_transform(crs) %>%
-    return()
-}
+# boundaryLoader <- function(boundary_file, city_code, crs = 3035)
+# {
+#   # load packages
+#   require(dplyr, quietly = TRUE)
+#   require(sf, quietly = TRUE)
+#   # laod boundary file
+#   boundary_file %>%
+#     st_read(quiet = TRUE) %>%
+#     select(code = matches("URAU_COD")) %>%
+#     # filter for city core polygon
+#     filter(substr(code, 1, 5) %in% city_code) %>%
+#     st_cast("POLYGON") %>%
+#     st_buffer(1000) %>%
+#     st_transform(crs) %>%
+#     return()
+# }
 
 
 ################################################################################

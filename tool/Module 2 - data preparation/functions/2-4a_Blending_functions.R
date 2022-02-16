@@ -64,8 +64,8 @@ st_snap_points = function(points, lines, maxDist = 1000)
   coordsLines <- st_coordinates(lines)
   coordsPoints <- st_coordinates(points)
   mNewCoords <- vapply(1:nrow(points),
-                      function(x) nearestPointOnLine(coordsLines[coordsLines[,3] == nearest_line_index[x],],
-                                                     coordsPoints[x, ]), FUN.VALUE = c(0, 0))
+                       function(x) nearestPointOnLine(coordsLines[coordsLines[,3] == nearest_line_index[x],],
+                                                      coordsPoints[x, ]), FUN.VALUE = c(0, 0))
   t(mNewCoords) %>%
     as_tibble() %>%
     st_as_sf(coords = c("X", "Y"), crs = 3035) %>%
@@ -73,12 +73,30 @@ st_snap_points = function(points, lines, maxDist = 1000)
     return()
 }
 
+
+################################################################################
+# WRAPPER FOR SNAPPING SF OBJECTS
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+
 nearestPointOnLine <- function(coordsLine, coordsPoint)
 {
   nearest_points <- vapply(2:nrow(coordsLine), function(x) nearestPointOnSegment(coordsLine[(x - 1):x, ],
-                                                                                coordsPoint), FUN.VALUE = c(0, 0, 0))
+                                                                                 coordsPoint), FUN.VALUE = c(0, 0, 0))
   nearest_points[1:2, which.min(nearest_points[3, ])]
 }
+
+
+################################################################################
+# WRAPPER FOR SNAPPING SF OBJECTS
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
 
 nearestPointOnSegment <- function(s, p)
 {
@@ -101,7 +119,81 @@ nearestPointOnSegment <- function(s, p)
 #    -> SNAP BUILDING CENTROIDS TO NETWORK
 # 8. OUTPUT TO TEMP
 ################################################################################
+#out_dir <- "C:/Berlin/tiles/"
 
+snapAndBlend <- function(city_boundary, build_entries, gs_entries, network,
+                         cellsize = 3000, output_dir, crs = 3035)
+{
+  # Load required packages
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  require(sfnetworks, quietly = TRUE)
+  # require(igraph)
+  # require(tidygraph)
+  # output directories:
+  edge_out <- paste0(output_dir, "edges.gpkg")
+  node_out <- paste0(output_dir, "nodes.gpkg")
+  # Tile boundaries
+  cityGrid <- city_boundary %>%
+    st_transform(crs) %>%
+    st_buffer(1000) %>%
+    st_make_grid(cellsize = cellsize) %>%
+    st_as_sf() %>%
+    st_filter(city_boundary, .pred = st_intersects)
+  # Iterate through city tiles
+  for (i in 1:nrow(cityGrid)) {
+    # User communication
+    message(paste(i, "of", nrow(cityGrid)))
+    # Intersect input with grid
+    # Buildings
+    build_tile <-
+      build_entries %>%
+      st_transform(crs) %>%
+      st_intersection(cityGrid$x[i]) %>%
+      st_cast("POINT")
+    # Green space entries
+    gs_tile <-
+      gs_entries %>%
+      st_transform(crs) %>%
+      st_intersection(cityGrid$x[i]) %>%
+      st_cast("POINT")
+    # Network
+    gb <- st_buffer(cityGrid$x[i], 100)
+    net_tile <-
+      network %>%
+      st_transform(crs) %>%
+      st_filter(gb, .predicate = st_intersects) %>%
+      st_cast("LINESTRING")
+    # Snap buildings and green space entries to network
+    if (nrow(build_tile) > 0) {
+      build_snap <- st_snap_points(points = build_tile, lines = net_tile)
+    } else build_snap <- NULL
+    if (nrow(gs_tile) > 0) {
+      gs_snap <- st_snap_points(points = gs_tile, lines = net_tile)
+    } else gs_snap <- NULL
+    # Make sure object is not empty
+    if (is.null(build_snap)) {nodes <- gs_snap
+    } else if (is.null(gs_snap)) {nodes <- build_snap}  else {
+      nodes <- bind_rows(build_snap, gs_snap)}
+    # Blend buildings and green space entries to network
+    tile_blend <-
+      as_sfnetwork(net_tile) %>%
+      st_network_blend(y = nodes, tolerance = 1e-4)
+    # Write results to temp file
+    tile_blend %>%
+      activate("edges") %>%
+      st_as_sf() %>%
+      st_write(edge_out, layer = "edges", quiet = TRUE, append = TRUE)
+    tile_blend %>%
+      activate("nodes") %>%
+      st_as_sf() %>%
+      st_write(node_out, layer = "nodes", quiet = TRUE, append = TRUE)
+    # Clean up
+    rm(tile_blend, nodes, net_tile, gs_tile, gs_snap,
+       build_tile, build_snap)
+    gc()
+  }
+}
 # OSMsnap <- function(osm_buildings, network_tile, crs = 3035)
 # {
 #   osm_buildings %>%

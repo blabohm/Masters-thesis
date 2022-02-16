@@ -22,15 +22,15 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES
-cityBoundary_file <- "E:/citiesEurope/Cities.shp"
-network_file <- "C:/Berlin/network_clean1.gpkg"
+cityBound <- "E:/citiesEurope/Cities.shp"
+networkFile <- "C:/Berlin/network_clean1.gpkg"
 uaDirectory <- "E:/UA2018"
 # FUA CITY CODE
 cityCode <- "DE001"
 
 ################################################################################
-greenSpacePrep <- function(cityBoundary_file, cityCode,
-                                    uaDirectory, network_file)
+greenSpacePrep <- function(city_boundaries, cityCode,
+                           uaDirectory, network_file)
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -45,12 +45,12 @@ greenSpacePrep <- function(cityBoundary_file, cityCode,
   # Load city boundaries matching urau code (to avoid matching multiple cities)
   # User communication
 
-  codeListUA <- proximity_checker(city_boundaries = cityBoundary_file,
+  codeListUA <- proximity_checker1(city_boundaries = city_boundaries,
                                   city_code = cityCode)
 
   greenSpaces <- UAgreen_space(code_list = codeListUA,
                                ua_directory = uaDirectory,
-                               city_boundaries = cityBoundary_file,
+                               city_boundaries = city_boundaries,
                                city_code = cityCode,
                                output = "sf")
   findGSentries(green_spaces = greenSpaces,
@@ -58,7 +58,7 @@ greenSpacePrep <- function(cityBoundary_file, cityCode,
     return()
 }
 
-# output <- greenSpacePrep(cityBoundary_file = cityBoundary_file,
+# output <- greenSpacePrep(cityBoundary_file = cityBound,
 #                                   cityCode = cityCode,
 #                                   uaDirectory = uaDirectory,
-#                                   network_file = network_file)
+#                                   network_file = networkFile)

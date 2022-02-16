@@ -16,41 +16,40 @@
 # READ OSM NETWORK
 # OUTPUT TO TEMP
 ################################################################################
-net_dir <- "C:/Berlin/network_clean1.gpkg"
-gs_dir <- "C:/Berlin/green_space_entries.gpkg"
-be_dir <- "C:/Berlin/popTiles/"
-tmpDir <- "C:/Berlin/popTilesSnapped/"
+netDir <- "C:/Berlin/network_clean1.gpkg"
+gsDir <- "C:/Berlin/green_space_entries.gpkg"
+beDir <- "C:/Berlin/buildings.gpkg"
+outDir <- "C:/Berlin/net_blend/"
+cityBound <- "E:/citiesEurope/Cities.shp"
+city_code <- "DE001"
+
+network_blend(network_dir = netDir,
+              green_space_dir = gsDir,
+              build_entry_dir = beDir,
+              city_boundaries = cityBound,
+              output_dir = outDir)
+
+network_blend <- function(network_dir, green_space_dir, build_entry_dir,
+                          output_dir)
+  {
 # LOAD PACKAGES AND FUNCTIONS
 require(dplyr, quietly = TRUE)
 require(sf, quietly = TRUE)
 getwd() %>%
   paste0("/tool/Module 2 - data preparation/functions/") %>%
-  list.files(pattern = "2-4[A-Za-z].*\\.R", full.names = TRUE) %>%
+  list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
   for (file in .) source(file)
-if (!dir.exists(tmpDir)) dir.create(tmpDir)
+if (!dir.exists(output_dir)) dir.create(output_dir)
 # READ OSM NETWORK
-OSMnetwork <- st_read(net_dir, quiet = TRUE)
-gsEntries <- st_read(gs_dir, quiet = TRUE)
-
-# CONVERT TO BUILDING CENTROID AND SNAP TO NEAREST NETWORK LINES
-#    -> POINT ON SURFACE
-#    -> SNAP BUILDING CENTROIDS TO NETWORK
-# OUTPUT TO TEMP
-be_tiles <- list.files(be_dir, pattern = ".gpkg$", full.names = TRUE)
-for (tile in be_tiles) {
-  # string for output generation
-  outName <- strsplit(tile, "/")[[1]] %>% last()
-  inTile <- tile %>%
-    st_read(quiet = TRUE) %>%
-    st_point_on_surface()
-  bbox <- sfc2bb(inTile) %>%
-    st_buffer(100)
-  net_tile <- OSMnetwork %>%
-    st_filter(bbox, .pred = st_intersects)
-
-  out <- st_snap_points(inTile, net_tile, maxDist = 200)
-
-  #snapPTLsf(points_sf = inTile, lines_sf = net_tile, max_distance = 200) %>%
-  st_write(out, paste0(tmpDir, outName),
-           quiet = TRUE, append = FALSE) #11:55
+OSMnetwork <- st_read(network_dir, quiet = TRUE)
+gsEntries <- st_read(green_space_dir, quiet = TRUE)
+bEntries <- build_entry_dir %>%
+  st_read(quiet = TRUE) %>%
+  st_point_on_surface()
+city_boundary <- boundaryLoader(city_boundaries = city_boundaries,
+                                city_code = city_code, code_string = "URAU_CO")
+# SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
+snapAndBlend(city_boundary = city_boundary, build_entries = bEntries,
+             gs_entries = gsEntries, network = OSMnetwork,
+             output_dir = outDir) # 65
 }

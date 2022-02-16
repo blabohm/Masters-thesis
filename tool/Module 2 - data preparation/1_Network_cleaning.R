@@ -40,11 +40,13 @@ networkPrep <- function(network_tile_dir, boundary_file, city_code)
   require(dplyr, quietly = TRUE)
   getwd() %>%
     paste0("/tool/Module 2 - data preparation/functions/") %>%
-    list.files(pattern = "2-1[A-Za-z].*\\.R", full.names = TRUE) %>%
+    list.files(pattern = "2-1[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # LOAD CITY CORE BOUNDARY
   cityBoundary <- boundaryLoader(boundary_file = boundary_file,
-                                 city_code = city_code)
+                                 city_code = city_code,
+                                 buffer_dist = 1000,
+                                 code_string = "URAU_COD")
   # LIST NETWORK TILES FOR FUA CODE
   listTiles(network_tile_directory = network_tile_dir,
             city_code = city_code) %>%

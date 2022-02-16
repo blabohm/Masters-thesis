@@ -19,19 +19,17 @@
 # city_boundaries <- "E:/citiesEurope/Cities.shp"
 # city_code <- "DE001"
 
-proximity_checker <- function(city_boundaries, city_code)
+proximity_checker1 <- function(city_boundaries, city_boundary)
 {
   # Load required packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
   # Load city boundaries europe
-  cityBound <- cityBoundLoader(city_boundaries)
+  city_boundaries <- boundaryLoader(city_boundaries)
   # User communication
   message("Checking proximity")
   # Filter for desired city
-  c <- cityBound %>%
-    filter(substr(code, 1, 5) %in% city_code) %>%
-    st_buffer(1000)
+  c <- st_buffer(city_boundary, 1000)
   # Check for proximity of other cities
   cityBound %>%
     st_filter(c, .pred = st_intersects) %>%
@@ -62,12 +60,14 @@ cityBoundLoader <- function(city_boundaries, city_code = NULL, buffer_dist = 0,
   # User communication
   message("Load city boundary")
 
-  cityBound <- select(cityBound, code = matches(code_string)) %>%
+  cityBound <- cityBound %>%
+    select(code = matches(code_string)) %>%
+    mutate(code = substr(code, 1, 5)) %>%
     st_transform(crs)
 
   if (is.null(city_code)) return(cityBound) else {
     cityBound %>%
-      filter(substr(code, 1, 5) %in% city_code) %>%
+      filter(code %in% city_code) %>%
       st_buffer(buffer_dist) %>%
       return() }
 }
@@ -106,7 +106,7 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
   outLayer <- paste0("green_spaces")
   gsDsn <- paste0(tempdir(), "\\", outLayer, ".gpkg")
   # load city boundary
-  cityBound <- cityBoundLoader(city_boundaries, city_code,
+  cityBound <- boundaryLoader(city_boundaries, city_code,
                                code_string = "URAU_CO", buffer_dist = 1000)
   # set up progress bar
   pb <- txtProgressBar(min = 0, max = length(ua),
