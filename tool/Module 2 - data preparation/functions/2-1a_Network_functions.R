@@ -80,7 +80,7 @@ combinator <- function(file_list, boundary = NULL, crs = 3035)
   require(sf, quietly = TRUE)
   # temp directory for output
   tmpOut <- paste0(tempdir(), "\\tmp-path.gpkg")
-  if(dir.exists(tmpOut)) unlink(tmpOut)
+  if (dir.exists(tmpOut)) unlink(tmpOut)
   # iterate through files
   for (file in file_list) {
     # check layers
