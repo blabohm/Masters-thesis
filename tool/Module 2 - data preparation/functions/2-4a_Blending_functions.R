@@ -156,7 +156,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
   #cl <- makeCluster(ncore, outfile = "")
   #registerDoParallel(cl)
   # Iterate through city tiles
-  for (i in 129:nrow(cityGrid)) { # 13:05
+  for (i in 725:nrow(cityGrid)) { # 13:05
     #foreach(i = 1:nrow(cityGrid), .combine = rbind) %dopar% ({
     require(dplyr)
     getwd() %>%
