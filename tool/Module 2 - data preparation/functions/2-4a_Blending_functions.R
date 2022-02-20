@@ -120,12 +120,12 @@ nearestPointOnSegment <- function(s, p)
 # 8. OUTPUT TO TEMP
 ################################################################################
 #out_dir <- "C:/Berlin/tiles/"
-city_boundary <- "D:/Berlin/cities.gpkg"
+city_boundary <- "C:/Berlin/cities.gpkg"
 city_code <- "DE001"
-build_entries <- "D:/Berlin/buildings_cent.gpkg"
-gs_entries <- "D:/Berlin/green_space_entries2.gpkg"
-network <- "D:/Berlin/network_clean1.gpkg"
-output_dir <- "D:/Berlin/net_blend/"
+build_entries <- "C:/Berlin/buildings_cent.gpkg"
+gs_entries <- "C:/Berlin/green_space_entries2.gpkg"
+network <- "C:/Berlin/network_clean1.gpkg"
+output_dir <- "C:/Berlin/net_blend/"
 cellsize = 1000
 crs = 3035
 
@@ -136,7 +136,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
   require(sfnetworks, quietly = TRUE)
-  require(doParallel, quietly = TRUE)
+  #require(doParallel, quietly = TRUE)
   # require(igraph)
   # require(tidygraph)
 
@@ -156,7 +156,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
   #cl <- makeCluster(ncore, outfile = "")
   #registerDoParallel(cl)
   # Iterate through city tiles
-  for (i in 725:nrow(cityGrid)) { # 13:05
+  for (i in 1004:nrow(cityGrid)) { # 13:05
     #foreach(i = 1:nrow(cityGrid), .combine = rbind) %dopar% ({
     require(dplyr)
     getwd() %>%
@@ -176,9 +176,10 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
       sf::st_geometry() %>%
       sf::st_as_text()
     # Buildings
-    build_tile <- build_entries %>%
+    build_tile <- tryCatch({build_entries %>%
       sf::st_read(wkt_filter = gridBox, quiet = TRUE) %>%
-      sf::st_cast("POINT")
+      sf::st_cast("POINT")}, error = function(e) message(e))
+    if (is.null(build_tile)) next
     # Green space entries
     gs_tile <- gs_entries %>%
       sf::st_read(wkt_filter = gridBox, quiet = TRUE) %>%

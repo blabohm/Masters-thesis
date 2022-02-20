@@ -18,9 +18,9 @@
 ################################################################################
 netDir <- "C:/Berlin/network_clean1.gpkg"
 gsDir <- "C:/Berlin/green_space_entries.gpkg"
-beDir <- "D:/Berlin/buildings.gpkg"
+beDir <- "C:/Berlin/buildings.gpkg"
 outDir <- "C:/Berlin/net_blend/"
-cityBound <- "E:/citiesEurope/Cities.shp"
+cityBound <- "C:/Berlin/cities.gpkg"
 city_code <- "DE001"
 
 network_blend(network_dir = netDir,
