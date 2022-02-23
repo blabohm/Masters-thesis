@@ -31,28 +31,22 @@ network_blend(network_dir = netDir,
 
 network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entry_dir,
                           output_dir)
-  {
-# LOAD PACKAGES AND FUNCTIONS
-require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
-require(sf, quietly = TRUE)
-getwd() %>%
-  paste0("/tool/Module 2 - data preparation/functions/") %>%
-  list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
-  for (file in .) source(file)
-if (!dir.exists(output_dir)) dir.create(output_dir)
-# READ OSM NETWORK
-#OSMnetwork <- st_read(network_dir, quiet = TRUE)
-#gsEntries <- st_read(green_space_dir, quiet = TRUE)
-#bEntries <- build_entry_dir %>%
-#  st_read(quiet = TRUE) %>%
-#  st_point_on_surface()
-#city_boundary <- boundaryLoader(city_boundaries = city_boundaries,
-#                                city_code = city_code, code_string = "URAU_CO")
-# SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
-snapAndBlend(city_boundary = boundary_dir,
-             build_entries = build_entry_dir,
-             gs_entries = green_space_dir,
-             network = network_dir,
-             output_dir = outDir) # 65
+{
+  # LOAD PACKAGES AND FUNCTIONS
+  require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
+  require(sf, quietly = TRUE)
+  getwd() %>%
+    paste0("/tool/Module 2 - data preparation/functions/") %>%
+    list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
+    for (file in .) source(file)
+  if (!dir.exists(output_dir)) dir.create(output_dir)
+  # SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
+  snapAndBlend(city_boundary = boundary_dir,
+               build_entries = build_entry_dir,
+               gs_entries = green_space_dir,
+               network = network_dir,
+               output_dir = outDir)
+  network_combinator(edges)
+  combinator(nodes)
 }
 
