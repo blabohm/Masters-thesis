@@ -16,17 +16,19 @@
 # READ OSM NETWORK
 # OUTPUT TO TEMP
 ################################################################################
-netDir <- "C:/Berlin/network_clean1.gpkg"
-gsDir <- "C:/Berlin/green_space_entries.gpkg"
-beDir <- "C:/Berlin/buildings.gpkg"
-outDir <- "C:/Berlin/net_blend/"
-cityBound <- "C:/Berlin/cities.gpkg"
+drive <- "D"
+cityBound <- paste0(drive, ":/Berlin/cities.gpkg")
 city_code <- "DE001"
+beDir <- paste0(drive, ":/Berlin/buildings_cent.gpkg")
+gsDir <- paste0(drive, ":/Berlin/green_space_entries2.gpkg")
+network <- paste0(drive, ":/Berlin/network_clean1.gpkg")
+outDir <- paste0(drive, ":/Berlin/net_blend/")
+netDir <- paste0(drive, ":/Berlin/network_clean1.gpkg")
 
-network_blend(network_dir = netDir,
+network_blend(boundary_dir = cityBound,
+              network_dir = netDir,
               green_space_dir = gsDir,
               build_entry_dir = beDir,
-              city_boundaries = cityBound,
               output_dir = outDir)
 
 network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entry_dir,
@@ -46,7 +48,15 @@ network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entr
                gs_entries = green_space_dir,
                network = network_dir,
                output_dir = outDir)
-  network_combinator(edges)
-  combinator(nodes)
+  nodes <- list.files(output_dir, pattern = "node", full.names = TRUE)
+  edges <- list.files(output_dir, pattern = "edge", full.names = TRUE)
+  network_combinator(edges, output_dir = output_dir)
+  combinator(nodes, output_dir = output_dir)
+  unlink(nodes)
+  unlink(edges)
 }
 
+
+################################################################################
+# END OF DOCUMENT
+################################################################################

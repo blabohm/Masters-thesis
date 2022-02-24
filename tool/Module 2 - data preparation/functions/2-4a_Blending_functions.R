@@ -6,31 +6,34 @@
 ################################################################################
 #
 # FUNCTIONS:
-# 1. sfc2bb
-#    -> Return a boundary box polygon for intersection
-# 2. snapPointsToLines
-#    -> Snap points to lines while preserving attributes
-# 3. snapPTLsf
-#    -> wrapper around snapPointsToLines for sf objects
+# 1. snapAndBlend
+# 2.networkCombinator
+#
 ################################################################################
 # 6. CONVERT TO BUILDING CENTROID
 #    -> POINT ON SURFACE
 #    -> SNAP BUILDING CENTROIDS TO NETWORK
 # 8. OUTPUT TO TEMP
 ################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
+# 1. SNAPPING AND BLENDING NETWORK COMPONENTS TOGETHER
 # REQUIRED SETTINGS:
-# setting_name: Setting description
+# city_boundary: Setting description
+# city_code: Setting description
+# build_entries: Setting description
+# gs_entries: Setting description
+# network: Setting description
+# output_dir: Setting description
 # OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
+# cellsize: Setting description - DEFAULT values
+# crs: Setting description - DEFAULT values
 ################################################################################
 
-drive <- "Z"
+drive <- "D"
 city_boundary <- paste0(drive, ":/Berlin/cities.gpkg")
 city_code <- "DE001"
 build_entries <- paste0(drive, ":/Berlin/buildings_cent.gpkg")
-gs_entries <- paste0(drive, ":/Berlin/green_space_entries2.gpkg")
-network <- paste0(drive, ":/Berlin/network_clean1.gpkg")
+gs_entries <- paste0(drive, ":/Berlin/green_space_entries.gpkg")
+network <- paste0(drive, ":/Berlin/network_clean.gpkg")
 output_dir <- paste0(drive, ":/Berlin/net_blend/")
 cellsize = 1000
 crs = 3035
@@ -41,6 +44,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
   # Load required packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
+  require(sfnetworks, quietly = TRUE)
   require(doParallel, quietly = TRUE)
   # Subset city boundaries
   bound_query <- paste0('SELECT * FROM \'cities\' WHERE URAU_CODE = \'',
@@ -63,6 +67,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
     #foreach(i = todo) %dopar% {
     require(dplyr)
     require(sf)
+    require(sfnetworks)
     getwd() %>%
       paste0("/tool/Module 2 - data preparation/functions/") %>%
       list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
@@ -92,48 +97,56 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
     net_tile <- network %>%
       sf::st_read(wkt_filter = gridBox1, quiet = TRUE) %>%
       sf::st_cast("LINESTRING")
-    # Snap buildings and green space entries to network
-    if (!is.null(build_tile)) {
-      if (nrow(build_tile) > 0) {
-        build_snap <- st_snap_points(points = build_tile, lines = net_tile)
-      } else build_snap <- NULL
-    } else build_snap <- NULL
-    if (!is.null(gs_tile)) {
-      if (nrow(gs_tile) > 0) {
-        gs_snap <- st_snap_points(points = gs_tile, lines = net_tile)
-      } else gs_snap <- NULL
-    } else gs_snap <- NULL
+    # Exception handling buildings and green space entries to network
+    if (is.null(build_tile)) {build_tile <- NULL
+    } else if (nrow(build_tile) == 0) build_tile <- NULL
+    if (is.null(gs_tile)) {gs_tile <- NULL
+    } else if (nrow(gs_tile) == 0) gs_tile <- NULL
+
     # Make sure object is not empty
-    if (is.null(build_snap) & is.null(gs_snap)) {
+    if (is.null(build_tile) & is.null(gs_tile)) {
       bind_rows(build_tile, gs_tile) %>%
         st_write(node_out, quiet = TRUE, append = TRUE)
       st_write(net_tile, edge_out, quiet = TRUE, append = TRUE)
     } else {
-      if (is.null(build_snap)) {
-        nodes <- mutate(gs_snap, population = NA, ID = NA)
-      } else if (is.null(gs_snap)) {
-        nodes <- mutate(build_snap, city_code = NA,
+      if (is.null(build_tile)) {
+        nodes <- mutate(gs_tile, population = NA, ID = NA)
+      } else if (is.null(gs_tile)) {
+        nodes <- mutate(build_tile, city_code = NA,
                         class = NA, identifier = NA,
                         area = NA)}  else {
-                          nodes <- dplyr::bind_rows(build_snap, gs_snap) %>%
+                          nodes <- dplyr::bind_rows(build_tile, gs_tile) %>%
                             dplyr::distinct()}
       # Blend buildings and green space entries to network
-      edges <- sf::st_collection_extract(
-        lwgeom::st_split(
-          net_tile,
-          sf::st_buffer(nodes, 1e-5)),
-        "LINESTRING")
+      # edges <- sf::st_collection_extract(
+      #   lwgeom::st_split(
+      #     net_tile,
+      #     sf::st_buffer(nodes, 1e-5)),
+      #   "LINESTRING")
       # make sure edges and node geometries are at exact same places
-      st_geometry(edges) <- edges %>%
-        st_geometry() %>%
-        lapply(function(x) round(x, 0)) %>%
-        st_sfc(crs = 3035)
-      edges <- distinct(edges)
-      st_geometry(nodes) <- nodes %>%
-        st_geometry() %>%
-        lapply(function(x) round(x, 0)) %>%
-        st_sfc(crs = 3035)
-      nodes <- distinct(nodes)
+      # st_geometry(edges) <- edges %>%
+      #   st_geometry() %>%
+      #   lapply(function(x) round(x, 0)) %>%
+      #   st_sfc(crs = 3035)
+      # edges <- distinct(edges)
+      # st_geometry(nodes) <- nodes %>%
+      #   st_geometry() %>%
+      #   lapply(function(x) round(x, 0)) %>%
+      #   st_sfc(crs = 3035)
+      # nodes <- distinct(nodes)
+      net <- net_tile %>%
+        as_sfnetwork() %>%
+        st_network_blend(nodes)
+      edges <- net %>%
+        activate("edges") %>%
+        st_as_sf() %>%
+        select(-c("from", "to")) %>%
+        distinct()
+      nodes <- net %>%
+        activate("nodes") %>%
+        st_as_sf() %>%
+        select(-c("city_code", "class")) %>%
+        distinct()
       # Write output
       st_write(nodes, node_out, quiet = TRUE, append = TRUE)
       st_write(edges, edge_out, quiet = TRUE, append = TRUE)
@@ -150,58 +163,129 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
 # OPTIONAL SETTINGS:
 # setting_name: Setting description - DEFAULT values
 ################################################################################
+#file_list <- list.files("Z:/Berlin/net_blend/", pattern = "edges", full.names = TRUE)
+#combinator(file_list, output_dir = "D:/Berlin")
 
-no <- list.files(output_dir, pattern = "node", full.names = TRUE)
-
-system.time({
-  for (f in ef) {
-    st_read(f, quiet = TRUE) %>%
-      st_write("Z:/Berlin/nodes.gpkg", quiet = TRUE, append = TRUE)
-  }})
-# function that uses simple dplyr::bind_rows functionality to
-# combine multiple vector files
-ef <- list.files(output_dir, pattern = "edge", full.names = TRUE)
-
-edges <- network_combinator(ef)
-edges %>%
-  activate("edges") %>%
-  st_as_sf() %>%
-  st_write("Z:/edges_clean.gpkg")
-
-network_combinator <- function(file_list) {
-
+networkCombinator <- function(file_list, out = "file", output_dir = NULL)
+{
   # load packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-
-  # make sure output is empty
-  outSF <- NULL
-  n <- 1
+  # check output consistency
+  output_dir <- outputChecker(directory = output_dir, file_name = "nodes.gpkg")
+  # set up progress bar
+  pb <- txtProgressBar(min = 0, max = length(file_list),
+                       initial = 0, style = 3)
+  stepi <- 0
+  tmp <- NULL
   # iterate through files
   for (file in file_list) {
-
-    message(n, " of ", length(file_list))
-    n <- n + 1
-
-    if (!is.null(outSF)) {
-
-      outSF <-
-        st_read(file, quiet = TRUE) %>%
-        filter(!st_is_empty(.)) %>%
-        as_sfnetwork() %>%
-        st_network_join(outSF)
-
+    # for progress bar
+    stepi <- stepi + 1
+    setTxtProgressBar(pb, stepi)
+    # Read input in file_list and execute a network join
+    tmp <- file %>%
+      st_read(quiet = TRUE) %>%
+      filter(!st_is_empty(.)) %>%
+      as_sfnetwork()
+    if (!is.null(tmp)) {
+      outSF <- tmp %>%
+        st_network_join(outSF, .)
     } else {
-      outSF <-
-        st_read(file, quiet = TRUE) %>%
-        filter(!st_is_empty(.)) %>%
-        as_sfnetwork()
-
+      outSF <- tmp
     }
   }
-  return(outSF)
+  if (out == "file") {
+    outSF %>%
+      activate("edges") %>%
+      st_as_sf() %>%
+      distinct() %>%
+      st_write(paste0(output_dir, "/edges_clean.gpkg"))
+  } else distinct(outSF)
 }
 
 
 ################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+#file_list <- list.files("D:/Berlin/net_blend/", pattern = "nodes", full.names = TRUE)
+#file <- file_list[2]
 
+#combinator(file_list, output_dir = "D:/Berlin")
+
+combinator <- function(file_list, out = "file", output_dir = NULL)
+{
+  # load packages
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  # check output consistency
+  output_dir <- outputChecker(directory = output_dir, file_name = "nodes.gpkg")
+  # set up progress bar
+  pb <- txtProgressBar(min = 0, max = length(file_list),
+                       initial = 0, style = 3)
+  stepi <- 0
+  # iterate through files
+  for (file in file_list) {
+    # for progress bar
+    stepi <- stepi + 1
+    setTxtProgressBar(pb, stepi)
+    # Read input in file_list and execute a network join
+    tmp <- file %>%
+      st_read(quiet = TRUE) %>%
+      filter(!st_is_empty(.))
+    # Check for content
+    if (nrow(tmp) > 0) {
+      tmp %>%
+        select(identifier, area, population, ID) %>%
+        mutate(identifier = as.character(identifier),
+               area = as.double(area),
+               population = as.double(population),
+               ID = as.character(ID)) %>%
+        st_write(output_dir, layer = "nodes",
+                 append = TRUE, quiet = TRUE)
+    } else rm(tmp)
+  }
+  if (out != "file") {
+    out <- st_read(output_dir)
+    unlink(output_dir)
+    out
+  } else { message("\n done!")
+    output_dir
+  }
+}
+
+
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+outputChecker <- function(directory, file_name, output_type = "file")
+{
+  if (is.null(directory) & output_type == "file") {
+    directory <- readline(prompt = "Please enter output directory.")
+  }
+  if (!dir.exists(directory)) {
+    a <- readline(prompt = "Output directory does not exist. Shall I create it? (y/n)")
+    if (a == "y") dir.create(directory) else stop("Specify different output directory.")
+  }
+  if (output_type == "file" & !is.null(directory)) {
+    tmpOut <- paste0(directory, "/", file_name)
+  } else tmpOut <- paste0(getwd(), "/", file_name)
+  if (file.exists(tmpOut)) {
+    b <- readline(prompt = "Output file exists. Remove? (y/n)")
+    if (b == "y") unlink(tmpOut) else stop("Specify different output directory.")
+  }
+  tmpOut
+}
+
+
+################################################################################
+# END OF DOCUMENT
+################################################################################

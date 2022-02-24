@@ -1,6 +1,17 @@
-
 ################################################################################
-# WRAPPER FOR SNAPPING SF OBJECTS
+# MODULE 2 - DATA PREPARATION
+# PART 4 - NETWORK BLENDING
+# 4c - SNAPPING TOOL
+# AUTHOR: BENJAMIN LABOHM, BERLIN, 2022
+################################################################################
+#
+# FUNCTIONS:
+# 1. st_snap_points
+# 2. nearestPointOnLine
+# 3. nearestPointOnSegment
+#
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
 # REQUIRED SETTINGS:
 # setting_name: Setting description
 # OPTIONAL SETTINGS:
@@ -73,3 +84,8 @@ nearestPointOnSegment <- function(s, p)
   names(result) = c("X", "Y", "distance")
   result
 }
+
+
+################################################################################
+# END OF DOCUMENT
+################################################################################
