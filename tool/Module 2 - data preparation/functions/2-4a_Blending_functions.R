@@ -212,7 +212,8 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
 # OPTIONAL SETTINGS:
 # setting_name: Setting description - DEFAULT values
 ################################################################################
-#file_list <- list.files("D:/Berlin/net_blend/", pattern = "nodes", full.names = TRUE)
+file_list <- list.files("D:/Berlin/net_blend/", pattern = "nodes", full.names = TRUE)
+file_list <- nodes
 #file <- file_list[2]
 
 #combinator(file_list, output_dir = "D:/Berlin")
@@ -234,9 +235,9 @@ combinator <- function(file_list, out = "file", output_dir = NULL)
     stepi <- stepi + 1
     setTxtProgressBar(pb, stepi)
     # Read input in file_list and execute a network join
-    tmp <- file %>%
+    tmp <- tryCatch({file %>%
       st_read(quiet = TRUE) %>%
-      filter(!st_is_empty(.))
+      filter(!st_is_empty(.))}, error = function(e) return(tibble()))
     # Check for content
     if (nrow(tmp) > 0) {
       tmp %>%
