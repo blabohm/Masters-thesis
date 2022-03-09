@@ -50,7 +50,9 @@ network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entr
                output_dir = outDir)
   nodes <- list.files(output_dir, pattern = "node", full.names = TRUE)
   edges <- list.files(output_dir, pattern = "edge", full.names = TRUE)
-  network_combinator(edges, output_dir = output_dir)
+  network_combinator(edges, output_dir = output_dir, out = "sf") %>%
+    mutate(edge_id = row_number()) %>%
+    st_write(paste0(output_dir, "edges.gpkg", append = FALSE))
   combinator(nodes, output_dir = output_dir)
   unlink(nodes)
   unlink(edges)
