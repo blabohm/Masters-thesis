@@ -16,7 +16,8 @@
 # OPTIONAL SETTINGS:
 # setting_name: Setting description - DEFAULT values
 ################################################################################
-i <- "76213-DE001L1"
+i <- "76213-DE001L1" # v-park
+i <- "81210-DE001L1" # t-feld
 i <- "109682-DE001L1"
 drive <- "D:/"
 output_dir <- paste0(drive, "Berlin/indices")
