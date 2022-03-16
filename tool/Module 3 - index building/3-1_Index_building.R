@@ -31,10 +31,10 @@ nodeDir <- paste0(drive, "Berlin/nodes.gpkg")
 edgeDir <- paste0(drive, "Berlin/edges.gpkg")
 # FUA CITY CODE
 
-makeIndex(node_directory = nodeDir,
+getIndices(node_directory = nodeDir,
           edge_directory = edgeDir)
 ################################################################################
-makeIndex <- function(node_directory, edge_directory)
+getIndices <- function(node_directory, edge_directory)
   # LOAD NODES, FILTER FOR GREEN SPACE ENTRIES AND GET IDENTIFIER VALUES
   gs_IDs <- node_directory %>%
   st_read(query = "SELECT identifier FROM nodes WHERE identifier is not null",

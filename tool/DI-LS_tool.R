@@ -32,15 +32,87 @@
 #
 ################################################################################
 # MODULE 2 - DATA PREPARATION
+
+# Load packages and data preparation functions
+require(dplyr, quietly = TRUE)
+getwd() %>%
+  paste0("/tool/Module 2 - data preparation/") %>%
+  list.files(pattern = "2-[1-9].*\\.R", full.names = TRUE) %>%
+  for (file in .) source(file)
+
+drive <- "D:/Berlin/"
+
+################################################################################
 # 2.1 - NETWORK CLEANING
 #
+# URAU city code
+cityCode <- "DE001"
+# Input data
+cityBound <- paste0(drive, "cities.gpkg")
+netTileDir <- paste0(drive, "osm_paths/")
+netDir <- paste0(drive, "network_clean.gpkg")
+# Run function
+networkPrep(city_code = cityCode,
+            network_tile_dir = netTileDir,
+            city_boundaries = cityBound,
+            output_directory = netDir)
+
+
+################################################################################
 # 2.2 - BUILDING PREPARATION
 #
+# Input data
+osmDir <- paste0(drive, "osm_buildings/")
+uaDirectory <- paste0(drive, "UA2018/")
+buildOut <- paste0(drive, "buildings.gpkg")
+# Run function
+buildingPrep(city_code = cityCode,
+             osm_directory = osmDir,
+             ua_directory = uaDirectory,
+             city_boundaries = cityBound,
+             out_dir = buildOut)
+
+
+################################################################################
 # 2.3 - GREEN SPACE ENTRY DETECTION
 #
+gsOut <- paste0(drive, "green_space_entries.gpkg")
+# Run function
+greenSpacePrep(city_code = cityCode,
+               city_boundaries = cityBound,
+               ua_directory = uaDirectory,
+               network_file = netDir,
+               output_directory = gsOut)
+
+
+################################################################################
 # 2.4 - NETWORK BLENDING
 #
+# Input data
+blendOut <- paste0(drive, "net_blend/")
+#
+# Run function
+networkBlend(boundary_directory = cityBound,
+             network_directory = netDir,
+             green_space_directory = gsOut,
+             building_directory = buildOut,
+             output_directory = blendOut)
+
+
 ################################################################################
 # MODULE 3 - INDEX BUILDING
 #
 ################################################################################
+# Input data
+nodeDir <- paste0(blendOut, "nodes.gpkg")
+edgeDir <- paste0(blendOut, "edges.gpkg")
+# Run function
+getIndices(node_directory = nodeDir,
+           edge_directory = edgeDir)
+
+################################################################################
+# Clean up
+
+################################################################################
+# END OF DOCUMENT
+

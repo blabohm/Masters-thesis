@@ -20,17 +20,17 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES FOR UA AND OSM DATA
-osmDir <-  "E:/osm_buildings/"
-uaDir <- "C:/Berlin/UA2018/"
-cityCode <- "DE001"
-cityBound <- "E:/citiesEurope/Cities.shp"
-outDir <- "C:/Berlin/buildings.gpkg"
-
-buildingPrep(osm_directory = osmDir,
-             ua_directory = uaDir,
-             city_code = cityCode,
-             city_boundaries = cityBound,
-             out_dir = outDir)
+# osmDir <-  "E:/osm_buildings/"
+# uaDir <- "C:/Berlin/UA2018/"
+# cityCode <- "DE001"
+# cityBound <- "E:/citiesEurope/Cities.shp"
+# outDir <- "C:/Berlin/buildings.gpkg"
+#
+# buildingPrep(osm_directory = osmDir,
+#              ua_directory = uaDir,
+#              city_code = cityCode,
+#              city_boundaries = cityBound,
+#              out_dir = outDir)
 ################################################################################
 
 buildingPrep <- function(osm_directory,
@@ -60,7 +60,7 @@ buildingPrep <- function(osm_directory,
   # 2. READ OSM BUILDING TILE
   #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES
   #    -> UNITE LAYERS IF NECESSARY
-  for(osm_file in osm_file_list$tile_dir) {
+  for (osm_file in osm_file_list$tile_dir) {
     #tmpDir <- paste0(out_dir, strsplit(osm_file, "/")[[1]] %>% last())
     osm_file %>%
       OSMloader() %>%
@@ -74,8 +74,12 @@ buildingPrep <- function(osm_directory,
       # 5. ADD BUILDING ID
       #    -> IDENTIFIER + NUMBER
       OSMbuildID() %>%
-      st_write(outDir, layer = "osm_buildings", quiet = TRUE, append = TRUE)
+      st_write(out_dir, layer = "osm_buildings", quiet = TRUE, append = TRUE)
   }
+  # Building entries
   out_dir %>%
-    return()
+    st_read(quiet = TRUE) %>%
+    st_point_on_surface() %>%
+    st_write(gsub("buildings", "building_entries", out_dir),
+             quiet = TRUE)
 }

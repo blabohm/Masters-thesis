@@ -22,15 +22,21 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES
-cityBound <- "E:/citiesEurope/Cities.shp"
-networkFile <- "C:/Berlin/network_clean1.gpkg"
-uaDirectory <- "E:/UA2018"
-# FUA CITY CODE
-cityCode <- "DE001"
-
+# cityBound <- "E:/citiesEurope/Cities.shp"
+# networkFile <- "C:/Berlin/network_clean1.gpkg"
+# uaDirectory <- "E:/UA2018"
+# # URAU CITY CODE
+# cityCode <- "DE001"
+# greenSpacePrep(city_code = cityCode,
+#                city_boundaries = cityBound,
+#                ua_directory = uaDirectory,
+#                network_file = networkFile)
 ################################################################################
-greenSpacePrep <- function(city_boundaries, cityCode,
-                           uaDirectory, network_file)
+greenSpacePrep <- function(city_boundaries,
+                           city_code,
+                           ua_directory,
+                           network_directory,
+                           output_directory)
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -46,17 +52,16 @@ greenSpacePrep <- function(city_boundaries, cityCode,
   # User communication
 
   codeListUA <- proximity_checker1(city_boundaries = city_boundaries,
-                                  city_code = cityCode)
+                                  city_code = city_code)
 
   greenSpaces <- UAgreen_space(code_list = codeListUA,
-                               ua_directory = uaDirectory,
+                               ua_directory = ua_directory,
                                city_boundaries = city_boundaries,
-                               city_code = cityCode,
+                               city_code = city_code,
                                output = "sf")
   findGSentries(green_spaces = greenSpaces,
-                network = network_file) %>%
-    return()
-}
+                network = network_directory) %>%
+    st_write(output_directory, quiet = TRUE)}
 
 # output <- greenSpacePrep(cityBoundary_file = cityBound,
 #                                   cityCode = cityCode,

@@ -16,23 +16,26 @@
 # READ OSM NETWORK
 # OUTPUT TO TEMP
 ################################################################################
-drive <- "D"
-cityBound <- paste0(drive, ":/Berlin/cities.gpkg")
-city_code <- "DE001"
-beDir <- paste0(drive, ":/Berlin/buildings_cent.gpkg")
-gsDir <- paste0(drive, ":/Berlin/green_space_entries2.gpkg")
-network <- paste0(drive, ":/Berlin/network_clean1.gpkg")
-outDir <- paste0(drive, ":/Berlin/net_blend/")
-netDir <- paste0(drive, ":/Berlin/network_clean1.gpkg")
+# drive <- "D"
+# cityBound <- paste0(drive, ":/Berlin/cities.gpkg")
+# city_code <- "DE001"
+# beDir <- paste0(drive, ":/Berlin/buildings_cent.gpkg")
+# gsDir <- paste0(drive, ":/Berlin/green_space_entries2.gpkg")
+# network <- paste0(drive, ":/Berlin/network_clean1.gpkg")
+# outDir <- paste0(drive, ":/Berlin/net_blend/")
+# netDir <- paste0(drive, ":/Berlin/network_clean1.gpkg")
+#
+# networkBlend(boundary_directory = cityBound,
+#              network_directory = netDir,
+#              green_space_directory = gsDir,
+#              build_entry_directory = beDir,
+#              output_directory = outDir)
 
-network_blend(boundary_dir = cityBound,
-              network_dir = netDir,
-              green_space_dir = gsDir,
-              build_entry_dir = beDir,
-              output_dir = outDir)
-
-network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entry_dir,
-                          output_dir)
+networkBlend <- function(city_boundaries,
+                         network_directory,
+                         green_space_directory,
+                         building_directory,
+                         output_directory)
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
@@ -42,18 +45,20 @@ network_blend <- function(boundary_dir, network_dir, green_space_dir, build_entr
     list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   if (!dir.exists(output_dir)) dir.create(output_dir)
+
   # SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
-  snapAndBlend(city_boundary = boundary_dir,
-               build_entries = build_entry_dir,
-               gs_entries = green_space_dir,
-               network = network_dir,
-               output_dir = outDir)
-  nodes <- list.files(output_dir, pattern = "node", full.names = TRUE)
-  edges <- list.files(output_dir, pattern = "edge", full.names = TRUE)
-  network_combinator(edges, output_dir = output_dir, out = "sf") %>%
+  snapAndBlend(city_boundary = city_boundaries,
+               build_entries = build_entries,
+               gs_entries = green_space_directory,
+               network = network_directory,
+               output_dir = output_directory)
+  # Combine ouput
+  nodes <- list.files(output_directory, pattern = "node", full.names = TRUE)
+  edges <- list.files(output_directory, pattern = "edge", full.names = TRUE)
+  network_combinator(edges, output_dir = output_directory, out = "sf") %>%
     mutate(edge_id = row_number()) %>%
-    st_write(paste0(output_dir, "edges.gpkg", append = FALSE))
-  combinator(nodes, output_dir = output_dir)
+    st_write(paste0(output_directory, "edges.gpkg", append = FALSE))
+  combinator(nodes, output_dir = output_directory)
   unlink(nodes)
   unlink(edges)
 }

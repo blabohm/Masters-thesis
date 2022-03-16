@@ -24,17 +24,20 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES FOR UA AND OSM DATA
-boundaryFile <- "E:/citiesEurope/Cities.shp"
-netTileDir <- "E:/osm_paths/"
-# # FUA CITY CODE
-cityCode <- "DE001"
-
-net <- networkPrep(network_tile_dir = netTileDir,
-                   boundary_file = boundaryFile,
-                   city_code = cityCode)
+# boundaryFile <- "E:/citiesEurope/Cities.shp"
+# netTileDir <- "E:/osm_paths/"
+# # # FUA CITY CODE
+# cityCode <- "DE001"
+#
+# net <- networkPrep(network_tile_dir = netTileDir,
+#                    city_boundaries = boundaryFile,
+#                    city_code = cityCode)
 ################################################################################
 
-networkPrep <- function(network_tile_dir, boundary_file, city_code)
+networkPrep <- function(network_tile_dir,
+                        city_boundaries,
+                        city_code,
+                        output_directory)
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -43,7 +46,7 @@ networkPrep <- function(network_tile_dir, boundary_file, city_code)
     list.files(pattern = "2-1[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # LOAD CITY CORE BOUNDARY
-  cityBoundary <- boundaryLoader(boundary_file = boundary_file,
+  cityBoundary <- boundaryLoader(boundary_file = city_boundaries,
                                  city_code = city_code,
                                  buffer_dist = 1000,
                                  code_string = "URAU_COD")
@@ -55,6 +58,6 @@ networkPrep <- function(network_tile_dir, boundary_file, city_code)
     # CLEAN NETWORK
     #    -> DOUBLE ENTRIES
     #    -> UNCONNECTED EDGES
-    networkCleaner() %>%
-    return()
+    networkCleaner()
+  st_write(output_directory, quiet = TRUE, append = FALSE)
 }
