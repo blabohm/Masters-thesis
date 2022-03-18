@@ -47,28 +47,22 @@ sfc2bb <- function(sfc_object, crs = 3035)
 # setting_name: Setting description - DEFAULT values
 ################################################################################
 
-boundaryLoader <- function(city_boundaries, city_code = NULL, buffer_dist = 0,
-                            code_string = "FUA_CO", crs = 3035)
+boundaryLoader <- function(city_boundaries, city_code,
+                           buffer_dist = 0, crs = 3035)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-
-  if (class(city_boundaries) == "character")  {
-    cityBound <- st_read(city_boundaries, quiet = TRUE) } else {
-      cityBound <- city_boundaries }
+  # Create query
+  q <- paste0("SELECT * FROM cities WHERE URAU_CODE LIKE '", city_code, "'")
   # User communication
   message("Load city boundary")
-
-  cityBound <- cityBound %>%
-    select(code = matches(code_string)) %>%
-    mutate(code = substr(code, 1, 5)) %>%
+  # Load boundary matching city code
+  city_boundaries %>%
+    st_read(query = q, quiet = TRUE) %>%
     st_transform(crs) %>%
-    st_cast("POLYGON", do_split = TRUE, warn = FALSE)
-
-  if (is.null(city_code)) return(cityBound) else {
-    cityBound %>%
-      filter(code %in% city_code) %>%
-      st_buffer(buffer_dist) %>%
-      return() }
+    st_cast("POLYGON", do_split = TRUE, warn = FALSE) %>%
+    st_buffer(buffer_dist) %>%
+    return()
 }
+
 

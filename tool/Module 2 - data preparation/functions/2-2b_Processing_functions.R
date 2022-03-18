@@ -40,7 +40,7 @@ proximity_checker <- function(city_boundary, osm_file, city_code, crs = 3035)
       st_transform(crs) %>%
       sfc2bb(crs = crs)
     # Check for proximity of other cities
-    if(any(st_intersects(c$geom, city_boundary, sparse = FALSE)))
+    if (any(st_intersects(c$geom, city_boundary, sparse = FALSE)))
       tmpDf <- tibble(tile_dir = i) %>%
       bind_rows(tmpDf)
   }
@@ -54,7 +54,7 @@ proximity_checker <- function(city_boundary, osm_file, city_code, crs = 3035)
 # ua_residential: UA residential as sfc_object with geometry type POLYGON
 ################################################################################
 
-OSMfilter <- function(osm_buildings, ua_residential, city_boundary)
+OSMfilter <- function(osm_buildings, ua_residential)
 {
   # required packages
   require(dplyr)
@@ -68,7 +68,6 @@ OSMfilter <- function(osm_buildings, ua_residential, city_boundary)
   message("\n filtering OSM buildings... \n")
   # filtering
   osm_buildings %>%
-    st_filter(city_boundary, .pred = st_intersects) %>%
     st_join(ua_residential) %>%
     # filter OSM buildings inside UA residential polygons
     filter(!is.na(code_2018)) %>%

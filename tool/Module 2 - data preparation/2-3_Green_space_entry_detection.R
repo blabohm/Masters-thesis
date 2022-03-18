@@ -52,7 +52,7 @@ greenSpacePrep <- function(city_boundaries,
   # User communication
 
   codeListUA <- proximity_checker1(city_boundaries = city_boundaries,
-                                  city_code = city_code)
+                                   city_code = city_code)
 
   greenSpaces <- UAgreen_space(code_list = codeListUA,
                                ua_directory = ua_directory,

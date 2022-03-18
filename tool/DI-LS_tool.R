@@ -35,20 +35,25 @@
 
 # Load packages and data preparation functions
 require(dplyr, quietly = TRUE)
+require(sf, quietly = TRUE)
 getwd() %>%
   paste0("/tool/Module 2 - data preparation/") %>%
   list.files(pattern = "2-[1-9].*\\.R", full.names = TRUE) %>%
   for (file in .) source(file)
 
-drive <- "D:/Berlin/"
+drive <- "D:/temp/"
 
 ################################################################################
 # 2.1 - NETWORK CLEANING
 #
+cityBound <- paste0(drive, "cities.gpkg")
+ccList <- cityBound %>%
+  st_read(query = "SELECT URAU_CODE FROM cities", quiet = TRUE) %>%
+  filter(grepl("001", URAU_CODE))
 # URAU city code
 cityCode <- "DE001"
+#cityCode <- ccList$URAU_CODE[1]
 # Input data
-cityBound <- paste0(drive, "cities.gpkg")
 netTileDir <- paste0(drive, "osm_paths/")
 netDir <- paste0(drive, "network_clean.gpkg")
 # Run function
@@ -70,9 +75,9 @@ buildingPrep(city_code = cityCode,
              osm_directory = osmDir,
              ua_directory = uaDirectory,
              city_boundaries = cityBound,
-             out_dir = buildOut)
+             output_directory = buildOut)
 
-
+################################################################################
 ################################################################################
 # 2.3 - GREEN SPACE ENTRY DETECTION
 #
@@ -84,13 +89,12 @@ greenSpacePrep(city_code = cityCode,
                network_file = netDir,
                output_directory = gsOut)
 
-
+################################################################################
 ################################################################################
 # 2.4 - NETWORK BLENDING
 #
 # Input data
 blendOut <- paste0(drive, "net_blend/")
-#
 # Run function
 networkBlend(boundary_directory = cityBound,
              network_directory = netDir,

@@ -24,7 +24,7 @@
 # numbers - DEFAULT is all UA residential classes
 ################################################################################
 
-UAresLoader <- function(ua_dir, city_code,
+UAresLoader <- function(ua_dir, city_code, boundary,
                         crs = 3035, res_class = c(11100, 11210, 11220,
                                                   11230, 11240, 11300))
 {
@@ -41,15 +41,19 @@ UAresLoader <- function(ua_dir, city_code,
                recursive = TRUE)
   # get name of UA land-use layer
   lr <- st_layers(ua_file)$name[1]
+  boundary <- boundary %>%
+    st_geometry() %>%
+    st_as_text()
   # user communication
   message("\n loading residential areas... \n")
   # load UA file and filter residential classes
-  ua <- ua_file %>%
-    st_read(lr, quiet = TRUE) %>%
+  ua_file %>%
+    st_read(lr, wkt_filter = boundary, quiet = TRUE
+            ) %>%
     filter(code_2018 %in% res_class) %>%
     st_transform(crs) %>%
-    select(Pop2018, identifier, code_2018)
-  return(ua)
+    select(Pop2018, identifier, code_2018) %>%
+    return()
 }
 
 
@@ -61,7 +65,7 @@ UAresLoader <- function(ua_dir, city_code,
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-OSMloader <- function(osm_file, crs = 3035)
+OSMloader <- function(osm_file, boundary, crs = 3035)
 {
   # required packages
   require(dplyr)
@@ -69,21 +73,24 @@ OSMloader <- function(osm_file, crs = 3035)
   # get name of OSM building layers (only using polygon and multipolygon layers)
   lr <- st_layers(osm_file)$name %>%
     grep("poly", ., ignore.case = TRUE, value = TRUE)
-  # user communication
-  message("\n loading osm buildings... \n")
+  boundary <- boundary %>%
+    st_transform(4326) %>%
+    st_geometry() %>%
+    st_as_text()
   # load individual layers
   for (i in lr) {
     # load OSM file and combine layers
     if (grepl("osm_multipolygons", i)) {
       tmp <- osm_file %>%
-        st_read(i, quiet = TRUE) %>%
+        st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
         st_make_valid() %>%
         st_cast("POLYGON")
     } else if (grepl("osm_polygons", i)) {
       tmp <- osm_file %>%
-        st_read(i, quiet = TRUE) %>%
+        st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
         st_make_valid() }
-    if (i == first(lr)) osm <- tmp else osm <- bind_rows(osm, tmp)}
+    if (i == first(lr)) osm <- tmp else osm <- bind_rows(osm, tmp)
+    }
   # delete temporary object
   rm(tmp)
   # transform to EPSG 3035 and drop columns

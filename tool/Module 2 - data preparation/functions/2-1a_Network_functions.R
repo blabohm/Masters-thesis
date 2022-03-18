@@ -73,39 +73,43 @@ listTiles <- function(network_tile_directory, city_code)
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-combinator <- function(file_list, boundary = NULL, crs = 3035)
+combinator <- function(file_list, tmp_dir, boundary = NULL, crs = 3035)
 {
   # load packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-  # temp directory for output
-  tmpOut <- paste0(tempdir(), "\\tmp-path.gpkg")
-  if (dir.exists(tmpOut)) unlink(tmpOut)
+  # temp directory for temp storage of output
+  if (grepl("//$", tmp_dir)) tmpOut <- tmp_dir else {
+  tmpOut <- gsub("network_clean.gpkg", "", tmp_dir) %>%
+    paste0("tmp-file.gpkg") }
+  if (file.exists(tmpOut)) unlink(tmpOut)
+  # converting boundary to wkt_filter
+  if (!is.null(boundary)) boundary <- boundary %>%
+      st_transform(4326) %>%
+      st_geometry() %>%
+      st_as_text()
+  # User communication
+  message("\n Starting network combination and filtering \n")
   # iterate through files
   for (file in file_list) {
-    # check layers
+    # get layer name
     lr <- st_layers(file)$name %>%
-      grep("line", .,
-           ignore.case = TRUE, value = TRUE)
+      grep("line", ., ignore.case = TRUE, value = TRUE)
     # read file
     tmp <- file %>%
-      st_read(quiet = TRUE, layer = lr[1]) %>%
+      st_read(quiet = TRUE, layer = lr, wkt_filter = boundary) %>%
       st_transform(crs)
-    # check if tmp is inside boundary
-    isIn <- ifelse(is.null(boundary), TRUE,
-                   any(st_intersects(tmp$geom, boundary, sparse = FALSE)))
     # combine
-    if (isIn) tmp %>%
+    if (nrow(tmp) == 0) next else tmp %>%
       select(highway = matches("^highway$")) %>%
       filter(!grepl("motorway", highway)) %>%
+      st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
       st_write(dsn = tmpOut, layer = "osm_paths",
                quiet = TRUE, append = TRUE)}
   # clear temp object
   rm(tmp)
   # read output and return
-  output <- tmpOut %>%
-    st_read(quiet = TRUE) %>%
-    st_filter(boundary, .pred = st_intersects)
+  output <- st_read(tmpOut, quiet = TRUE)
   unlink(tmpOut)
   return(output)
 }
@@ -126,12 +130,15 @@ networkCleaner <- function(network, crs = 3035)
   require(sf, quietly = TRUE)
   require(tidygraph, quietly = TRUE)
   require(sfnetworks, quietly = TRUE)
+  # User communication
+  network <- network
+  message("\n Starting network cleaning \n")
   # network cleaning
   network %>%
     # remove double entries
     distinct() %>%
     # make sure no MULTILINESTRINGS in network
-    st_cast("LINESTRING") %>%
+    #st_cast("LINESTRING") %>%
     st_geometry() %>%
     # make sure point coordinates match
     lapply(function(x) round(x, 0)) %>%
@@ -143,5 +150,9 @@ networkCleaner <- function(network, crs = 3035)
     convert(to_spatial_smooth) %>%
     # remove unconnected edges
     filter(group_components() == 1) %>%
+    activate("edges") %>%
+    st_geometry() %>%
+    st_as_sf() %>%
+    rename(geom = x) %>%
     return()
 }
