@@ -42,7 +42,7 @@ greenSpacePrep <- function(city_boundaries,
   require(dplyr, quietly = TRUE)
   getwd() %>%
     paste0("/tool/Module 2 - data preparation/functions/") %>%
-    list.files(pattern = "2-3_[A-Za-z].*\\.R", full.names = TRUE) %>%
+    list.files(pattern = "2-3_[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
 
   ################################################################################
@@ -50,7 +50,6 @@ greenSpacePrep <- function(city_boundaries,
   #    -> DESCRIPTION OF STEPS
   # Load city boundaries matching urau code (to avoid matching multiple cities)
   # User communication
-
   codeListUA <- proximity_checker1(city_boundaries = city_boundaries,
                                    city_code = city_code)
 
@@ -61,7 +60,8 @@ greenSpacePrep <- function(city_boundaries,
                                output = "sf")
   findGSentries(green_spaces = greenSpaces,
                 network = network_directory) %>%
-    st_write(output_directory, quiet = TRUE)}
+    st_write(output_directory, quiet = TRUE)
+  }
 
 # output <- greenSpacePrep(cityBoundary_file = cityBound,
 #                                   cityCode = cityCode,

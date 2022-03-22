@@ -19,58 +19,29 @@
 # city_boundaries <- "E:/citiesEurope/Cities.shp"
 # city_code <- "DE001"
 
-proximity_checker1 <- function(city_boundaries, city_boundary)
+proximity_checker1 <- function(city_boundaries, city_code)
 {
   # Load required packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-  # Load city boundaries europe
-  city_boundaries <- boundaryLoader(city_boundaries)
-  # User communication
-  message("Checking proximity")
-  # Filter for desired city
-  c <- st_buffer(city_boundary, 1000)
+  # LOAD CITY CORE BOUNDARY
+  city_boundary <- boundaryLoader(city_boundaries = city_boundaries,
+                                  city_code = city_code,
+                                  buffer_dist = 1000)
+  # Create filter
+  f <- city_boundary %>%
+    st_geometry() %>%
+    st_as_text()
   # Check for proximity of other cities
-  cityBound %>%
-    st_filter(c, .pred = st_intersects) %>%
-    pull(code) %>%
+  city_boundaries %>%
+    st_read(wkt_filter = f,
+            quiet = TRUE) %>%
+    pull(URAU_CODE) %>%
     substr(1, 5) %>%
     unique() %>%
     return()
 }
 
-
-################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
-# REQUIRED SETTINGS:
-# setting_name: Setting description
-# OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
-################################################################################
-
-cityBoundLoader <- function(city_boundaries, city_code = NULL, buffer_dist = 0,
-                            code_string = "FUA_CO", crs = 3035)
-{
-  require(dplyr, quietly = TRUE)
-  require(sf, quietly = TRUE)
-
-  if (class(city_boundaries) == "character")  {
-    cityBound <- st_read(city_boundaries, quiet = TRUE) } else {
-      cityBound <- city_boundaries }
-  # User communication
-  message("Load city boundary")
-
-  cityBound <- cityBound %>%
-    select(code = matches(code_string)) %>%
-    mutate(code = substr(code, 1, 5)) %>%
-    st_transform(crs)
-
-  if (is.null(city_code)) return(cityBound) else {
-    cityBound %>%
-      filter(code %in% city_code) %>%
-      st_buffer(buffer_dist) %>%
-      return() }
-}
 
 
 ################################################################################
@@ -106,8 +77,11 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
   outLayer <- paste0("green_spaces")
   gsDsn <- paste0(tempdir(), "\\", outLayer, ".gpkg")
   # load city boundary
-  cityBound <- boundaryLoader(city_boundaries, city_code,
-                               code_string = "URAU_CO", buffer_dist = 1000)
+  city_boundary <- boundaryLoader(city_boundaries = city_boundaries,
+                                  city_code = city_code,
+                                  buffer_dist = 1000) %>%
+    st_geometry() %>%
+    st_as_text()
   # set up progress bar
   pb <- txtProgressBar(min = 0, max = length(ua),
                        initial = 0, style = 3)
@@ -120,14 +94,13 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
     # get name of land use layer
     lyr <- st_layers(uaFile)$name[1]
     # write parks to one layer
-    st_read(uaFile, layer = lyr, quiet = TRUE) %>%
+    st_read(uaFile, layer = lyr, wkt_filter = city_boundary , quiet = TRUE) %>%
       st_transform(crs) %>%
       select(city_code = contains("FUA_OR") | contains("fua_code"),
              class = contains("code") & contains("20"),
              contains("identifier"),
              contains("area")) %>%
       filter(class %in% greenSpaces) %>%
-      st_filter(cityBound, .pred = st_intersects) %>%
       st_write(dsn = gsDsn, layer = outLayer,
                append = TRUE, quiet = TRUE) }
   # check for output style and return

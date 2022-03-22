@@ -77,7 +77,7 @@ buildingPrep(city_code = cityCode,
              city_boundaries = cityBound,
              output_directory = buildOut)
 
-################################################################################
+
 ################################################################################
 # 2.3 - GREEN SPACE ENTRY DETECTION
 #
@@ -86,7 +86,7 @@ gsOut <- paste0(drive, "green_space_entries.gpkg")
 greenSpacePrep(city_code = cityCode,
                city_boundaries = cityBound,
                ua_directory = uaDirectory,
-               network_file = netDir,
+               network_directory = netDir,
                output_directory = gsOut)
 
 ################################################################################
@@ -102,7 +102,7 @@ networkBlend(boundary_directory = cityBound,
              building_directory = buildOut,
              output_directory = blendOut)
 
-
+################################################################################
 ################################################################################
 # MODULE 3 - INDEX BUILDING
 #
