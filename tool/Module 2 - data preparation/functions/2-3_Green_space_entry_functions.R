@@ -72,7 +72,7 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
                full.names = TRUE,
                recursive = TRUE)
   # User communication
-  message("Load green spaces")
+  message("\n Load green spaces \n")
   # generate output layer and file names
   outLayer <- paste0("green_spaces")
   gsDsn <- paste0(tempdir(), "\\", outLayer, ".gpkg")
@@ -100,7 +100,7 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
              class = contains("code") & contains("20"),
              contains("identifier"),
              contains("area")) %>%
-      filter(class %in% greenSpaces) %>%
+      filter(class %in% greenSpaces | identifier %in% "81210-DE001L1") %>%
       st_write(dsn = gsDsn, layer = outLayer,
                append = TRUE, quiet = TRUE) }
   # check for output style and return
@@ -129,33 +129,37 @@ findGSentries <- function(green_spaces, network, crs = 3035)
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-  # Check inputs
-  if (class(green_spaces)[1] == "character") {
-    gs <- st_read(green_spaces, quiet = TRUE)
-  } else gs <- green_spaces
-  if (class(network)[1] == "character") {
-    net <- st_read(network, quiet = TRUE)
-  } else net <- network
+  # # Check inputs
+  # if (class(green_spaces)[1] == "character") {
+  #   gs <- st_read(green_spaces, quiet = TRUE)
+  # } else gs <- green_spaces
+  # if (class(network)[1] == "character") {
+  network <- st_read(network, quiet = TRUE)
+  # } else net <- network
+  green_spaces <- st_cast(green_spaces, "POLYGON",
+                          do_split = TRUE, warn = FALSE)
   # User communication
-  message("Finding green space entries")
+  message("\n Finding green space entries \n")
   # First iteration of intersecting network with park outlines
-  gsEntries <- gs %>%
+  gsEntries <- green_spaces %>%
     st_buffer(-5) %>%
-    st_cast("MULTILINESTRING") %>%
-    st_intersection(net)
+    st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
+    st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
+    st_intersection(network)
   # Further iterations
   b <- 0
   while (
     # Check if any parks are missing
-    gs %>%
+    green_spaces %>%
     filter(!(identifier %in% unique(gsEntries$identifier))) %>%
     nrow() > 0 ) {
     # Intersect network with parks and new buffer size
-    gsEntries <- gs %>%
+    gsEntries <- green_spaces %>%
       filter(!(identifier %in% unique(gsEntries$identifier))) %>%
       st_buffer(b) %>%
-      st_cast("MULTILINESTRING") %>%
-      st_intersection(net) %>%
+      st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
+      st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
+      st_intersection(network) %>%
       bind_rows(gsEntries)
     # Increase buffer
     if (b <= 50) {b <- b + 5
@@ -164,8 +168,14 @@ findGSentries <- function(green_spaces, network, crs = 3035)
     } else {b <- b + 50}
   }
   gsEntries %>%
-    st_cast("POINT") %>%
+    st_cast("MULTIPOINT", do_split = TRUE, warn = FALSE) %>%
+    st_cast("POINT", do_split = TRUE, warn = FALSE) %>%
     return()
 }
 
 #gse <- findGSentries(green_spaces, network)
+
+
+
+################################################################################
+

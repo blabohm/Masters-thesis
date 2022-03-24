@@ -84,11 +84,14 @@ OSMloader <- function(osm_file, boundary, crs = 3035)
       tmp <- osm_file %>%
         st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
         st_make_valid() %>%
-        st_cast("POLYGON")
+        st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
+        st_cast("POLYGON", do_split = TRUE, warn = FALSE)
     } else if (grepl("osm_polygons", i)) {
       tmp <- osm_file %>%
         st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
-        st_make_valid() }
+        st_make_valid() %>%
+        st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
+        st_cast("POLYGON", do_split = TRUE, warn = FALSE)}
     if (i == first(lr)) osm <- tmp else osm <- bind_rows(osm, tmp)
     }
   # delete temporary object

@@ -22,15 +22,12 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES
-# cityBound <- "E:/citiesEurope/Cities.shp"
-# networkFile <- "C:/Berlin/network_clean1.gpkg"
-# uaDirectory <- "E:/UA2018"
-# # URAU CITY CODE
-# cityCode <- "DE001"
-# greenSpacePrep(city_code = cityCode,
-#                city_boundaries = cityBound,
-#                ua_directory = uaDirectory,
-#                network_file = networkFile)
+drive <- "D:/temp"
+city_boundaries <- paste0(drive, "/cities.gpkg")
+city_code <- "DE001"
+network_directory <- paste0(drive, "/network_clean.gpkg")
+ua_directory <- paste0(drive, "/UA2018")
+output_directory <- paste0(drive, "green_space_entries.gpkg")
 ################################################################################
 greenSpacePrep <- function(city_boundaries,
                            city_code,
@@ -49,19 +46,21 @@ greenSpacePrep <- function(city_boundaries,
   # 1. STEP
   #    -> DESCRIPTION OF STEPS
   # Load city boundaries matching urau code (to avoid matching multiple cities)
-  # User communication
   codeListUA <- proximity_checker1(city_boundaries = city_boundaries,
                                    city_code = city_code)
 
-  greenSpaces <- UAgreen_space(code_list = codeListUA,
-                               ua_directory = ua_directory,
-                               city_boundaries = city_boundaries,
-                               city_code = city_code,
-                               output = "sf")
-  findGSentries(green_spaces = greenSpaces,
-                network = network_directory) %>%
-    st_write(output_directory, quiet = TRUE)
-  }
+  # Load all urban atlas green spaces in city area + 1 km
+  UAgreen_space(code_list = codeListUA,
+                ua_directory = ua_directory,
+                city_boundaries = city_boundaries,
+                city_code = city_code,
+                output = "sf") %>%
+    # detect entry points
+    findGSentries(green_spaces = .,
+                  network = network_directory) %>%
+    roundGeometry() %>%
+    st_write(output_directory, quiet = TRUE, append = FALSE)
+}
 
 # output <- greenSpacePrep(cityBoundary_file = cityBound,
 #                                   cityCode = cityCode,

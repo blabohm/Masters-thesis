@@ -81,6 +81,7 @@ buildingPrep <- function(city_boundaries,
   output_directory %>%
     st_read(quiet = TRUE) %>%
     st_point_on_surface() %>%
+    roundGeometry() %>%
     st_write(gsub("buildings", "building_entries", output_directory),
-             quiet = TRUE)
+             quiet = TRUE, append = FALSE)
 }

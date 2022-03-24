@@ -103,6 +103,7 @@ combinator <- function(file_list, tmp_dir, boundary = NULL, crs = 3035)
     if (nrow(tmp) == 0) next else tmp %>%
       select(highway = matches("^highway$")) %>%
       filter(!grepl("motorway", highway)) %>%
+      st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
       st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
       st_write(dsn = tmpOut, layer = "osm_paths",
                quiet = TRUE, append = TRUE)}

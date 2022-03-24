@@ -94,12 +94,14 @@ greenSpacePrep(city_code = cityCode,
 # 2.4 - NETWORK BLENDING
 #
 # Input data
+buildEntries <- paste0(drive, "building_entries.gpkg")
 blendOut <- paste0(drive, "net_blend/")
 # Run function
-networkBlend(boundary_directory = cityBound,
+networkBlend(city_code = city_code,
+             city_boundaries = cityBound,
              network_directory = netDir,
              green_space_directory = gsOut,
-             building_directory = buildOut,
+             building_directory = buildEntries,
              output_directory = blendOut)
 
 ################################################################################

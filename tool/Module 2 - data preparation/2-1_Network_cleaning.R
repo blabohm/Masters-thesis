@@ -47,11 +47,10 @@ networkPrep <- function(city_boundaries,
     for (file in .) source(file)
   # LOAD CITY CORE BOUNDARY
   city_boundary <- boundaryLoader(city_boundaries = city_boundaries,
-                                 city_code = city_code,
-                                 buffer_dist = 1000)
+                                  city_code = city_code,
+                                  buffer_dist = 1000)
   # LIST NETWORK TILES FOR FUA CODE
- system.time({
-   listTiles(network_tile_directory = network_tile_dir,
+  listTiles(network_tile_directory = network_tile_dir,
             city_code = city_code) %>%
     # LOAD AND COMBINE NETWORK TILES
     combinator(file_list = ., boundary = city_boundary,
@@ -60,5 +59,5 @@ networkPrep <- function(city_boundaries,
     #    -> DOUBLE ENTRIES
     #    -> UNCONNECTED EDGES
     networkCleaner() %>%
-    st_write(output_directory, quiet = TRUE, append = FALSE)})
+    st_write(output_directory, quiet = TRUE, append = FALSE)
 }

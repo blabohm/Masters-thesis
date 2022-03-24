@@ -66,3 +66,25 @@ boundaryLoader <- function(city_boundaries, city_code,
 }
 
 
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+
+roundGeometry <- function(x)
+{
+  dat <- st_drop_geometry(x)
+  st_geometry(x)  %>%
+    lapply(function(i) round(i, 0)) %>%
+    st_sfc(crs = st_crs(x)) %>%
+    st_sf() %>%
+    bind_cols(dat) %>%
+    rename(geom = geometry) %>%
+    return()
+}
+
+################################################################################
+

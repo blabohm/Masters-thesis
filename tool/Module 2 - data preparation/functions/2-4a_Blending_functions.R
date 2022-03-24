@@ -28,18 +28,20 @@
 # crs: Setting description - DEFAULT values
 ################################################################################
 
-drive <- "D"
-city_boundary <- paste0(drive, ":/Berlin/cities.gpkg")
+drive <- "D:/temp"
+city_boundary <- paste0(drive, "/cities.gpkg")
 city_code <- "DE001"
-build_entries <- paste0(drive, ":/Berlin/buildings_cent.gpkg")
-gs_entries <- paste0(drive, ":/Berlin/green_space_entries.gpkg")
-network <- paste0(drive, ":/Berlin/network_clean.gpkg")
-output_dir <- paste0(drive, ":/Berlin/net_blend/")
+build_entries <- paste0(drive, "/building_entries.gpkg")
+gs_entries <- paste0(drive, "/green_space_entries.gpkg")
+network <- paste0(drive, "/network_clean.gpkg")
+output_dir <- paste0(drive, "/net_blend/")
 cellsize = 3000
 crs = 3035
+perc_core = .5
 
-snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, network,
-                         output_dir, cellsize = 3000, crs = 3035)
+snapAndBlend <- function(city_code, city_boundary, build_entries, gs_entries,
+                         network, output_dir,
+                         cellsize = 3000, crs = 3035, perc_core = .75)
 {
   # Load required packages
   require(dplyr, quietly = TRUE)
@@ -59,7 +61,7 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
     st_as_sf() %>%
     st_filter(city_boundary, .pred = st_intersects)
   # Set up parallel processing
-  ncore <- round(detectCores() * .75)
+  ncore <- round(detectCores() * perc_core)
   cl <- makeCluster(ncore, outfile = "")
   registerDoParallel(cl)
   # Iterate through city tiles
@@ -140,12 +142,12 @@ snapAndBlend <- function(city_boundary, city_code, build_entries, gs_entries, ne
       edges <- net %>%
         activate("edges") %>%
         st_as_sf() %>%
-        select(-c("from", "to")) %>%
+        select(-matches("from|to")) %>%
         distinct()
       nodes <- net %>%
         activate("nodes") %>%
         st_as_sf() %>%
-        select(-c("city_code", "class")) %>%
+        select(-matches("city_code|class")) %>%
         distinct()
       # Write output
       st_write(nodes, node_out, quiet = TRUE, append = TRUE)
@@ -172,12 +174,12 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
   # check output consistency
-  output_dir <- outputChecker(directory = output_dir, file_name = "nodes.gpkg")
+  output_dir <- outputChecker(directory = output_dir, file_name = "edges.gpkg")
   # set up progress bar
   pb <- txtProgressBar(min = 0, max = length(file_list),
                        initial = 0, style = 3)
   stepi <- 0
-  tmp <- NULL
+  outSF <- NULL
   # iterate through files
   for (file in file_list) {
     # for progress bar
@@ -188,7 +190,7 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
       st_read(quiet = TRUE) %>%
       filter(!st_is_empty(.)) %>%
       as_sfnetwork()
-    if (!is.null(tmp)) {
+    if (!is.null(outSF)) {
       outSF <- tmp %>%
         st_network_join(outSF, .)
     } else {
@@ -201,7 +203,11 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
       st_as_sf() %>%
       distinct() %>%
       st_write(paste0(output_dir, "/edges_clean.gpkg"))
-  } else distinct(outSF)
+  } else outSF %>%
+    activate("edges") %>%
+    st_as_sf() %>%
+    distinct() %>%
+    return()
 }
 
 
@@ -212,8 +218,8 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
 # OPTIONAL SETTINGS:
 # setting_name: Setting description - DEFAULT values
 ################################################################################
-file_list <- list.files("D:/Berlin/net_blend/", pattern = "nodes", full.names = TRUE)
-file_list <- nodes
+# file_list <- list.files("D:/Berlin/net_blend/", pattern = "nodes", full.names = TRUE)
+# file_list <- nodes
 #file <- file_list[2]
 
 #combinator(file_list, output_dir = "D:/Berlin")

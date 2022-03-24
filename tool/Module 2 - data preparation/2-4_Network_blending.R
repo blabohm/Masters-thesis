@@ -32,6 +32,7 @@
 #              output_directory = outDir)
 
 networkBlend <- function(city_boundaries,
+                         city_code,
                          network_directory,
                          green_space_directory,
                          building_directory,
@@ -44,20 +45,21 @@ networkBlend <- function(city_boundaries,
     paste0("/tool/Module 2 - data preparation/functions/") %>%
     list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
-  if (!dir.exists(output_dir)) dir.create(output_dir)
+  if (!dir.exists(output_directory)) dir.create(output_directory)
 
   # SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
-  snapAndBlend(city_boundary = city_boundaries,
-               build_entries = build_entries,
+  snapAndBlend(city_code = city_code,
+               city_boundary = city_boundaries,
+               build_entries = building_directory,
                gs_entries = green_space_directory,
                network = network_directory,
                output_dir = output_directory)
   # Combine ouput
   nodes <- list.files(output_directory, pattern = "node", full.names = TRUE)
   edges <- list.files(output_directory, pattern = "edge", full.names = TRUE)
-  network_combinator(edges, output_dir = output_directory, out = "sf") %>%
+  networkCombinator(file_list = edges, output_dir = output_directory, out = "sf") %>%
     mutate(edge_id = row_number()) %>%
-    st_write(paste0(output_directory, "edges.gpkg", append = FALSE))
+    st_write(paste0(output_directory, "edges.gpkg"), append = FALSE)
   combinator(nodes, output_dir = output_directory)
   unlink(nodes)
   unlink(edges)
