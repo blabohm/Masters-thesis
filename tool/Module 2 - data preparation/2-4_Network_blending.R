@@ -59,7 +59,8 @@ networkBlend <- function(city_boundaries,
   edges <- list.files(output_directory, pattern = "edge", full.names = TRUE)
   networkCombinator(file_list = edges, output_dir = output_directory, out = "sf") %>%
     mutate(edge_id = row_number()) %>%
-    st_write(paste0(output_directory, "edges.gpkg"), append = FALSE)
+    st_write(paste0(output_directory, "edges.gpkg"),
+             append = FALSE, quiet = TRUE)
   combinator(nodes, output_dir = output_directory)
   unlink(nodes)
   unlink(edges)

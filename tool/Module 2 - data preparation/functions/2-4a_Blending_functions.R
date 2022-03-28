@@ -294,39 +294,5 @@ outputChecker <- function(directory, file_name, output_type = "file")
 
 
 ################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
-# REQUIRED SETTINGS:
-# setting_name: Setting description
-# OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
-################################################################################
-#e <- edges
-#e <- distinct(out)
-#e <- st_read("D:/Berlin/indices/edges_76213-DE001L11.gpkg")
-
-remove_overlap <- function(e)
-{
-  e <- distinct( select(e, geom) )
-  eb <- st_buffer(e, 1e-5)
-  e$covers <- c(st_covers(eb, e))
-
-  covering <- filter(e, lengths(covers) > 1)
-  notCovering <- filter(e, lengths(covers) < 2)
-
-  if (nrow(covering) < 1) return(message("No overlap!"))
-
-  st_difference(st_union(covering), st_union(notCovering)) %>%
-    st_cast("LINESTRING") %>%
-    st_sf() %>%
-    rename(geom = geometry) %>%
-    bind_rows(notCovering, .) %>%
-    distinct() %>%
-    select(geom) %>%
-    mutate(weight = st_length(.)) %>%
-    return()
-}
-
-
-################################################################################
 # END OF DOCUMENT
 ################################################################################

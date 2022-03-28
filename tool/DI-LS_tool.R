@@ -54,8 +54,8 @@ ccList <- cityBound %>%
 cityCode <- "DE001"
 #cityCode <- ccList$URAU_CODE[1]
 # Input data
-netTileDir <- paste0(drive, "osm_paths/")
-netDir <- paste0(drive, "network_clean.gpkg")
+netTileDir <- paste0(drive, "/osm_paths/")
+netDir <- paste0(drive, "/network_clean.gpkg")
 # Run function
 networkPrep(city_code = cityCode,
             network_tile_dir = netTileDir,
@@ -67,9 +67,9 @@ networkPrep(city_code = cityCode,
 # 2.2 - BUILDING PREPARATION
 #
 # Input data
-osmDir <- paste0(drive, "osm_buildings/")
-uaDirectory <- paste0(drive, "UA2018/")
-buildOut <- paste0(drive, "buildings.gpkg")
+osmDir <- paste0(drive, "/osm_buildings/")
+uaDirectory <- paste0(drive, "/UA2018/")
+buildOut <- paste0(drive, "/buildings.gpkg")
 # Run function
 buildingPrep(city_code = cityCode,
              osm_directory = osmDir,
@@ -81,7 +81,7 @@ buildingPrep(city_code = cityCode,
 ################################################################################
 # 2.3 - GREEN SPACE ENTRY DETECTION
 #
-gsOut <- paste0(drive, "green_space_entries.gpkg")
+gsOut <- paste0(drive, "/green_space_entries.gpkg")
 # Run function
 greenSpacePrep(city_code = cityCode,
                city_boundaries = cityBound,
@@ -94,8 +94,8 @@ greenSpacePrep(city_code = cityCode,
 # 2.4 - NETWORK BLENDING
 #
 # Input data
-buildEntries <- paste0(drive, "building_entries.gpkg")
-blendOut <- paste0(drive, "net_blend/")
+buildEntries <- paste0(drive, "/building_entries.gpkg")
+blendOut <- paste0(drive, "/net_blend/")
 # Run function
 networkBlend(city_code = city_code,
              city_boundaries = cityBound,
@@ -112,9 +112,12 @@ networkBlend(city_code = city_code,
 # Input data
 nodeDir <- paste0(blendOut, "nodes.gpkg")
 edgeDir <- paste0(blendOut, "edges.gpkg")
+indexDir <- paste0(drive, "/indices/")
 # Run function
 getIndices(node_directory = nodeDir,
-           edge_directory = edgeDir)
+           edge_directory = edgeDir,
+           building_directory = buildOut,
+           output_directory = indexDir)
 
 ################################################################################
 # Clean up
