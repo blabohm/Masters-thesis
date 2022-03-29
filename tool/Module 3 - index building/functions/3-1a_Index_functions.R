@@ -16,14 +16,15 @@
 # OPTIONAL SETTINGS:
 # setting_name: Setting description - DEFAULT values
 ################################################################################
-ID <- "76213-DE001L1" # v-park
-ID <- "81210-DE001L1" # t-feld
-drive <- "D:/temp/"
-output <- paste0(drive, "indices")
-nodes <- paste0(drive, "nodes.gpkg")
-edges <- paste0(drive, "edges.gpkg")
-perc_core <- .5
-d <- 500
+# ID <- "76213-DE001L1" # v-park
+# ID <- "81210-DE001L1" # t-feld
+# drive <- "D:/temp/"
+# output <- paste0(drive, "indices")
+# nodes <- paste0(drive, "nodes.gpkg")
+# edges <- paste0(drive, "edges.gpkg")
+# perc_core <- .5
+# d <- 500
+# folder <- "D:/temp/"
 ################################################################################
 # Urban atlas identifiers of green spaces
 # Network node file path
@@ -38,33 +39,38 @@ calcIndices <- function(green_space_IDs, folder,
   # create output directory if it doesn't exist
   if (!dir.exists(output)) dir.create(output)
   # Set up parallel processing
-  # require(doParallel)
-  # ncore <- round(detectCores() * perc_core)
-  # cl <- makeCluster(ncore, outfile = "")
-  # registerDoParallel(cl)
-  # foreach(i = gs_IDs) %dopar% {
-  for (ID in gs_IDs) {
-
+  require(doParallel)
+  ncore <- round(detectCores() * perc_core)
+  cl <- makeCluster(ncore, outfile = "")
+  registerDoParallel(cl)
+  foreach(ID = green_space_IDs) %dopar% {
+  #for (ID in green_space_IDs) {
     # Load required packages for each core
-    require(dplyr, quietly = TRUE)
     require(sf, quietly = TRUE)
     require(sfnetworks, quietly = TRUE)
     require(tidygraph, quietly = TRUE)
+    require(dplyr, quietly = TRUE)
+    getwd() %>%
+      paste0("/tool/Module 3 - index building/functions/") %>%
+      list.files(pattern = "3-1[A-Za-z].*\\.R", full.names = TRUE) %>%
+      for (file in .) source(file)
+
 
     # 1
     gs_entries <- load_gs_entries(ID, folder)
     # 2
-    build_entries <- load_build_entries(folder, gs_entries)
+    build_entries <- load_build_entries(folder, gs_entries, d)
     # 3
     network <- load_network(folder, gs_entries)
+    if (nrow(build_entries) == 0) next
     # 4
     out <- add_params(build_entries, gs_entries, network)
+    if (nrow(out) < 1) next
     # 5
-    write_output(out, network, folder)
+    write_output(out, network, folder, ID)
   }
-  #parallel::stopCluster(cl)
+  parallel::stopCluster(cl)
 }
-
 
 
 ################################################################################
@@ -83,7 +89,7 @@ gatherDI <- function(building_polygons, index_dir, output_dir)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-
+  building_polygons
   di_files <- list.files(index_dir,
                          pattern = "nodes[1-9]*.*csv$",
                          full.names = TRUE)
@@ -123,7 +129,7 @@ gatherLS <- function(edges, index_dir, output_dir)
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
 
-  ls_files <- list.files(di_directory,
+  ls_files <- list.files(index_dir,
                          pattern = "edges[1-9]*.*csv$",
                          full.names = TRUE)
 
@@ -143,41 +149,7 @@ gatherLS <- function(edges, index_dir, output_dir)
   edges %>%
     st_read(quiet = TRUE) %>%
     left_join(ls_out) %>%
-    st_write(ouput_dir)
-}
-
-
-################################################################################
-# 1. FUNCTION DESCRIPTION (SHORT)
-# REQUIRED SETTINGS:
-# setting_name: Setting description
-# OPTIONAL SETTINGS:
-# setting_name: Setting description - DEFAULT values
-################################################################################
-#e <- edges
-#e <- distinct(out)
-#e <- st_read("D:/Berlin/indices/edges_76213-DE001L11.gpkg")
-
-remove_overlap <- function(e)
-{
-  e <- distinct( select(e, geom) )
-  eb <- st_buffer(e, 1e-5)
-  e$covers <- c(st_covers(eb, e))
-
-  covering <- filter(e, lengths(covers) > 1)
-  notCovering <- filter(e, lengths(covers) < 2)
-
-  if (nrow(covering) < 1) return( select(e, geom) )
-
-  st_difference(st_union(covering), st_union(notCovering)) %>%
-    st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
-    st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
-    st_sf() %>%
-    rename(geom = geometry) %>%
-    bind_rows(notCovering, .) %>%
-    distinct() %>%
-    select(geom) %>%
-    return()
+    st_write(output_dir)
 }
 
 

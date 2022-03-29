@@ -114,10 +114,7 @@ nodeDir <- paste0(blendOut, "nodes.gpkg")
 edgeDir <- paste0(blendOut, "edges.gpkg")
 indexDir <- paste0(drive, "/indices/")
 # Run function
-getIndices(node_directory = nodeDir,
-           edge_directory = edgeDir,
-           building_directory = buildOut,
-           output_directory = indexDir)
+getIndices(working_directory)
 
 ################################################################################
 # Clean up
