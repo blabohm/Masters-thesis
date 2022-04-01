@@ -66,8 +66,9 @@ load_network <- function(folder, gs_entries, d = 500)
     st_buffer(d) %>%
     st_union() %>%
     st_as_text()
-  network <- st_read(edges, wkt_filter = gs_filter, quiet = TRUE)
-  return(network)
+  edges %>%
+    st_read(wkt_filter = gs_filter, quiet = TRUE) %>%
+    return()
 }
 
 ################################################################################

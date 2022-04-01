@@ -155,5 +155,7 @@ networkCleaner <- function(network, crs = 3035)
     st_geometry() %>%
     st_as_sf() %>%
     rename(geom = x) %>%
+    remove_overlap() %>%
     return()
 }
+

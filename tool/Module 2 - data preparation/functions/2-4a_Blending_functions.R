@@ -201,12 +201,14 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
     outSF %>%
       activate("edges") %>%
       st_as_sf() %>%
-      distinct() %>%
-      st_write(paste0(output_dir, "/edges_clean.gpkg"))
+      remove_overlap() %>%
+      mutate(edge_id = row_number()) %>%
+      st_write(paste0(output_dir, "/edges.gpkg"))
   } else outSF %>%
     activate("edges") %>%
     st_as_sf() %>%
-    distinct() %>%
+    remove_overlap() %>%
+    mutate(edge_id = row_number()) %>%
     return()
 }
 
@@ -292,6 +294,27 @@ outputChecker <- function(directory, file_name, output_type = "file")
   tmpOut
 }
 
+#4.1.1
+remove_overlap <- function(network)
+{
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  network <- distinct( select(network, geom) )
+  eb <- st_buffer(network, 1e-5)
+  network$covers <- c(st_covers(eb, network))
+  covering <- filter(network, lengths(covers) > 1)
+  notCovering <- filter(network, lengths(covers) < 2)
+  if (nrow(covering) < 1) return( select(network, geom) )
+  st_difference(st_union(covering), st_union(notCovering)) %>%
+    st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
+    st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
+    st_sf() %>%
+    rename(geom = geometry) %>%
+    bind_rows(notCovering, .) %>%
+    distinct() %>%
+    select(geom) %>%
+    return()
+}
 
 ################################################################################
 # END OF DOCUMENT

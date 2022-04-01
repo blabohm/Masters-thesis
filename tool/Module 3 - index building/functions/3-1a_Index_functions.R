@@ -17,14 +17,10 @@
 # setting_name: Setting description - DEFAULT values
 ################################################################################
 # ID <- "76213-DE001L1" # v-park
-# ID <- "81210-DE001L1" # t-feld
-# drive <- "D:/temp/"
-# output <- paste0(drive, "indices")
-# nodes <- paste0(drive, "nodes.gpkg")
-# edges <- paste0(drive, "edges.gpkg")
-# perc_core <- .5
-# d <- 500
-# folder <- "D:/temp/"
+ID <- "81210-DE001L1" # t-feld
+perc_core <- .75
+d <- 500
+folder <- "D:/temp/"
 ################################################################################
 # Urban atlas identifiers of green spaces
 # Network node file path
@@ -37,7 +33,7 @@ calcIndices <- function(green_space_IDs, folder,
                         perc_core = .75, d = 500)
 {
   # create output directory if it doesn't exist
-  if (!dir.exists(output)) dir.create(output)
+  #if (!dir.exists(output)) dir.create(output)
   # Set up parallel processing
   require(doParallel)
   ncore <- round(detectCores() * perc_core)
@@ -89,7 +85,7 @@ gatherDI <- function(building_polygons, index_dir, output_dir)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
-  building_polygons
+  #building_polygons
   di_files <- list.files(index_dir,
                          pattern = "nodes[1-9]*.*csv$",
                          full.names = TRUE)

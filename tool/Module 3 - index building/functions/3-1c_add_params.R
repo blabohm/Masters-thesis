@@ -24,7 +24,6 @@ make_sf_network <- function(network)
   require(sfnetworks, quietly = TRUE)
   require(tidygraph, quietly = TRUE)
   network %>%
-    remove_overlap() %>%
     mutate(weight = st_length(.)) %>%
     as_sfnetwork() %>%
     convert(to_undirected) %>%
@@ -32,27 +31,6 @@ make_sf_network <- function(network)
 }
 
 
-#4.1.1
-remove_overlap <- function(network)
-{
-  require(dplyr, quietly = TRUE)
-  require(sf, quietly = TRUE)
-  network <- distinct( select(network, geom) )
-  eb <- st_buffer(network, 1e-5)
-  network$covers <- c(st_covers(eb, network))
-  covering <- filter(network, lengths(covers) > 1)
-  notCovering <- filter(network, lengths(covers) < 2)
-  if (nrow(covering) < 1) return( select(network, geom) )
-  st_difference(st_union(covering), st_union(notCovering)) %>%
-    st_cast("MULTILINESTRING", do_split = TRUE, warn = FALSE) %>%
-    st_cast("LINESTRING", do_split = TRUE, warn = FALSE) %>%
-    st_sf() %>%
-    rename(geom = geometry) %>%
-    bind_rows(notCovering, .) %>%
-    distinct() %>%
-    select(geom) %>%
-    return()
-}
 
 
 # 4.2
@@ -88,8 +66,7 @@ add_euklid_dist <- function(build_entries)
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
   build_entries %>%
-    mutate(euklid_dis = round(st_distance(nearest_entry, geom,
-                                          by_element = TRUE))) %>%
+    mutate(euklid_dis = st_distance(nearest_entry, geom, by_element = TRUE)) %>%
     arrange(ne_id) %>%
     return()
 }
@@ -99,8 +76,10 @@ add_shortest_path <- function(build_entries, gs_entries, sf_network)
 {
   require(dplyr, quietly = TRUE)
   if (length(unique(build_entries$ne_id)) == 2 &
-      length(build_entries$ne_id[build_entries$ne_id == unique(build_entries$ne_id)[1]]) == 2 &
-      length(build_entries$ne_id[build_entries$ne_id == unique(build_entries$ne_id)[2]]) == 2) {
+      length(build_entries$ne_id[build_entries$ne_id ==
+                                 unique(build_entries$ne_id)[1]]) == 2 &
+      length(build_entries$ne_id[build_entries$ne_id ==
+                                 unique(build_entries$ne_id)[2]]) == 2) {
     build_entries %>%
       s_path1(gs_entries, sf_network) %>%
       return()
