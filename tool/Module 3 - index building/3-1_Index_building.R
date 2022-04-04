@@ -19,7 +19,11 @@
 # INPUT VALUES FOR TESTING CODE
 
 # DATA DIRECTORIES
+<<<<<<< Updated upstream
 working_directory <- "D:/temp/"
+=======
+#working_directory <- "D:/temp/"
+>>>>>>> Stashed changes
 ################################################################################
 getIndices <- function(working_directory)
 {
