@@ -17,10 +17,10 @@
 # setting_name: Setting description - DEFAULT values
 ################################################################################
 # ID <- "76213-DE001L1" # v-park
-ID <- "81210-DE001L1" # t-feld
-perc_core <- .75
-d <- 500
-folder <- "D:/temp/"
+# ID <- "81210-DE001L1" # t-feld
+# perc_core <- .75
+# d <- 500
+# folder <- "D:/temp/"
 ################################################################################
 # Urban atlas identifiers of green spaces
 # Network node file path
