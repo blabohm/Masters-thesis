@@ -73,7 +73,7 @@ listTiles <- function(network_tile_directory, city_code)
 # crs: Desired crs - DEFAULT is ETRS3035
 ################################################################################
 
-combinator <- function(file_list, tmp_dir, boundary = NULL, crs = 3035)
+net_combinator <- function(file_list, tmp_dir, boundary = NULL, crs = 3035)
 {
   # load packages
   require(dplyr, quietly = TRUE)

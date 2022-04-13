@@ -19,13 +19,14 @@
 # INPUT VALUES FOR TESTING CODE
 
 # DATA DIRECTORIES
-<<<<<<< Updated upstream
-working_directory <- "D:/temp/"
-=======
 #working_directory <- "D:/temp/"
->>>>>>> Stashed changes
 ################################################################################
-getIndices <- function(working_directory)
+getIndices <- function(working_directory,
+                       output = paste0(working_directory, "indices/"),
+                       nodes = paste0(working_directory, "nodes.gpkg"),
+                       edges = paste0(working_directory, "edges.gpkg"),
+                       buildings = paste0(working_directory, "buildings.gpkg")
+                       )
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -34,10 +35,6 @@ getIndices <- function(working_directory)
     paste0("/tool/Module 3 - index building/functions/") %>%
     list.files(pattern = "3-1[A-Za-z].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
-  output <- paste0(working_directory, "indices/")
-  nodes <- paste0(working_directory, "nodes.gpkg")
-  edges <- paste0(working_directory, "edges.gpkg")
-  buildings <- paste0(working_directory, "buildings.gpkg")
   # LOAD NODES, FILTER FOR GREEN SPACE ENTRIES AND GET IDENTIFIER VALUES
   green_space_IDs <- nodes %>%
     st_read(query = "SELECT identifier FROM nodes WHERE identifier is not null",

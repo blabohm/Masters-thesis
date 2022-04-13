@@ -34,10 +34,11 @@
 #                    city_code = cityCode)
 ################################################################################
 
-networkPrep <- function(city_boundaries,
-                        city_code,
-                        network_tile_dir,
-                        output_directory)
+networkPrep <- function(city_code, input_directory, output_directory,
+                        city_boundaries = paste0(input_directory, "/cities.gpkg"),
+                        network_tile_dir = paste0(input_directory, "/osm_paths/"),
+                        network_out = paste0(output_directory, "/network_clean.gpkg")
+)
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -53,11 +54,11 @@ networkPrep <- function(city_boundaries,
   listTiles(network_tile_directory = network_tile_dir,
             city_code = city_code) %>%
     # LOAD AND COMBINE NETWORK TILES
-    combinator(file_list = ., boundary = city_boundary,
-               tmp_dir = output_directory) %>%
+    net_combinator(file_list = ., boundary = city_boundary,
+                   tmp_dir = output_directory) %>%
     # CLEAN NETWORK
     #    -> DOUBLE ENTRIES
     #    -> UNCONNECTED EDGES
     networkCleaner() %>%
-    st_write(output_directory, quiet = TRUE, append = FALSE)
+    st_write(network_out, quiet = TRUE, append = FALSE)
 }

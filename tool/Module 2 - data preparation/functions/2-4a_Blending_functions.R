@@ -39,20 +39,6 @@
 # crs = 3035
 # perc_core = .5
 
-<<<<<<< Updated upstream
-drive <- "D:/temp"
-city_boundary <- paste0(drive, "/cities.gpkg")
-city_code <- "DE001"
-build_entries <- paste0(drive, "/building_entries.gpkg")
-gs_entries <- paste0(drive, "/green_space_entries.gpkg")
-network <- paste0(drive, "/network_clean.gpkg")
-output_dir <- paste0(drive, "/net_blend/")
-cellsize = 3000
-crs = 3035
-perc_core = .5
-
-=======
->>>>>>> Stashed changes
 snapAndBlend <- function(city_code, city_boundary, build_entries, gs_entries,
                          network, output_dir,
                          cellsize = 3000, crs = 3035, perc_core = .75)

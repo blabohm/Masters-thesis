@@ -22,18 +22,19 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES
-drive <- "D:/temp"
-city_boundaries <- paste0(drive, "/cities.gpkg")
-city_code <- "DE001"
-network_directory <- paste0(drive, "/network_clean.gpkg")
-ua_directory <- paste0(drive, "/UA2018")
-output_directory <- paste0(drive, "green_space_entries.gpkg")
+# drive <- "D:/temp"
+# city_boundaries <- paste0(drive, "/cities.gpkg")
+# city_code <- "DE001"
+# network_directory <- paste0(drive, "/network_clean.gpkg")
+# ua_directory <- paste0(drive, "/UA2018")
+# output_directory <- paste0(drive, "green_space_entries.gpkg")
 ################################################################################
-greenSpacePrep <- function(city_boundaries,
-                           city_code,
-                           ua_directory,
-                           network_directory,
-                           output_directory)
+greenSpacePrep <- function(city_code, input_directory, output_directory,
+                           city_boundaries = paste0(input_directory, "/cities.gpkg"),
+                           ua_directory = paste0(input_directory, "/UA2018/"),
+                           network_directory = paste0(output_directory, "/network_clean.gpkg"),
+                           green_space_out = paste0(output_directory, "/green_space_entries.gpkg")
+                           )
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -59,7 +60,7 @@ greenSpacePrep <- function(city_boundaries,
     findGSentries(green_spaces = .,
                   network = network_directory) %>%
     roundGeometry() %>%
-    st_write(output_directory, quiet = TRUE, append = FALSE)
+    st_write(green_space_out, quiet = TRUE, append = FALSE)
 }
 
 # output <- greenSpacePrep(cityBoundary_file = cityBound,
