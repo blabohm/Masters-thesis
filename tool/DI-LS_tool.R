@@ -22,7 +22,7 @@
 #
 ################################################################################
 # INPUT DATA
-inputDir <- "Z:/_MA/temp/"
+inputDir <- "D:/temp/"
 out <- gsub("temp/", "output/", inputDir)
 if (!dir.exists(out)) dir.create(out)
 
@@ -34,6 +34,7 @@ require(sf, quietly = TRUE)
 
 ccList <- tibble(URAU_CODE = c(#"DE008",
                                "DE503", "ES002", "BE001", "PL003"))
+#cityCode <- ccList$URAU_CODE[1]
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
@@ -41,11 +42,16 @@ ccList <- tibble(URAU_CODE = c(#"DE008",
 
 for (cityCode in ccList$URAU_CODE) {
 
+  outputDir <- paste0(out, cityCode, "/")
+  if (!dir.exists(outputDir)) dir.create(outputDir)
 ################################################################################
 # MODULE 1 - OSM DOWNLOAD
 # Download OpenStreetMap (OSM) data covering the city polygon
 #
-################################################################################
+download_OSM(city_code = cityCode,
+             input_directory = inputDir,
+             output_directory = outputDir)
+  ################################################################################
 # MODULE 2 - DATA PREPARATION
 # Load packages and data preparation functions
 ################################################################################
@@ -60,8 +66,7 @@ getwd() %>%
 #cityCode <- "DE008"
 #cityCode <- ccList$URAU_CODE[1]
 
-outputDir <- paste0(out, cityCode, "/")
-if (!dir.exists(outputDir)) dir.create(outputDir)
+
 
 
 ################################################################################
