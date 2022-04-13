@@ -19,18 +19,14 @@
 # INPUT VALUES FOR TESTING CODE
 
 # DATA DIRECTORIES
-# drive <- "D:/temp/"
-# nodeDir <- paste0(drive, "/nodes.gpkg")
-# edgeDir <- paste0(drive, "/edges.gpkg")
-# FUA CITY CODE
-
-getIndices(node_directory = nodeDir,
-           edge_directory = edgeDir,
-           building_directory = buildEntries,
-           output_directory = indexDir)
+#working_directory <- "D:/temp/"
 ################################################################################
-getIndices <- function(node_directory, edge_directory,
-                       building_directory, output_directory)
+getIndices <- function(working_directory,
+                       output = paste0(working_directory, "indices/"),
+                       nodes = paste0(working_directory, "nodes.gpkg"),
+                       edges = paste0(working_directory, "edges.gpkg"),
+                       buildings = paste0(working_directory, "buildings.gpkg")
+                       )
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -40,25 +36,23 @@ getIndices <- function(node_directory, edge_directory,
     list.files(pattern = "3-1[A-Za-z].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # LOAD NODES, FILTER FOR GREEN SPACE ENTRIES AND GET IDENTIFIER VALUES
-  gs_IDs <- node_directory %>%
+  green_space_IDs <- nodes %>%
     st_read(query = "SELECT identifier FROM nodes WHERE identifier is not null",
             quiet = TRUE) %>%
     pull(identifier) %>%
     unique()
   # ITERATE THROUGH GREEN SPACE IDs AND CREATE IDICES - WRITE OUTPUT TO TEMP FILES
-  calcIndices(green_space_IDs = gs_IDs,
-              nodes = node_directory,
-              edges = edge_directory,
-              output = output_directory,
+  calcIndices(green_space_IDs = green_space_IDs,
+              folder = working_directory,
               perc_core = .5,
               d = 500)
   # UNITE OUTPUT TO ONE LAYER PER INDEX
-  gatherDI(building_polygons = building_directory,
-           index_dir = output_directory,
-           output_dir = gsub("/indices/", "detour_index.gpkg", output_directory))
-  gatherLS(edges = edge_directory,
-           index_dir = output_directory,
-           output_dir = gsub("/indices/", "local_significance.gpkg", output_directory))
+  gatherDI(building_polygons = buildings,
+           index_dir = output,
+           output_dir = gsub("indices/", "detour_index.gpkg", output))
+  gatherLS(edges = edges,
+           index_dir = output,
+           output_dir = gsub("indices/", "local_significance.gpkg", output))
 }
 
 

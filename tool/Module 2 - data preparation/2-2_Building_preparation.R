@@ -33,11 +33,12 @@
 #              out_dir = outDir)
 ################################################################################
 
-buildingPrep <- function(city_boundaries,
-                         city_code,
-                         ua_directory,
-                         osm_directory,
-                         output_directory)
+buildingPrep <- function(city_code, input_directory, output_directory,
+                         city_boundaries = paste0(input_directory, "/cities.gpkg"),
+                         osm_directory = paste0(input_directory, "/osm_buildings/"),
+                         ua_directory = paste0(input_directory, "/UA2018/"),
+                         building_out = paste0(output_directory, "/buildings.gpkg")
+                         )
 {
   # LOAD PACKAGES AND FUNCTIONS
   require(dplyr, quietly = TRUE)
@@ -75,13 +76,13 @@ buildingPrep <- function(city_boundaries,
       # 5. ADD BUILDING ID
       #    -> IDENTIFIER + NUMBER
       OSMbuildID() %>%
-      st_write(output_directory, layer = "osm_buildings", quiet = TRUE, append = TRUE)
+      st_write(building_out, layer = "osm_buildings", quiet = TRUE, append = TRUE)
   }
   # Building entries
-  output_directory %>%
+  building_out %>%
     st_read(quiet = TRUE) %>%
     st_point_on_surface() %>%
     roundGeometry() %>%
-    st_write(gsub("buildings", "building_entries", output_directory),
+    st_write(gsub("buildings", "building_entries", building_out),
              quiet = TRUE, append = FALSE)
 }

@@ -22,106 +22,99 @@
 #
 ################################################################################
 # INPUT DATA
+inputDir <- "Z:/_MA/temp/"
+out <- gsub("temp/", "output/", inputDir)
+if (!dir.exists(out)) dir.create(out)
+
+# cityBound <- paste0(inputDir, "cities.gpkg")
+require(dplyr, quietly = TRUE)
+require(sf, quietly = TRUE)
+# ccList <- cityBound %>%
+#   st_read(query = "SELECT * FROM cities", quiet = TRUE)
+
+ccList <- tibble(URAU_CODE = c(#"DE008",
+                               "DE503", "ES002", "BE001", "PL003"))
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
 # - URAU code (?)
+
+for (cityCode in ccList$URAU_CODE) {
+
 ################################################################################
 # MODULE 1 - OSM DOWNLOAD
 # Download OpenStreetMap (OSM) data covering the city polygon
 #
 ################################################################################
 # MODULE 2 - DATA PREPARATION
-
 # Load packages and data preparation functions
-require(dplyr, quietly = TRUE)
-require(sf, quietly = TRUE)
+################################################################################
 getwd() %>%
   paste0("/tool/Module 2 - data preparation/") %>%
   list.files(pattern = "2-[1-9].*\\.R", full.names = TRUE) %>%
   for (file in .) source(file)
+# URAU city code
+# Berlin
+#cityCode <- "DE001"
+# Leipzig
+#cityCode <- "DE008"
+#cityCode <- ccList$URAU_CODE[1]
 
-drive <- "D:/temp/"
+outputDir <- paste0(out, cityCode, "/")
+if (!dir.exists(outputDir)) dir.create(outputDir)
+
 
 ################################################################################
 # 2.1 - NETWORK CLEANING
 #
-cityBound <- paste0(drive, "cities.gpkg")
-ccList <- cityBound %>%
-  st_read(query = "SELECT URAU_CODE FROM cities", quiet = TRUE) %>%
-  filter(grepl("001", URAU_CODE))
-# URAU city code
-cityCode <- "DE001"
-#cityCode <- ccList$URAU_CODE[1]
-# Input data
-netTileDir <- paste0(drive, "/osm_paths/")
-netDir <- paste0(drive, "/network_clean.gpkg")
 # Run function
 networkPrep(city_code = cityCode,
-            network_tile_dir = netTileDir,
-            city_boundaries = cityBound,
-            output_directory = netDir)
+            input_directory = inputDir,
+            output_directory = outputDir)
 
 
 ################################################################################
 # 2.2 - BUILDING PREPARATION
 #
-# Input data
-osmDir <- paste0(drive, "/osm_buildings/")
-uaDirectory <- paste0(drive, "/UA2018/")
-buildOut <- paste0(drive, "/buildings.gpkg")
 # Run function
 buildingPrep(city_code = cityCode,
-             osm_directory = osmDir,
-             ua_directory = uaDirectory,
-             city_boundaries = cityBound,
-             output_directory = buildOut)
+             input_directory = inputDir,
+             output_directory = outputDir)
 
 
 ################################################################################
 # 2.3 - GREEN SPACE ENTRY DETECTION
 #
-gsOut <- paste0(drive, "/green_space_entries.gpkg")
 # Run function
 greenSpacePrep(city_code = cityCode,
-               city_boundaries = cityBound,
-               ua_directory = uaDirectory,
-               network_directory = netDir,
-               output_directory = gsOut)
+               input_directory = inputDir,
+               output_directory = outputDir)
 
-################################################################################
+
 ################################################################################
 # 2.4 - NETWORK BLENDING
 #
-# Input data
-buildEntries <- paste0(drive, "/building_entries.gpkg")
-blendOut <- paste0(drive, "/net_blend/")
 # Run function
-networkBlend(city_code = city_code,
-             city_boundaries = cityBound,
-             network_directory = netDir,
-             green_space_directory = gsOut,
-             building_directory = buildEntries,
-             output_directory = blendOut)
+networkBlend(city_code = cityCode,
+             input_directory = inputDir,
+             output_directory = outputDir)
 
-################################################################################
+
 ################################################################################
 # MODULE 3 - INDEX BUILDING
 #
 ################################################################################
 # Input data
-nodeDir <- paste0(blendOut, "nodes.gpkg")
-edgeDir <- paste0(blendOut, "edges.gpkg")
-indexDir <- paste0(drive, "/indices/")
+getwd() %>%
+  paste0("/tool/Module 3 - index building") %>%
+  list.files(pattern = "3-[1-9].*\\.R", full.names = TRUE) %>%
+  for (file in .) source(file)
 # Run function
-getIndices(node_directory = nodeDir,
-           edge_directory = edgeDir,
-           building_directory = buildOut,
-           output_directory = indexDir)
+getIndices(outputDir)
 
 ################################################################################
 # Clean up
-
+}
 ################################################################################
 # END OF DOCUMENT
 

@@ -11,7 +11,12 @@ Deskriptive Werte überlegen -> Histogramme vergleichen? z.B. nach mean sortiere
 DI: x% leute haben einen DI von x (keine Tortendiagramme)
 
 LS: länge des Wegenetzes mit einbringen (LS / meter)
-
-Leipzig, Gelsenkirchen, Barcelona, Brüssel, Krakow als Testdatensatz benutzen.
+city, code
+"Leipzig", "DE008" 
+"Gelsenkirchen", "DE503" 
+"Barcelona", "ES002" 
+"Brüssel", "BE001" 
+"Krakow", "PL003" 
+als Testdatensatz benutzen.
 
 2-3 Namen Brainstormen
