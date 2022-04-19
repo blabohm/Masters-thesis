@@ -131,9 +131,6 @@ networkCleaner <- function(network, crs = 3035)
   require(sf, quietly = TRUE)
   require(tidygraph, quietly = TRUE)
   require(sfnetworks, quietly = TRUE)
-  # User communication
-  network <- network
-  message("\n Starting network cleaning \n")
   # network cleaning
   network %>%
     # remove double entries

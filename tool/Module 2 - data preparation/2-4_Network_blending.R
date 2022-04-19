@@ -50,7 +50,7 @@ networkBlend <- function(city_code, input_directory, output_directory,
 
   # SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
   snapAndBlend(city_code = city_code,
-               city_boundary = city_boundaries,
+               city_boundaries = city_boundaries,
                build_entries = building_directory,
                gs_entries = green_space_directory,
                network = network_directory,
@@ -60,8 +60,7 @@ networkBlend <- function(city_code, input_directory, output_directory,
   edges <- list.files(blend_out, pattern = "edge", full.names = TRUE)
   networkCombinator(file_list = edges, output_dir = blend_out, out = "sf") %>%
     mutate(edge_id = row_number()) %>%
-    st_write(paste0(blend_out, "edges.gpkg"),
-             append = FALSE, quiet = TRUE)
+    st_write(paste0(blend_out, "edges.gpkg"), append = FALSE, quiet = TRUE)
   combinator(nodes, output_dir = blend_out)
   unlink(nodes)
   unlink(edges)

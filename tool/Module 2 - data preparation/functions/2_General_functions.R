@@ -60,7 +60,7 @@ boundaryLoader <- function(city_boundaries, city_code,
   city_boundaries %>%
     st_read(query = q, quiet = TRUE) %>%
     st_transform(crs) %>%
-    st_cast("POLYGON", do_split = TRUE, warn = FALSE) %>%
+    #st_cast("POLYGON", do_split = TRUE, warn = FALSE) %>%
     st_buffer(buffer_dist) %>%
     return()
 }

@@ -36,7 +36,7 @@
 
 networkPrep <- function(city_code, input_directory, output_directory,
                         city_boundaries = paste0(input_directory, "/cities.gpkg"),
-                        network_tile_dir = paste0(input_directory, "/osm_paths/"),
+                        network_tile_dir = paste0(input_directory, "/osm_network/"),
                         network_out = paste0(output_directory, "/network_clean.gpkg")
 )
 {

@@ -33,32 +33,12 @@ require(sf, quietly = TRUE)
 #   st_read(query = "SELECT * FROM cities", quiet = TRUE)
 
 ccList <- tibble(URAU_CODE = c(#"DE008",
-                               "DE503", "ES002", "BE001", "PL003"))
+  "DE503", "ES002", "BE001", "PL003"))
 #cityCode <- ccList$URAU_CODE[1]
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
 # - URAU code (?)
-
-for (cityCode in ccList$URAU_CODE) {
-
-  outputDir <- paste0(out, cityCode, "/")
-  if (!dir.exists(outputDir)) dir.create(outputDir)
-################################################################################
-# MODULE 1 - OSM DOWNLOAD
-# Download OpenStreetMap (OSM) data covering the city polygon
-#
-download_OSM(city_code = cityCode,
-             input_directory = inputDir,
-             output_directory = outputDir)
-  ################################################################################
-# MODULE 2 - DATA PREPARATION
-# Load packages and data preparation functions
-################################################################################
-getwd() %>%
-  paste0("/tool/Module 2 - data preparation/") %>%
-  list.files(pattern = "2-[1-9].*\\.R", full.names = TRUE) %>%
-  for (file in .) source(file)
 # URAU city code
 # Berlin
 #cityCode <- "DE001"
@@ -67,58 +47,72 @@ getwd() %>%
 #cityCode <- ccList$URAU_CODE[1]
 
 
+for (cityCode in ccList$URAU_CODE) {
 
+  outputDir <- paste0(out, cityCode, "/")
+  if (!dir.exists(outputDir)) dir.create(outputDir)
+  ################################################################################
+  # MODULE 1 - OSM DOWNLOAD
+  # Download OpenStreetMap (OSM) data covering the city polygon
+  ################################################################################
+  getwd() %>%
+    paste0("/tool/Module 1 - OSM download/") %>%
+    list.files(pattern = "1-[1-9].*\\.R", full.names = TRUE) %>%
+    for (file in .) source(file)
 
-################################################################################
-# 2.1 - NETWORK CLEANING
-#
-# Run function
-networkPrep(city_code = cityCode,
-            input_directory = inputDir,
-            output_directory = outputDir)
-
-
-################################################################################
-# 2.2 - BUILDING PREPARATION
-#
-# Run function
-buildingPrep(city_code = cityCode,
-             input_directory = inputDir,
-             output_directory = outputDir)
-
-
-################################################################################
-# 2.3 - GREEN SPACE ENTRY DETECTION
-#
-# Run function
-greenSpacePrep(city_code = cityCode,
+  download_OSM(city_code = cityCode,
+               input_directory = inputDir)
+  ################################################################################
+  # MODULE 2 - DATA PREPARATION
+  ################################################################################
+  getwd() %>%
+    paste0("/tool/Module 2 - data preparation/") %>%
+    list.files(pattern = "2-[1-9].*\\.R", full.names = TRUE) %>%
+    for (file in .) source(file)
+  ################################################################################
+  # 2.1 - NETWORK CLEANING
+  #
+  # Run function
+  networkPrep(city_code = cityCode,
+              input_directory = inputDir,
+              output_directory = outputDir)
+  ################################################################################
+  # 2.2 - BUILDING PREPARATION
+  #
+  # Run function
+  buildingPrep(city_code = cityCode,
+               input_directory = inputDir,
+               output_directory = outputDir,
+               ua_directory = "E:/UA2018/")
+  ################################################################################
+  # 2.3 - GREEN SPACE ENTRY DETECTION
+  #
+  # Run function
+  greenSpacePrep(city_code = cityCode,
+                 input_directory = inputDir,
+                 output_directory = outputDir,
+                 ua_directory = "E:/UA2018/")
+  ################################################################################
+  # 2.4 - NETWORK BLENDING
+  #
+  # Run function
+  networkBlend(city_code = cityCode,
                input_directory = inputDir,
                output_directory = outputDir)
+  ################################################################################
+  # MODULE 3 - INDEX BUILDING
+  #
+  ################################################################################
+  # Input data
+  getwd() %>%
+    paste0("/tool/Module 3 - index building") %>%
+    list.files(pattern = "3-[1-9].*\\.R", full.names = TRUE) %>%
+    for (file in .) source(file)
+  # Run function
+  getIndices(outputDir)
 
-
-################################################################################
-# 2.4 - NETWORK BLENDING
-#
-# Run function
-networkBlend(city_code = cityCode,
-             input_directory = inputDir,
-             output_directory = outputDir)
-
-
-################################################################################
-# MODULE 3 - INDEX BUILDING
-#
-################################################################################
-# Input data
-getwd() %>%
-  paste0("/tool/Module 3 - index building") %>%
-  list.files(pattern = "3-[1-9].*\\.R", full.names = TRUE) %>%
-  for (file in .) source(file)
-# Run function
-getIndices(outputDir)
-
-################################################################################
-# Clean up
+  ################################################################################
+  # Clean up
 }
 ################################################################################
 # END OF DOCUMENT

@@ -64,6 +64,7 @@ OSM_build_writer <- function(polygons, OSM_out)
       st_cast("MULTIPOLYGON") %>%
       st_cast("POLYGON", do_split = TRUE, warn = FALSE)},
       error = function(e) return(NULL))
+  if (is.null(p) & is.null(mp)) return(message("\n Empty tile. Proceeding..."))
   if (is.null(p)) write_sf(mp, OSM_out, append = FALSE) else if (is.null(mp)) {
     write_sf(p, OSM_out, append = FALSE) } else {
       write_sf(bind_rows(p, mp), OSM_out, append = FALSE)}
@@ -84,6 +85,7 @@ OSM_network_writer <- function(lines, OSM_out)
       st_cast("MULTILINESTRING") %>%
       st_cast("LINESTRING", do_split = TRUE, warn = FALSE)},
       error = function(e) return(NULL))
+  if (is.null(p) & is.null(mp)) return(message("\n Empty tile. Proceeding..."))
   if (is.null(p)) write_sf(mp, OSM_out, append = FALSE) else if (is.null(mp)) {
     write_sf(p, OSM_out, append = FALSE) } else {
       write_sf(bind_rows(p, mp), OSM_out, append = FALSE)}

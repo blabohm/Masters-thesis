@@ -28,7 +28,7 @@
 
 # 1. STEP
 #    -> DESCRIPTION OF STEPS
-boundaryLoader <- function(city_boundaries, buffer_dist = 0, crs = 3035)
+boundaryLoader <- function(city_code, city_boundaries, buffer_dist = 0, crs = 3035)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
@@ -40,7 +40,7 @@ boundaryLoader <- function(city_boundaries, buffer_dist = 0, crs = 3035)
   city_boundaries %>%
     st_read(query = q, quiet = TRUE) %>%
     st_transform(3035) %>%
-    st_cast("POLYGON", do_split = TRUE, warn = FALSE) %>%
+    #st_cast("POLYGON", do_split = TRUE, warn = FALSE) %>%
     st_buffer(buffer_dist) %>%
     return()
 }
@@ -48,12 +48,12 @@ boundaryLoader <- function(city_boundaries, buffer_dist = 0, crs = 3035)
 
 ################################################################################
 
-dlOSM <- function(city_boundary, OSM_out)
+dlOSM <- function(city_boundary, input_directory)
 {
   city_grid <- mkCityGrid(city_boundary)
-  build_out <- paste0(OSM_out, "osm_buildings/")
+  build_out <- paste0(input_directory, "osm_buildings/")
   if (!dir.exists(build_out)) dir.create(build_out)
-  net_out <- paste0(OSM_out, "osm_network/")
+  net_out <- paste0(input_directory, "osm_network/")
   if (!dir.exists(net_out)) dir.create(net_out)
   for (i in 1:nrow(city_grid)) {
     polygons <- OSM_downloader(city_grid$geom[i], key = "building")
