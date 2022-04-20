@@ -28,7 +28,7 @@
 
 # 1. STEP
 #    -> DESCRIPTION OF STEPS
-boundaryLoader <- function(city_code, city_boundaries, buffer_dist = 0, crs = 3035)
+boundaryLoader1 <- function(city_code, city_boundaries, buffer_dist = 0, crs = 3035)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
@@ -59,9 +59,8 @@ dlOSM <- function(city_boundary, input_directory)
     polygons <- OSM_downloader(city_grid$geom[i], key = "building")
     dsn1 <- paste0(build_out, city_boundary$URAU_CODE, "_", city_grid$id[i], ".gpkg")
     if (!is.null(polygons)) OSM_build_writer(polygons, dsn1)
-
-    dsn2 <- paste0(net_out, city_boundary$URAU_CODE, "_", city_grid$id[i], ".gpkg")
     lines <- OSM_downloader(city_grid$geom[i], key = "highway")
+    dsn2 <- paste0(net_out, city_boundary$URAU_CODE, "_", city_grid$id[i], ".gpkg")
     if (!is.null(lines)) OSM_network_writer(lines, dsn2)
   }
 }

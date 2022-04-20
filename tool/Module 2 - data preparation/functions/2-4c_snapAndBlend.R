@@ -1,15 +1,16 @@
 
 
-mkCityGrid <- function(city_code, city_boundaries, cellsize)
+mkCityGrid <- function(city_code, city_boundaries, cellsize, crs = 3035)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
   bound_query <- paste0('SELECT * FROM \'cities\' WHERE URAU_CODE = \'',
                         city_code, '\'')
-  city_boundaries %>%
+  city_boundary <- city_boundaries %>%
     st_read(query = bound_query, quiet = TRUE) %>%
     st_transform(crs) %>%
-    st_buffer(1000) %>%
+    st_buffer(1000)
+  city_boundary %>%
     st_make_grid(cellsize = cellsize) %>%
     st_as_sf() %>%
     st_filter(city_boundary, .pred = st_intersects) %>%

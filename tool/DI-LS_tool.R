@@ -22,7 +22,7 @@
 #
 ################################################################################
 # INPUT DATA
-inputDir <- "D:/temp/"
+inputDir <- "Z:/temp/"
 out <- gsub("temp/", "output/", inputDir)
 if (!dir.exists(out)) dir.create(out)
 
@@ -34,7 +34,7 @@ require(sf, quietly = TRUE)
 
 ccList <- tibble(URAU_CODE = c(#"DE008",
   "DE503", "ES002", "BE001", "PL003"))
-#cityCode <- ccList$URAU_CODE[1]
+cityCode <- ccList$URAU_CODE[2]
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
@@ -83,7 +83,7 @@ for (cityCode in ccList$URAU_CODE) {
   buildingPrep(city_code = cityCode,
                input_directory = inputDir,
                output_directory = outputDir,
-               ua_directory = "E:/UA2018/")
+               ua_directory = "Z:/UA2018/")
   ################################################################################
   # 2.3 - GREEN SPACE ENTRY DETECTION
   #
@@ -91,7 +91,7 @@ for (cityCode in ccList$URAU_CODE) {
   greenSpacePrep(city_code = cityCode,
                  input_directory = inputDir,
                  output_directory = outputDir,
-                 ua_directory = "E:/UA2018/")
+                 ua_directory = "Z:/UA2018/")
   ################################################################################
   # 2.4 - NETWORK BLENDING
   #

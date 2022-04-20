@@ -70,36 +70,19 @@ OSMloader <- function(osm_file, boundary, crs = 3035)
   # required packages
   require(dplyr)
   require(sf)
-  # get name of OSM building layers (only using polygon and multipolygon layers)
-  lr <- st_layers(osm_file)$name %>%
-    grep("poly", ., ignore.case = TRUE, value = TRUE)
   boundary <- boundary %>%
     st_transform(4326) %>%
     st_geometry() %>%
     st_as_text()
-  # load individual layers
-  for (i in lr) {
-    # load OSM file and combine layers
-    if (grepl("osm_multipolygons", i)) {
-      tmp <- osm_file %>%
-        st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
-        st_make_valid() %>%
-        st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
-        st_cast("POLYGON", do_split = TRUE, warn = FALSE)
-    } else if (grepl("osm_polygons", i)) {
-      tmp <- osm_file %>%
-        st_read(i, wkt_filter = boundary, quiet = TRUE) %>%
-        st_make_valid() %>%
-        st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
-        st_cast("POLYGON", do_split = TRUE, warn = FALSE)}
-    if (i == first(lr)) osm <- tmp else osm <- bind_rows(osm, tmp)
-    }
-  # delete temporary object
-  rm(tmp)
-  # transform to EPSG 3035 and drop columns
-  osm %>%
+  tmp <- osm_file %>%
+    st_read(wkt_filter = boundary, quiet = TRUE) %>%
+    st_make_valid() %>%
+    st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
+    st_cast("POLYGON", do_split = TRUE, warn = FALSE)
+  if (!exists("tmp")) return(NULL)
+  tmp %>%
     st_transform(crs) %>%
-    select(building, geom) %>%
+    select(matches("build|geom")) %>%
     return()
 }
 

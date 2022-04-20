@@ -39,31 +39,120 @@
 # crs = 3035
 # perc_core = .5
 
-snapAndBlend <- function(city_code, city_boundaries, build_entries, gs_entries,
+snapAndBlend <- function(city_code, city_boundary, build_entries, gs_entries,
                          network, output_dir,
                          cellsize = 3000, crs = 3035, perc_core = .75)
 {
+  # Load required packages
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  require(sfnetworks, quietly = TRUE)
   require(doParallel, quietly = TRUE)
-  cityGrid <- mkCityGrid(city_code, city_boundaries, cellsize)
+  # Subset city boundaries
+  bound_query <- paste0('SELECT * FROM \'cities\' WHERE URAU_CODE = \'',
+                        city_code, '\'')
+  city_boundary <- city_boundary %>%
+    st_read(query = bound_query, quiet = TRUE) %>%
+    st_transform(crs)
+  # Tile boundaries
+  cityGrid <- city_boundary %>%
+    st_buffer(1000) %>%
+    st_make_grid(cellsize = cellsize) %>%
+    st_as_sf() %>%
+    st_filter(city_boundary, .pred = st_intersects)
+  # Set up parallel processing
   ncore <- round(detectCores() * perc_core)
   cl <- makeCluster(ncore, outfile = "")
   registerDoParallel(cl)
-  foreach(i = 1:nrow(cityGrid), packages = c(dplyr, sf, sfnetworks)) %dopar% {
+  # Iterate through city tiles
+  foreach(i = 1:nrow(cityGrid)) %dopar% {
+    #foreach(i = todo) %dopar% {
+    require(dplyr)
+    require(sf)
+    require(sfnetworks)
     getwd() %>%
       paste0("/tool/Module 2 - data preparation/functions/") %>%
       list.files(pattern = "2-4[A-Za-z].*\\.R|2_.*\\.R", full.names = TRUE) %>%
       for (file in .) source(file)
+    # output directories:
     edge_out <- paste0(output_dir, "edges", i, ".gpkg")
     node_out <- paste0(output_dir, "nodes", i, ".gpkg")
-    gridBox <- getGb(cityGrid, i)
-    build_tile <- getNodes(build_entries, gridBox)
-    gs_tile <- getNodes(gs_entries, gridBox)
-    net_tile <- getEdges(network, cityGrid, i)
-    nodes <- mergeNodes(build_tile, gs_tile, node_out)
-    if (is.null(nodes)) {write_sf(net_tile, edge_out, append = FALSE)
-      try(next)}
-    net <- blend(net_tile, nodes)
-    writeOutput(net, edge_out, node_out)
+    # User communication
+    message(paste(i, "of", nrow(cityGrid)))
+    # Intersect input with grid
+    gridBox <- cityGrid[i,] %>%
+      sf::st_geometry() %>%
+      sf::st_as_text()
+    # Buildings
+    build_tile <- tryCatch({build_entries %>%
+        sf::st_read(wkt_filter = gridBox, quiet = TRUE) %>%
+        sf::st_cast("POINT")}, error = function(e) return(NULL))
+    # Green space entries
+    gs_tile <- tryCatch({gs_entries %>%
+        sf::st_read(wkt_filter = gridBox, quiet = TRUE) %>%
+        sf::st_cast("POINT")}, error = function(e) return(NULL))
+    # Network (with buffer to avoid errors at edges)
+    gridBox1 <- cityGrid[i,] %>%
+      sf::st_buffer(100, nQuadSegs = 1) %>%
+      sf::st_geometry() %>%
+      sf::st_as_text()
+    net_tile <- network %>%
+      sf::st_read(wkt_filter = gridBox1, quiet = TRUE) %>%
+      sf::st_cast("LINESTRING")
+    # Exception handling buildings and green space entries to network
+    if (is.null(build_tile)) {build_tile <- NULL
+    } else if (nrow(build_tile) == 0) build_tile <- NULL
+    if (is.null(gs_tile)) {gs_tile <- NULL
+    } else if (nrow(gs_tile) == 0) gs_tile <- NULL
+
+    # Make sure object is not empty
+    if (is.null(build_tile) & is.null(gs_tile)) {
+      bind_rows(build_tile, gs_tile) %>%
+        st_write(node_out, quiet = TRUE, append = TRUE)
+      st_write(net_tile, edge_out, quiet = TRUE, append = TRUE)
+    } else {
+      if (is.null(build_tile)) {
+        nodes <- mutate(gs_tile, population = NA, ID = NA)
+      } else if (is.null(gs_tile)) {
+        nodes <- mutate(build_tile, city_code = NA,
+                        class = NA, identifier = NA,
+                        area = NA)}  else {
+                          nodes <- dplyr::bind_rows(build_tile, gs_tile) %>%
+                            dplyr::distinct()}
+      # Blend buildings and green space entries to network
+      # edges <- sf::st_collection_extract(
+      #   lwgeom::st_split(
+      #     net_tile,
+      #     sf::st_buffer(nodes, 1e-5)),
+      #   "LINESTRING")
+      # make sure edges and node geometries are at exact same places
+      # st_geometry(edges) <- edges %>%
+      #   st_geometry() %>%
+      #   lapply(function(x) round(x, 0)) %>%
+      #   st_sfc(crs = 3035)
+      # edges <- distinct(edges)
+      # st_geometry(nodes) <- nodes %>%
+      #   st_geometry() %>%
+      #   lapply(function(x) round(x, 0)) %>%
+      #   st_sfc(crs = 3035)
+      # nodes <- distinct(nodes)
+      net <- net_tile %>%
+        as_sfnetwork() %>%
+        st_network_blend(nodes)
+      edges <- net %>%
+        activate("edges") %>%
+        st_as_sf() %>%
+        select(-matches("from|to")) %>%
+        distinct()
+      nodes <- net %>%
+        activate("nodes") %>%
+        st_as_sf() %>%
+        select(-matches("city_code|class")) %>%
+        distinct()
+      # Write output
+      st_write(nodes, node_out, quiet = TRUE, append = FALSE)
+      st_write(edges, edge_out, quiet = TRUE, append = FALSE)
+    }
   }
   stopCluster(cl)
 }

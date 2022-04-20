@@ -37,6 +37,8 @@ mkCityGrid <- function(city_boundary, cellsize = 3000, crs = 3035)
 ################################################################################
 OSM_downloader <- function(tile, key)
 {
+  if (!curl::has_internet()) assign("has_internet_via_proxy", TRUE,
+                                    environment(curl::has_internet))
   require(sf, quietly = TRUE)
   require(osmdata, quietly = TRUE)
   set_overpass_url(APIselect())
@@ -56,14 +58,8 @@ OSM_build_writer <- function(polygons, OSM_out)
 {
   require(sf, quietly = TRUE)
   require(dplyr, quietly = TRUE)
-  p <- tryCatch({select(polygons$osm_polygons, matches("build$")) %>%
-      st_cast("MULTIPOLYGON") %>%
-      st_cast("POLYGON", do_split = TRUE, warn = FALSE)},
-      error = function(e) return(NULL))
-  mp <- tryCatch({select(polygons$osm_multipolygons, matches("build$")) %>%
-      st_cast("MULTIPOLYGON") %>%
-      st_cast("POLYGON", do_split = TRUE, warn = FALSE)},
-      error = function(e) return(NULL))
+  p <- cleanPolygons(polygons$osm_polygons)
+  mp <- cleanPolygons(polygons$osm_multipolygons)
   if (is.null(p) & is.null(mp)) return(message("\n Empty tile. Proceeding..."))
   if (is.null(p)) write_sf(mp, OSM_out, append = FALSE) else if (is.null(mp)) {
     write_sf(p, OSM_out, append = FALSE) } else {
@@ -77,16 +73,10 @@ OSM_network_writer <- function(lines, OSM_out)
 {
   require(sf, quietly = TRUE)
   require(dplyr, quietly = TRUE)
-  p <- tryCatch({select(lines$osm_lines, matches("highway")) %>%
-      st_cast("MULTILINESTRING") %>%
-      st_cast("LINESTRING", do_split = TRUE, warn = FALSE)},
-      error = function(e) return(NULL))
-  mp <- tryCatch({select(lines$osm_multilines, matches("highway")) %>%
-      st_cast("MULTILINESTRING") %>%
-      st_cast("LINESTRING", do_split = TRUE, warn = FALSE)},
-      error = function(e) return(NULL))
-  if (is.null(p) & is.null(mp)) return(message("\n Empty tile. Proceeding..."))
-  if (is.null(p)) write_sf(mp, OSM_out, append = FALSE) else if (is.null(mp)) {
-    write_sf(p, OSM_out, append = FALSE) } else {
-      write_sf(bind_rows(p, mp), OSM_out, append = FALSE)}
+  l <- cleanLines(lines$osm_lines)
+  ml <- cleanLines(lines$osm_multilines)
+  if (is.null(l) & is.null(ml)) return(message("\n Empty tile. Proceeding..."))
+  if (is.null(l)) write_sf(ml, OSM_out, append = FALSE) else if (is.null(ml)) {
+    write_sf(l, OSM_out, append = FALSE) } else {
+      write_sf(bind_rows(l, ml), OSM_out, append = FALSE)}
 }

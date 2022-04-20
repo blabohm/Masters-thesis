@@ -22,7 +22,7 @@
 # input_directory = inputDir
 # output_directory = outputDir
 # city_boundaries = paste0(input_directory, "/cities.gpkg")
-# OSM_out = paste0(input_directory, "/osm_paths/")
+# OSM_out = paste0(input_directory, "/osm_network/")
 # DATA DIRECTORIES
 
 # FUA CITY CODE
@@ -39,7 +39,7 @@ download_OSM <- function(city_code, input_directory,
     list.files(pattern = "1[A-Za-z].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
 
-  city_boundary <- boundaryLoader(city_code, city_boundaries, buffer_dist = 1000)
+  city_boundary <- boundaryLoader1(city_code, city_boundaries, buffer_dist = 1000)
   dlOSM(city_boundary, input_directory)
 }
 
