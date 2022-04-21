@@ -65,7 +65,8 @@ snapAndBlend <- function(city_code, city_boundaries, build_entries, gs_entries,
     gs_tile <- getNodes(gs_entries, gridBox)
     net_tile <- getEdges(network, cityGrid, i)
     nodes <- mergeNodes(build_tile, gs_tile, node_out)
-    if (is.null(nodes)) {write_sf(net_tile, edge_out, append = FALSE)
+    if (is.null(nodes)) {
+      write_sf(net_tile, edge_out, append = FALSE)
       next}
     net <- blend(net_tile, nodes)
     writeOutput(net, edge_out, node_out)
@@ -89,6 +90,7 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
   # load packages
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)
+  require(sfnetworks, quietly = TRUE)
   # check output consistency
   output_dir <- outputChecker(directory = output_dir, file_name = "edges.gpkg")
   # set up progress bar

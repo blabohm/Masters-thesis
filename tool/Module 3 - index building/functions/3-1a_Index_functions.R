@@ -29,11 +29,11 @@
 # Percent of computational core to be used
 # Distance
 
-calcIndices <- function(green_space_IDs, folder,
+calcIndices <- function(green_space_IDs, in_directory, out_directory,
                         perc_core = .75, d = 500)
 {
   # create output directory if it doesn't exist
-  #if (!dir.exists(output)) dir.create(output)
+  if (!dir.exists(in_directory)) dir.create(in_directory)
   # Set up parallel processing
   require(doParallel)
   ncore <- round(detectCores() * perc_core)
@@ -50,20 +50,18 @@ calcIndices <- function(green_space_IDs, folder,
       paste0("/tool/Module 3 - index building/functions/") %>%
       list.files(pattern = "3-1[A-Za-z].*\\.R", full.names = TRUE) %>%
       for (file in .) source(file)
-
-
     # 1
-    gs_entries <- load_gs_entries(ID, folder)
+    gs_entries <- load_gs_entries(ID, in_directory)
     # 2
-    build_entries <- load_build_entries(folder, gs_entries, d)
+    build_entries <- load_build_entries(in_directory, gs_entries, d)
     # 3
-    network <- load_network(folder, gs_entries)
+    network <- load_network(in_directory, gs_entries)
     if (nrow(build_entries) == 0) next
     # 4
     out <- add_params(build_entries, gs_entries, network)
     if (nrow(out) < 1) next
     # 5
-    write_output(out, network, folder, ID)
+    write_output(out, network, out_directory, ID)
   }
   parallel::stopCluster(cl)
 }

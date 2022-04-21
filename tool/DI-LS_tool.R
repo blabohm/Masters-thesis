@@ -33,8 +33,9 @@ require(sf, quietly = TRUE)
 #   st_read(query = "SELECT * FROM cities", quiet = TRUE)
 
 ccList <- tibble(URAU_CODE = c(#"DE008",
-  "DE503", "ES002", "BE001", "PL003"))
-cityCode <- ccList$URAU_CODE[2]
+  "DE503", #"ES002",
+  "BE001", "PL003"))
+cityCode <- ccList$URAU_CODE[1]
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
@@ -96,9 +97,9 @@ for (cityCode in ccList$URAU_CODE) {
   # 2.4 - NETWORK BLENDING
   #
   # Run function
-  networkBlend(city_code = cityCode,
+  try({networkBlend(city_code = cityCode,
                input_directory = inputDir,
-               output_directory = outputDir)
+               output_directory = outputDir)})
   ################################################################################
   # MODULE 3 - INDEX BUILDING
   #
@@ -109,7 +110,7 @@ for (cityCode in ccList$URAU_CODE) {
     list.files(pattern = "3-[1-9].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # Run function
-  getIndices(outputDir)
+  try({getIndices(working_directory = outputDir)})
 
   ################################################################################
   # Clean up

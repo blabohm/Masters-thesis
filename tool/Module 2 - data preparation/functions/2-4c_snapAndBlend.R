@@ -69,8 +69,8 @@ mergeNodes <- function(nodesBuild, nodesGS, node_out)
 blend <- function(net_tile, nodes)
 {
   require(sfnetworks)
-  as_sfnetwork(net_tile) %>%
-    st_network_blend(nodes) %>%
+  sfnetworks::as_sfnetwork(net_tile) %>%
+    sfnetworks::st_network_blend(nodes) %>%
     return()
 }
 

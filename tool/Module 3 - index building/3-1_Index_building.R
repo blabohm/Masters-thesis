@@ -43,9 +43,8 @@ getIndices <- function(working_directory,
     unique()
   # ITERATE THROUGH GREEN SPACE IDs AND CREATE IDICES - WRITE OUTPUT TO TEMP FILES
   calcIndices(green_space_IDs = green_space_IDs,
-              folder = working_directory,
-              perc_core = .5,
-              d = 500)
+              in_directory = working_directory,
+              out_directory = output)
   # UNITE OUTPUT TO ONE LAYER PER INDEX
   gatherDI(building_polygons = buildings,
            index_dir = output,

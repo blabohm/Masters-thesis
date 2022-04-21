@@ -35,7 +35,7 @@ networkBlend <- function(city_code, input_directory, output_directory,
                          city_boundaries = paste0(input_directory, "cities.gpkg"),
                          network_directory = paste0(output_directory, "/network_clean.gpkg"),
                          green_space_directory = paste0(output_directory, "/green_space_entries.gpkg"),
-                         building_directory = paste0(output_directory, "/buildings.gpkg"),
+                         building_directory = paste0(output_directory, "/building_entries.gpkg"),
                          blend_out = paste0(outputDir, "/net_blend/")
                          )
 {
@@ -49,12 +49,13 @@ networkBlend <- function(city_code, input_directory, output_directory,
   if (!dir.exists(blend_out)) dir.create(blend_out)
 
   # SNAP AND BLEND BUILDING AND PARK ENTRIES TO NETWORK
+  try({
   snapAndBlend(city_code = city_code,
                city_boundaries = city_boundaries,
                build_entries = building_directory,
                gs_entries = green_space_directory,
                network = network_directory,
-               output_dir = blend_out)
+               output_dir = blend_out)})
   # Combine ouput
   nodes <- list.files(blend_out, pattern = "node", full.names = TRUE)
   edges <- list.files(blend_out, pattern = "edge", full.names = TRUE)

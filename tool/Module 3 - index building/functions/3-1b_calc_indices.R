@@ -97,10 +97,10 @@ add_params <- function(build_entries, gs_entries, network)
 
 ################################################################################
 # 5
-write_output <- function(out, network, folder, ID)
+write_output <- function(out, network, out_dir, ID)
 {
   if (nrow(out) < 1) message("No buildings in service area.") else{
-    out_dir <- paste0(folder, "/indices/")
+    #out_dir <- paste0(folder, "/indices/")
     if (!dir.exists(out_dir)) dir.create(out_dir)
     write_di(out, out_dir, ID)
     write_ls(out, network, out_dir, ID)

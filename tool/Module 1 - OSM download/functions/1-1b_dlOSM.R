@@ -42,13 +42,19 @@ OSM_downloader <- function(tile, key)
   require(sf, quietly = TRUE)
   require(osmdata, quietly = TRUE)
   set_overpass_url(APIselect())
-  tryCatch({tile %>%
+  ntry <- 0
+  while (!exists("tmp") & ntry < 5) {
+  try({
+    if (ntry > 0) set_overpass_url(APIselect())
+    ntry <- ntry + 1
+    tmp <- tile %>%
       st_transform(4326) %>%
       st_bbox() %>%
       opq() %>%
       add_osm_feature(key = key) %>%
-      osmdata_sf()}, error = function(e) return(NULL)) %>%
-    return()
+      osmdata_sf()})}
+  if (!exists("tmp")) return(NULL)
+  return(NULL)
 }
 
 
