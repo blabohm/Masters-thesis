@@ -30,15 +30,16 @@
 # Distance
 
 calcIndices <- function(green_space_IDs, in_directory, out_directory,
-                        perc_core = .75, d = 500)
+                        perc_core = .75)
 {
   # create output directory if it doesn't exist
-  if (!dir.exists(in_directory)) dir.create(in_directory)
+  if (!dir.exists(out_directory)) dir.create(out_directory)
   # Set up parallel processing
   require(doParallel)
   ncore <- round(detectCores() * perc_core)
-  cl <- makeCluster(ncore, outfile = "")
+  cl <- makeCluster(ncore)
   registerDoParallel(cl)
+
   foreach(ID = green_space_IDs) %dopar% {
   #for (ID in green_space_IDs) {
     # Load required packages for each core
@@ -53,7 +54,7 @@ calcIndices <- function(green_space_IDs, in_directory, out_directory,
     # 1
     gs_entries <- load_gs_entries(ID, in_directory)
     # 2
-    build_entries <- load_build_entries(in_directory, gs_entries, d)
+    build_entries <- load_build_entries(in_directory, gs_entries)
     # 3
     network <- load_network(in_directory, gs_entries)
     if (nrow(build_entries) == 0) next

@@ -96,7 +96,7 @@ add_shortest_path <- function(build_entries, gs_entries, sf_network)
 
 
 # 4.6
-add_net_dist <- function(build_entries, sf_network)
+add_net_dist <- function(build_entries, sf_network, d = 500)
 {
   require(dplyr, quietly = TRUE)
   require(sf, quietly = TRUE)

@@ -22,19 +22,25 @@
 #
 ################################################################################
 # INPUT DATA
-inputDir <- "Z:/temp/"
-out <- gsub("temp/", "output/", inputDir)
+inputDir <- "Z:/input/"
+out <- gsub("input/", "output/", inputDir)
 if (!dir.exists(out)) dir.create(out)
 
-# cityBound <- paste0(inputDir, "cities.gpkg")
 require(dplyr, quietly = TRUE)
 require(sf, quietly = TRUE)
-# ccList <- cityBound %>%
-#   st_read(query = "SELECT * FROM cities", quiet = TRUE)
 
-ccList <- tibble(URAU_CODE = c(#"DE008",
-  "DE503", #"ES002",
-  "BE001", "PL003"))
+cityBound <- paste0(inputDir, "cities.gpkg")
+read_sf("Z:/cities_europe_kernel/cities_boundary.shp") %>%
+  select(URAU_CODE = URAU_COD_1,
+         FUA_CODE, SelectBenn) %>%
+  mutate(URAU_CODE = substr(URAU_CODE, 1, 5),
+         FUA_CODE = substr(FUA_CODE, 1, 5)) %>%
+  write_sf(cityBound, layer = "cities")
+ccList <- cityBound %>%
+  st_read(query = "SELECT * FROM cities", quiet = TRUE)
+
+ccList <- tibble(URAU_CODE = c(#"DE008", "DE503", "ES002", "BE001",
+  "PL003"))
 cityCode <- ccList$URAU_CODE[1]
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
@@ -83,16 +89,14 @@ for (cityCode in ccList$URAU_CODE) {
   # Run function
   buildingPrep(city_code = cityCode,
                input_directory = inputDir,
-               output_directory = outputDir,
-               ua_directory = "Z:/UA2018/")
+               output_directory = outputDir)
   ################################################################################
   # 2.3 - GREEN SPACE ENTRY DETECTION
   #
   # Run function
   greenSpacePrep(city_code = cityCode,
                  input_directory = inputDir,
-                 output_directory = outputDir,
-                 ua_directory = "Z:/UA2018/")
+                 output_directory = outputDir)
   ################################################################################
   # 2.4 - NETWORK BLENDING
   #
@@ -110,7 +114,7 @@ for (cityCode in ccList$URAU_CODE) {
     list.files(pattern = "3-[1-9].*\\.R", full.names = TRUE) %>%
     for (file in .) source(file)
   # Run function
-  try({getIndices(working_directory = outputDir)})
+  getIndices(working_directory = outputDir)
 
   ################################################################################
   # Clean up

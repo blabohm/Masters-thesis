@@ -36,7 +36,7 @@ proximity_checker1 <- function(city_boundaries, city_code)
   city_boundaries %>%
     st_read(wkt_filter = f,
             quiet = TRUE) %>%
-    pull(URAU_CODE) %>%
+    pull(FUA_CODE) %>%
     substr(1, 5) %>%
     unique() %>%
     return()
@@ -83,14 +83,14 @@ UAgreen_space <- function(code_list, ua_directory, city_boundaries, city_code,
     st_geometry() %>%
     st_as_text()
   # set up progress bar
-  pb <- txtProgressBar(min = 0, max = length(ua),
-                       initial = 0, style = 3)
-  stepi <- 0
+  #pb <- txtProgressBar(min = 0, max = length(ua),
+  #                     initial = 0, style = 3)
+  #stepi <- 0
   # interate through files
   for (uaFile in ua) {
     # for progress bar
-    stepi <- stepi + 1
-    setTxtProgressBar(pb, stepi)
+    #stepi <- stepi + 1
+    #setTxtProgressBar(pb, stepi)
     # get name of land use layer
     lyr <- st_layers(uaFile)$name[1]
     # write parks to one layer

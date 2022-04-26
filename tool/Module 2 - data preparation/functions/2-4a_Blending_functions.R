@@ -41,7 +41,7 @@
 
 snapAndBlend <- function(city_code, city_boundaries, build_entries, gs_entries,
                          network, output_dir,
-                         cellsize = 3000, crs = 3035, perc_core = .75)
+                         cellsize = 2000, crs = 3035, perc_core = .75)
 {
   require(dplyr, quietly = TRUE, warn.conflicts = FALSE)
   require(sf, quietly = TRUE)
@@ -94,15 +94,15 @@ networkCombinator <- function(file_list, out = "file", output_dir = NULL)
   # check output consistency
   output_dir <- outputChecker(directory = output_dir, file_name = "edges.gpkg")
   # set up progress bar
-  pb <- txtProgressBar(min = 0, max = length(file_list),
-                       initial = 0, style = 3)
-  stepi <- 0
+  # pb <- txtProgressBar(min = 0, max = length(file_list),
+  #                      initial = 0, style = 3)
+  # stepi <- 0
   outSF <- NULL
   # iterate through files
   for (file in file_list) {
     # for progress bar
-    stepi <- stepi + 1
-    setTxtProgressBar(pb, stepi)
+    # stepi <- stepi + 1
+    # setTxtProgressBar(pb, stepi)
     # Read input in file_list and execute a network join
     tmp <- file %>%
       st_read(quiet = TRUE) %>%

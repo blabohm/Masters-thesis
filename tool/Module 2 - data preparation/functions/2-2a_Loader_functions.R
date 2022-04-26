@@ -23,8 +23,16 @@
 # res_class: Desired urban atlas residential class-codes. Provided as vector of
 # numbers - DEFAULT is all UA residential classes
 ################################################################################
+# ua_dir = paste0(input_directory, "/UA2018/")
+# city_code = cityCode
+# boundary = boundaryLoader(city_boundaries = paste0(input_directory, "/cities.gpkg"),
+#                           city_code = city_code)
+# crs = 3035
+# res_class = c(11100, 11210, 11220,
+#               11230, 11240, 11300)
+################################################################################
 
-UAresLoader <- function(ua_dir, city_code, boundary,
+UAresLoader <- function(ua_dir, fua_code, boundary,
                         crs = 3035, res_class = c(11100, 11210, 11220,
                                                   11230, 11240, 11300))
 {
@@ -34,7 +42,7 @@ UAresLoader <- function(ua_dir, city_code, boundary,
 
   # get ua file with right code
   ua_file <- ua_dir %>%
-    list.files(pattern = cityCode,
+    list.files(pattern = fua_code,
                full.names = TRUE) %>%
     list.files(pattern = "gpkg$",
                full.names = TRUE,

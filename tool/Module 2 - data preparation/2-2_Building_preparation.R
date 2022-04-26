@@ -20,17 +20,14 @@
 ################################################################################
 # INPUT VALUES FOR TESTING CODE
 # DATA DIRECTORIES FOR UA AND OSM DATA
-# osmDir <-  "E:/osm_buildings/"
-# uaDir <- "C:/Berlin/UA2018/"
-# cityCode <- "DE001"
-# cityBound <- "E:/citiesEurope/Cities.shp"
-# outDir <- "C:/Berlin/buildings.gpkg"
-#
-# buildingPrep(osm_directory = osmDir,
-#              ua_directory = uaDir,
-#              city_code = cityCode,
-#              city_boundaries = cityBound,
-#              out_dir = outDir)
+# city_code = cityCode
+# input_directory = inputDir
+# output_directory = outputDir
+# city_boundaries = paste0(input_directory, "/cities.gpkg")
+# osm_directory = paste0(input_directory, "/osm_buildings/")
+# ua_directory = paste0(input_directory, "/UA2018/")
+# building_out = paste0(output_directory, "/buildings.gpkg")
+
 ################################################################################
 
 buildingPrep <- function(city_code, input_directory, output_directory,
@@ -56,7 +53,7 @@ buildingPrep <- function(city_code, input_directory, output_directory,
   # 1. READ UA 2018 DATA
   #    -> FILTER FOR RESIDENTIAL AREAS
   UAresidential <- UAresLoader(ua_dir = ua_directory,
-                               city_code = city_code,
+                               fua_code = city_boundary$FUA_CODE,
                                boundary = city_boundary)
   # 2. READ OSM BUILDING TILE
   #    -> CHECK IF OSM LAYER IS INSIDE CITY BOUNDARIES

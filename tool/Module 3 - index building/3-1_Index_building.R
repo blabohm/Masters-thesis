@@ -19,7 +19,12 @@
 # INPUT VALUES FOR TESTING CODE
 
 # DATA DIRECTORIES
-#working_directory <- "D:/temp/"
+# working_directory <- outputDir
+# output = paste0(working_directory, "indices/")
+# nodes = paste0(working_directory, "nodes.gpkg")
+# edges = paste0(working_directory, "edges.gpkg")
+# buildings = paste0(working_directory, "buildings.gpkg")
+
 ################################################################################
 getIndices <- function(working_directory,
                        output = paste0(working_directory, "indices/"),
@@ -42,9 +47,11 @@ getIndices <- function(working_directory,
     pull(identifier) %>%
     unique()
   # ITERATE THROUGH GREEN SPACE IDs AND CREATE IDICES - WRITE OUTPUT TO TEMP FILES
+  tryCatch({
   calcIndices(green_space_IDs = green_space_IDs,
               in_directory = working_directory,
               out_directory = output)
+    }, error = function(e) message(e) )
   # UNITE OUTPUT TO ONE LAYER PER INDEX
   gatherDI(building_polygons = buildings,
            index_dir = output,
