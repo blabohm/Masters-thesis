@@ -85,6 +85,7 @@ OSMloader <- function(osm_file, boundary, crs = 3035)
   tmp <- osm_file %>%
     st_read(wkt_filter = boundary, quiet = TRUE) %>%
     st_make_valid() %>%
+    filter(!st_is_empty(.)) %>%
     st_cast("MULTIPOLYGON", do_split = TRUE, warn = FALSE) %>%
     st_cast("POLYGON", do_split = TRUE, warn = FALSE)
   if (!exists("tmp")) return(NULL)

@@ -30,18 +30,20 @@ require(dplyr, quietly = TRUE)
 require(sf, quietly = TRUE)
 
 cityBound <- paste0(inputDir, "cities.gpkg")
-read_sf("Z:/cities_europe_kernel/cities_boundary.shp") %>%
-  select(URAU_CODE = URAU_COD_1,
-         FUA_CODE, SelectBenn) %>%
-  mutate(URAU_CODE = substr(URAU_CODE, 1, 5),
-         FUA_CODE = substr(FUA_CODE, 1, 5)) %>%
-  write_sf(cityBound, layer = "cities")
+# read_sf("Z:/cities_europe_kernel/cities_boundary.shp") %>%
+#   select(URAU_CODE = URAU_COD_1,
+#          FUA_CODE, SelectBenn) %>%
+#   mutate(URAU_CODE = substr(URAU_CODE, 1, 5),
+#          FUA_CODE = substr(FUA_CODE, 1, 5)) %>%
+#   write_sf(cityBound, layer = "cities")
+done <- list.files(out)
 ccList <- cityBound %>%
-  st_read(query = "SELECT * FROM cities", quiet = TRUE)
+  read_sf(query = "SELECT URAU_CODE, SelectBenn FROM cities") %>%
+  arrange(desc(SelectBenn)) %>%
+  filter(!(URAU_CODE %in% done))
 
-ccList <- tibble(URAU_CODE = c(#"DE008", "DE503", "ES002", "BE001",
-  "PL003"))
-cityCode <- ccList$URAU_CODE[1]
+# cityCode <- ccList$URAU_CODE[1]
+
 # - urban atlas (UA) data of a cities FUA (including population values for
 #   residential areas)
 # - polygon of the area of interest (if not provided, UA core will be used)
@@ -51,8 +53,6 @@ cityCode <- ccList$URAU_CODE[1]
 #cityCode <- "DE001"
 # Leipzig
 #cityCode <- "DE008"
-#cityCode <- ccList$URAU_CODE[1]
-
 
 for (cityCode in ccList$URAU_CODE) {
 
