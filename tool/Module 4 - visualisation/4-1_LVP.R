@@ -11,7 +11,7 @@ getwd() %>%
   list.files(pattern = "3.*\\.R", full.names = TRUE) %>%
   for (file in .) source(file)
 ID <- "23473-DE008L2"
-wd <- "D:/output/DE008/"
+wd <- "C:/Users/labohben/Desktop/DE008/"
 
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
 gse_dir <- paste0(wd, "green_space_entries.gpkg")
@@ -63,10 +63,10 @@ st_distance(be$geom[301], gse$geom[be$ne_id[301]])
 di <- 118 / 169
 ls <- b$population[300] * gs$area / 169
 
-gatherDI("D:/output/DE008/buildings.gpkg",
-         "D:/output/DE008/lvp/",
-         "D:/output/DE008/lvp/di.gpkg")
+gatherDI("C:/Users/labohben/Desktop/DE008/buildings.gpkg",
+         "C:/Users/labohben/Desktop/DE008/lvp/",
+         "C:/Users/labohben/Desktop/DE008/lvp/di.gpkg")
 
-gatherLS("D:/output/DE008/edges.gpkg",
-         "D:/output/DE008/lvp/",
-         "D:/output/DE008/lvp/ls.gpkg")
+gatherLS("C:/Users/labohben/Desktop/DE008/edges.gpkg",
+         "C:/Users/labohben/Desktop/DE008/lvp/",
+         "C:/Users/labohben/Desktop/lvp/ls.gpkg")
