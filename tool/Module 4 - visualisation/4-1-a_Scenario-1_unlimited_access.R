@@ -3,6 +3,7 @@ library(dplyr)
 library(sf)
 library(sfnetworks)
 library(ggplot2)
+library(tidygraph)
 getwd() %>%
   paste0("/tool/Module 3 - index building/functions/") %>%
   list.files(pattern = "3.*\\.R", full.names = TRUE) %>%
@@ -40,7 +41,7 @@ new_gse <- lvp_outline %>%
   st_as_sf() %>%
   mutate(area = gs$area) %>%
   rename(geom = x)
-
+write_sf(new_gse, paste0(lvp_dir, "new_gse.gpkg"))
 net <- edges %>%
   read_sf(wkt_filter = lvp_filter) %>%
   as_sfnetwork() %>%
@@ -54,5 +55,22 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0)
 
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+write_output(out, network = net, out_dir = wd, ID = id)
 
+gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+  filter(!is.na(identifier),
+         identifier != id) %>%
+  pull(identifier) %>%
+  unique()
 
+lvp_dir <- paste0(wd, "lvp/")
+flist <- list.files(paste0(wd, "indices/"),
+                    pattern = paste(gs_ids, collapse = "|"),
+                    full.names = TRUE)
+file.copy(flist, lvp_dir)
+
+build_poly <- paste0(wd, "buildings.gpkg")
+gatherDI(building_polygons = build_poly, index_dir = lvp_dir,
+         output_dir = paste0(lvp_dir, "di.gpkg"))
+gatherLS(edges = edges, index_dir = lvp_dir,
+         output_dir = paste0(lvp_dir, "ls.gpkg"))
