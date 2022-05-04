@@ -11,7 +11,7 @@ getwd() %>%
 
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
-d <- 1000
+d <- 2000
 nodes <- paste0(wd, "nodes.gpkg")
 edges <- paste0(wd, "edges.gpkg")
 
@@ -65,12 +65,13 @@ gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   pull(identifier) %>%
   unique()
 
-lvp_dir <- paste0(wd, "lvp/")
 flist <- list.files(paste0(wd, "indices/"),
                     pattern = paste(gs_ids, collapse = "|"),
                     full.names = TRUE)
 file.copy(flist, out_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = out_dir, output_dir = paste0(out_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = out_dir, output_dir = paste0(out_dir, "ls.gpkg"))
+gatherDI(building_polygons = build_poly, index_dir = out_dir,
+         output_dir = paste0(out_dir, "di.gpkg"))
+gatherLS(edges = edges, index_dir = out_dir,
+         output_dir = paste0(out_dir, "ls.gpkg"))

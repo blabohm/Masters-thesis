@@ -1,7 +1,6 @@
 library(dplyr)
 library(sf)
 library(ggplot2)
-library(units)
 
 wd <- "Z:/output/"
 cities <- list.files(wd)

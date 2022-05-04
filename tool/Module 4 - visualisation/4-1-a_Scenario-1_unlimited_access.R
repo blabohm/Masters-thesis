@@ -11,7 +11,7 @@ getwd() %>%
 
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
-d <- 1000
+d <- 2000
 nodes <- paste0(wd, "nodes.gpkg")
 edges <- paste0(wd, "edges.gpkg")
 
@@ -41,7 +41,7 @@ new_gse <- lvp_outline %>%
   st_as_sf() %>%
   mutate(area = gs$area) %>%
   rename(geom = x)
-write_sf(new_gse, paste0(lvp_dir, "new_gse.gpkg"))
+write_sf(new_gse, paste0(wd, "new_gse.gpkg"))
 net <- edges %>%
   read_sf(wkt_filter = lvp_filter) %>%
   as_sfnetwork() %>%
@@ -55,7 +55,9 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0)
 
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
-write_output(out, network = net, out_dir = wd, ID = id)
+out_dir <- paste0(wd, "scenario1/")
+dir.create(out_dir)
+write_output(out, network = net, out_dir = out_dir, ID = id)
 
 gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
@@ -63,14 +65,14 @@ gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   pull(identifier) %>%
   unique()
 
-lvp_dir <- paste0(wd, "lvp/")
 flist <- list.files(paste0(wd, "indices/"),
                     pattern = paste(gs_ids, collapse = "|"),
                     full.names = TRUE)
-file.copy(flist, lvp_dir)
+file.copy(flist, out_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = lvp_dir,
-         output_dir = paste0(lvp_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = lvp_dir,
-         output_dir = paste0(lvp_dir, "ls.gpkg"))
+gatherDI(building_polygons = build_poly, index_dir = out_dir,
+         output_dir = paste0(out_dir, "di.gpkg"))
+gatherLS(edges = edges, index_dir = out_dir,
+         output_dir = paste0(out_dir, "ls.gpkg"))
+
