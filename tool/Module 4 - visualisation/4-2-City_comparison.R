@@ -1,6 +1,7 @@
 library(dplyr)
 library(sf)
 library(ggplot2)
+library(plotly)
 
 wd <- "Z:/output/"
 cities <- list.files(wd)
@@ -13,20 +14,20 @@ print(city)
   paste0(city, "/detour_index.gpkg") %>%
     read_sf() %>%
     st_drop_geometry() %>%
+    #filter(!is.na(di)) %>%
     mutate(city = city,
            di = case_when(di > 1 ~ 1,
-                          is.na(di) ~ 0,
+                          #is.na(di) ~ 0,
                           TRUE ~ di)) %>%
     arrange(di) %>%
     mutate(pop_cum = cumsum(population),
            pop_sum = sum(population),
            pop_rel = pop_cum / pop_sum,
-           pop_round = round(pop_rel, digits = 3)) %>%
+           pop_round = round(pop_rel, digits = 2)) %>%
     group_by(pop_round) %>%
     summarise(di = mean(di), city = first(city)) %>%
     bind_rows(out)
 }
-
 agg_df <- read_sf("Z:/cities_europe_core/cities_full.gpkg") %>%
   st_drop_geometry() %>%
   mutate(city = substr(URAU_COD_1, 1, 5)) %>%
@@ -36,6 +37,17 @@ out_agg <- left_join(out, agg_df)
 
 out_cntr <- out_agg %>%
   group_by(CNTR_CODE, pop_round) %>%
+  arrange(di, pop_round) %>%
+  summarise(di = mean(di))
+
+out_region <- out_agg %>%
+  group_by(RegionUN, pop_round) %>%
+  arrange(di, pop_round) %>%
+  summarise(di = mean(di))
+
+out_region1 <- out_agg %>%
+  group_by(RegionEU, pop_round) %>%
+  arrange(di, pop_round) %>%
   summarise(di = mean(di))
 
 out %>%
@@ -44,15 +56,24 @@ out %>%
 out_cntr %>%
   ggplot(aes(x = di, y = pop_round, col = CNTR_CODE)) + geom_line()
 
+out_region %>%
+  ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
 
-ls <- read_sf("C:/project/DE001/local_significance.gpkg") %>%
-  filter(!is.na(ls)) %>%
-  mutate(edge_length = st_length(.)) %>%
-  st_drop_geometry() %>%
-  mutate(ls_meter = ls / edge_length,
-         city = "Berlin",
-         x_bar = mean(ls),
-         x_bar1 = mean(ls_meter))
+out_region1 %>%
+  ggplot(aes(x = di, y = pop_round, col = RegionEU)) + geom_line()
+
+plot_ly(data = out, x = ~di, y = ~pop_round, color = ~city) %>%
+  add_lines()
+out_sav <- out
+out <- out_sav
+# ls <- read_sf("C:/project/DE001/local_significance.gpkg") %>%
+#   filter(!is.na(ls)) %>%
+#   mutate(edge_length = st_length(.)) %>%
+#   st_drop_geometry() %>%
+#   mutate(ls_meter = ls / edge_length,
+#          city = "Berlin",
+#          x_bar = mean(ls),
+#          x_bar1 = mean(ls_meter))
 
 # di1 <- read_sf("C:/project/DE008/detour_index.gpkg") %>%
 #   st_drop_geometry() %>%
