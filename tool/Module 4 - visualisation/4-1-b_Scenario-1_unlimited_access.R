@@ -20,42 +20,44 @@ lvp_query <- paste0("SELECT * FROM nodes WHERE identifier IS '", id, "'")
 lvp_entries <- read_sf(nodes, query = lvp_query)
 lvp_filter <- st_buffer(lvp_entries, d) %>% st_geometry() %>% st_as_text()
 
-# REPLACE PARK ENTRIES WITH BUILDING ENTRIES
-target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2")
-target_query <- paste0("SELECT * FROM nodes WHERE identifier = '",
-                       target_ids, "'")
-for(q in target_query) { tmp <- read_sf(nodes, query = q)
-  if (q == first(target_query)) target_gs <- tmp else target_gs <- bind_rows(target_gs, tmp) }
+# PARK ENTRIES EVERY 2M
+gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
+gsq <- paste0("SELECT area, geom FROM ",  st_layers(gs_dir)$name[1],
+              " WHERE identifier LIKE '", id, "'")
+gs <- read_sf(gs_dir, query = gsq)
 
-ua_dir <- "Z:/input/UA2018/DE008L2_LEIPZIG_UA2018_v013/Data/DE008L2_LEIPZIG_UA2018_v013.gpkg"
-ua_lyr <-  st_layers(ua_dir)$name[1]
+lvp_outline <- wd %>%
+  paste0("lvp_outline.gpkg") %>%
+  read_sf() %>%
+  st_union() %>%
+  st_cast("MULTILINESTRING", warn = FALSE)
 
-pop_query <- paste0("SELECT Pop2018, area FROM ", ua_lyr, " WHERE code_2018 = 11100")
-hd_pop <- read_sf(ua_dir, wkt_filter = lvp_filter,
-                  query = pop_query)
-hd_pop <- hd_pop %>%
-  mutate(pop_per_m = Pop2018 / area)
-pop_per_m_95 <- quantile(hd_pop$pop_per_m, probs = .95)
+n <-  (st_length(lvp_outline) / 5) %>% round() %>% as.numeric()
 
-new_building_entries <- target_gs %>%
-  group_by(identifier) %>%
-  mutate(population = round(area * pop_per_m_95 / n()),
-         ID = identifier,
-         area = NA,
-         identifier = NA)
+# BLEND NEW PARK ENTRIES INTO NETWORK
+new_gse <- lvp_outline %>%
+  st_sample(size = n, type = "regular") %>%
+  st_cast("POINT") %>%
+  st_as_sf() %>%
+  mutate(area = gs$area) %>%
+  rename(geom = x)
+#write_sf(new_gse, paste0(wd, "new_gse.gpkg"))
 
-# BLEND NEW BUILDINGS TO NETWORK
+net <- edges %>%
+  read_sf(wkt_filter = lvp_filter) %>%
+  as_sfnetwork() %>%
+  convert(to_undirected) %>%
+  st_network_blend(new_gse) %>%
+  activate("edges") %>%
+  st_as_sf()
+#write_sf(st_as_sf(activate(net, "edges")), paste0(wd, "edges_new.gpkg"))
+
 #CALC INDICES
 be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-  filter(population > 0) %>%
-  bind_rows(new_building_entries)
-
-new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-  filter(!is.na(area),
-         !(identifier %in% target_ids))
+  filter(population > 0)
 
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
-out_dir <- paste0(wd, "scenario2/")
+out_dir <- paste0(wd, "scenario1/")
 dir.create(out_dir)
 write_output(out, network = net, out_dir = out_dir, ID = id)
 
@@ -75,3 +77,4 @@ gatherDI(building_polygons = build_poly, index_dir = out_dir,
          output_dir = paste0(out_dir, "di.gpkg"))
 gatherLS(edges = edges, index_dir = out_dir,
          output_dir = paste0(out_dir, "ls.gpkg"))
+
