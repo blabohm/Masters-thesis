@@ -21,3 +21,7 @@ for (scenario in scenarios) {
     na.omit() %>% left_join(base_ls) %>% mutate(delta_ls = ls - base_ls) %>%
     write_sf(paste0(scenario, "/delta_ls.gpkg"))
 }
+
+# read_sf("C:/Users/labohben/Desktop/DE008/scenario3/delta_ls.gpkg") %>%
+#   mutate(delta_ls = ifelse(delta_ls < 0, sqrt(abs(delta_ls)), delta_ls)) %>%
+#   write_sf("C:/Users/labohben/Desktop/DE008/scenario3/delta_ls1.gpkg")

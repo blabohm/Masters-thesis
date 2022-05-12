@@ -21,7 +21,8 @@ lvp_entries <- read_sf(nodes, query = lvp_query)
 lvp_filter <- st_buffer(lvp_entries, d) %>% st_geometry() %>% st_as_text()
 
 # REPLACE PARK ENTRIES WITH BUILDING ENTRIES
-target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2")
+target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
+                "23508-DE008L2", "23509-DE008L2")
 target_query <- paste0("SELECT * FROM nodes WHERE identifier = '",
                        target_ids, "'")
 for(q in target_query) { tmp <- read_sf(nodes, query = q)
