@@ -45,7 +45,9 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   left_join(ua_pop) %>%
   left_join(hd_pop) %>%
   mutate(Pop2018_new = area * pop_high,
-         population_new = round(population / Pop2018 * Pop2018_new)) %>%
+         population_new = round(population / Pop2018 * Pop2018_new),
+         population_new = ifelse(population_new < population,
+                                 round(population * 1.2), population_new)) %>%
   transmute(identifier = NA,
             area = NA,
             population = population_new,
@@ -54,7 +56,10 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
 
 new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(area))
-net <- read_sf(edges, wkt_filter = lvp_filter)
+net <- edges %>%
+  read_sf(wkt_filter = lvp_filter) %>%
+  mutate(edge_id = row_number()) %>%
+  select(edge_id)
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 out_dir <- paste0(wd, "scenario3/")
 dir.create(out_dir)
@@ -72,5 +77,7 @@ flist <- list.files(paste0(wd, "indices/"),
 file.copy(flist, out_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = out_dir, output_dir = paste0(out_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = out_dir, output_dir = paste0(out_dir, "ls.gpkg"))
+gatherDI(building_polygons = build_poly, index_dir = out_dir,
+         output_dir = paste0(out_dir, "di.gpkg"))
+gatherLS(edges = edges, index_dir = out_dir,
+         output_dir = paste0(out_dir, "ls.gpkg"))

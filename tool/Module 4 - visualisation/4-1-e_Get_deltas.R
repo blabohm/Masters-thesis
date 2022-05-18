@@ -8,13 +8,15 @@ id <- "23473-DE008L2"
 # scenario_cols - base_index_cols
 base_indices <- paste0(wd, "base_indices")
 base_di <- read_sf(paste0(base_indices, "/di.gpkg")) %>%
-  rename(base_di = di) %>% na.omit() %>% st_drop_geometry()
+  rename(base_di = di) %>% na.omit() %>% st_drop_geometry() %>%
+  mutate(ifelse(base_di > 1, 1, round(base_di, digits = 3)))
 base_ls <- read_sf(paste0(base_indices, "/ls.gpkg")) %>%
   rename(base_ls = ls) %>% na.omit() %>% st_drop_geometry()
 
 scenarios <- list.files(wd, pattern = "scenario", full.names = TRUE)
 for (scenario in scenarios) {
   read_sf(paste0(scenario, "/di.gpkg")) %>% na.omit() %>%
+    mutate(ifelse(di > 1, 1, round(di, digits = 3))) %>%
     left_join(base_di) %>% mutate(delta_di = di - base_di) %>%
     write_sf(paste0(scenario, "/delta_di.gpkg"))
   read_sf(paste0(scenario, "/ls.gpkg")) %>%
@@ -22,6 +24,3 @@ for (scenario in scenarios) {
     write_sf(paste0(scenario, "/delta_ls.gpkg"))
 }
 
-# read_sf("C:/Users/labohben/Desktop/DE008/scenario3/delta_ls.gpkg") %>%
-#   mutate(delta_ls = ifelse(delta_ls < 0, sqrt(abs(delta_ls)), delta_ls)) %>%
-#   write_sf("C:/Users/labohben/Desktop/DE008/scenario3/delta_ls1.gpkg")

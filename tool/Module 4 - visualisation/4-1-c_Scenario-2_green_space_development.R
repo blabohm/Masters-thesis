@@ -54,7 +54,10 @@ new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(area),
          !(identifier %in% target_ids))
 
-net <- read_sf(edges, wkt_filter = lvp_filter)
+net <- edges %>%
+  read_sf(wkt_filter = lvp_filter) %>%
+  mutate(edge_id = row_number()) %>%
+  select(edge_id)
 
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 out_dir <- paste0(wd, "scenario2/")

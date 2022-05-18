@@ -39,7 +39,10 @@ new_gse <- lvp_outline %>%
   st_sample(size = n, type = "regular") %>%
   st_cast("POINT") %>%
   st_as_sf() %>%
-  mutate(area = gs$area) %>%
+  mutate(area = gs$area,
+         identifier = id,
+         ID = NA,
+         population = NA) %>%
   rename(geom = x)
 #write_sf(new_gse, paste0(wd, "new_gse.gpkg"))
 
@@ -56,25 +59,49 @@ net <- edges %>%
 be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0)
 
-out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 out_dir <- paste0(wd, "scenario1/")
 dir.create(out_dir)
-write_output(out, network = net, out_dir = out_dir, ID = id)
+
+bind_rows(be, new_gse)
+edges %>%
+  read_sf() %>%
+  filter(!(edge_id %in% net$edge_id)) %>%
+  bind_rows(net) %>%
+  mutate(edge_id = row_number()) %>%
+  select(edge_id) %>%
+  write_sf(paste0(out_dir, "edges.gpkg"))
+
+nodes %>%
+  read_sf() %>%
+  filter(!(identifier %in% id),
+         !(ID %in% be$ID)) %>%
+  bind_rows(be) %>%
+  bind_rows(new_gse) %>%
+  write_sf(paste0(out_dir,"nodes.gpkg"))
 
 gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
          identifier != id) %>%
   pull(identifier) %>%
   unique()
+index_dir <- paste0(out_dir, "indices/")
+dir.create(index_dir)
+calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+            out_directory = index_dir)
 
-flist <- list.files(paste0(wd, "indices/"),
-                    pattern = paste(gs_ids, collapse = "|"),
-                    full.names = TRUE)
-file.copy(flist, out_dir)
+
+#out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+#write_output(out, network = net, out_dir = out_dir, ID = id)
+
+
+# flist <- list.files(paste0(wd, "indices/"),
+#                     pattern = paste(gs_ids, collapse = "|"),
+#                     full.names = TRUE)
+# file.copy(flist, out_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = out_dir,
+gatherDI(building_polygons = build_poly, index_dir = index_dir,
          output_dir = paste0(out_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = out_dir,
+gatherLS(edges = paste0(out_dir, "edges.gpkg"), index_dir = index_dir,
          output_dir = paste0(out_dir, "ls.gpkg"))
 
