@@ -13,9 +13,9 @@ getwd() %>%
 wd <- "D:/output/DE008/"
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
-d <- 2000
+d <- 1000
 nodes <- paste0(wd, "nodes.gpkg")
-edges <- paste0(wd, "edges_new.gpkg")
+edges <- paste0(wd, "scenario1/edges.gpkg")
 
 # ACTUAL PARK ENTRIES
 lvp_query <- paste0("SELECT * FROM nodes WHERE identifier IS '", id, "'")
@@ -25,7 +25,6 @@ lvp_filter <- st_buffer(lvp_entries, d) %>% st_geometry() %>% st_as_text()
 # REPLACE PARK ENTRIES WITH BUILDING ENTRIES
 ua_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
 ua_lyr <-  st_layers(ua_dir)$name[1]
-
 
 ua_pop <- read_sf(ua_dir, wkt_filter = lvp_filter, layer = ua_lyr) %>%
   filter(grepl("^11",  code_2018)) %>%
@@ -54,30 +53,39 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
             ID,
             geom)
 
-new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-  filter(!is.na(area))
-net <- edges %>%
-  read_sf(wkt_filter = lvp_filter) %>%
-  mutate(edge_id = row_number()) %>%
-  select(edge_id)
-out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+# new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+#   filter(!is.na(area))
+# net <- edges %>%
+#   read_sf(wkt_filter = lvp_filter) %>%
+#   mutate(edge_id = row_number()) %>%
+#   select(edge_id)
+#out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 out_dir <- paste0(wd, "scenario3/")
-dir.create(out_dir)
-write_output(out, network = net, out_dir = out_dir, ID = id)
+index_dir <- paste0(out_dir, "indices/")
+dir.create(index_dir, recursive = TRUE)
 
+nodes %>%
+  read_sf() %>%
+  filter(!(ID %in% be$ID)) %>%
+  bind_rows(be) %>%
+  write_sf(paste0(out_dir, "nodes.gpkg"))
+#write_output(out, network = net, out_dir = out_dir, ID = id)
 gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
          identifier != id) %>%
   pull(identifier) %>%
   unique()
+file.copy(edges, out_dir)
+calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+            out_directory = index_dir)
 
-flist <- list.files(paste0(wd, "indices/"),
-                    pattern = paste(gs_ids, collapse = "|"),
-                    full.names = TRUE)
-file.copy(flist, out_dir)
+# flist <- list.files(paste0(wd, "indices/"),
+#                     pattern = paste(gs_ids, collapse = "|"),
+#                     full.names = TRUE)
+# file.copy(flist, out_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = out_dir,
+gatherDI(building_polygons = build_poly, index_dir = index_dir,
          output_dir = paste0(out_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = out_dir,
+gatherLS(edges = edges, index_dir = index_dir,
          output_dir = paste0(out_dir, "ls.gpkg"))

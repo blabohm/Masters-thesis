@@ -12,9 +12,9 @@ getwd() %>%
 
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
-d <- 2000
+d <- 1000
 nodes <- paste0(wd, "nodes.gpkg")
-edges <- paste0(wd, "edges_new.gpkg")
+edges <- paste0(wd, "scenario1/edges.gpkg")
 
 # ACTUAL PARK ENTRIES
 lvp_query <- paste0("SELECT * FROM nodes WHERE identifier IS '", id, "'")
@@ -23,31 +23,37 @@ lvp_filter <- st_buffer(lvp_entries, d) %>% st_geometry() %>% st_as_text()
 
 # BLEND NEW BUILDINGS TO NETWORK
 #CALC INDICES
-be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-  filter(population > 0)
+# be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+#   filter(population > 0)
+#
+# new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+#   filter(!is.na(area))
+#
+# net <- read_sf(edges, wkt_filter = lvp_filter)
+#
+# out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 
-new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-  filter(!is.na(area))
-
-net <- read_sf(edges, wkt_filter = lvp_filter)
-
-out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
-out_dir <- paste0(wd, "base_indices/")
-dir.create(out_dir)
-write_output(out, network = net, out_dir = out_dir, ID = id)
+# write_output(out, network = net, out_dir = out_dir, ID = id)
 
 gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier)) %>%
   pull(identifier) %>%
   unique()
 
-flist <- list.files(paste0(wd, "indices/"),
-                    pattern = paste(gs_ids, collapse = "|"),
-                    full.names = TRUE)
-file.copy(flist, out_dir)
+# flist <- list.files(paste0(wd, "indices/"),
+#                     pattern = paste(gs_ids, collapse = "|"),
+#                     full.names = TRUE)
+# file.copy(flist, out_dir)
+out_dir <- paste0(wd, "base_indices/")
+index_dir <- paste0(out_dir, "indices/")
+dir.create(index_dir, recursive = TRUE)
+file.copy(nodes, out_dir)
+file.copy(edges, out_dir)
+calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+            out_directory = index_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-gatherDI(building_polygons = build_poly, index_dir = out_dir,
+gatherDI(building_polygons = build_poly, index_dir = index_dir,
          output_dir = paste0(out_dir, "di.gpkg"))
-gatherLS(edges = edges, index_dir = out_dir,
+gatherLS(edges = edges, index_dir = index_dir,
          output_dir = paste0(out_dir, "ls.gpkg"))

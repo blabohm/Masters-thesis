@@ -11,7 +11,7 @@ getwd() %>%
 
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
-d <- 2000
+d <- 1000
 nodes <- paste0(wd, "nodes.gpkg")
 edges <- paste0(wd, "edges.gpkg")
 
@@ -53,7 +53,7 @@ net <- edges %>%
   st_network_blend(new_gse) %>%
   activate("edges") %>%
   st_as_sf()
-#write_sf(st_as_sf(activate(net, "edges")), paste0(wd, "edges_new.gpkg"))
+write_sf(net, paste0(wd, "edges_new.gpkg"))
 
 #CALC INDICES
 be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
@@ -62,7 +62,6 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
 out_dir <- paste0(wd, "scenario1/")
 dir.create(out_dir)
 
-bind_rows(be, new_gse)
 edges %>%
   read_sf() %>%
   filter(!(edge_id %in% net$edge_id)) %>%
@@ -90,7 +89,7 @@ calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
             out_directory = index_dir)
 
 
-#out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 #write_output(out, network = net, out_dir = out_dir, ID = id)
 
 
