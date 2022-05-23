@@ -9,7 +9,8 @@ out <- tibble()
 #city <- cities[1]
 
 for (city in cities) {
-print(city)
+
+  print(paste(which(cities == city), "of", length(cities)))
   out <- wd %>%
   paste0(city, "/detour_index.gpkg") %>%
     read_sf() %>%
