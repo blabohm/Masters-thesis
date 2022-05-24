@@ -28,9 +28,23 @@ for (city_code in cities[18:832]) {
   N <- nrow(UAresidential)
   i <- nrow(UAresidential[lapply(covered, length) > 0,])
   i/N
-  perc_coverage <- tibble(city_code = city_code, perc_coverage = i / N) %>%
+  perc_coverage <- tibble(city_code = city_code, percent_coverage = i / N) %>%
     bind_rows(perc_coverage)
   })
 }
+city_info <- read.csv("Z:/city_info.csv") %>%
+  tibble() %>%
+  mutate(city_code = substr(URAU_COD_1, 1, 5),
+        URAU_NAME = ifelse(city_code == "XK003", "Mitrovica", URAU_NAME))
 
-plot(perc_coverage)
+city_sf <- read_sf(city_boundaries) %>%
+  rename(city_code = URAU_CODE) %>%
+  left_join(perc_coverage) %>%
+  left_join(city_info, by = "city_code")
+
+ggplot() +
+  geom_sf(data = city_sf, aes(col = percent_coverage, fill = percent_coverage)) +
+  labs(title = "OSM coverage of European cities",
+       color = "Percent of UA residential \n class covered by OSM") +
+  guides(fill = "none") +
+  theme(legend.position = "bottom")
