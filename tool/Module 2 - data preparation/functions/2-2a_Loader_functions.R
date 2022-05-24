@@ -56,8 +56,7 @@ UAresLoader <- function(ua_dir, fua_code, boundary,
   message("\n loading residential areas... \n")
   # load UA file and filter residential classes
   ua_file %>%
-    st_read(lr, wkt_filter = boundary, quiet = TRUE
-            ) %>%
+    st_read(lr, wkt_filter = boundary, quiet = TRUE) %>%
     filter(code_2018 %in% res_class) %>%
     st_transform(crs) %>%
     select(Pop2018, identifier, code_2018) %>%

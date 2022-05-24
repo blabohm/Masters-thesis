@@ -9,8 +9,8 @@ out <- tibble()
 #city <- cities[1]
 
 for (city in cities) {
-
   print(paste(which(cities == city), "of", length(cities)))
+  try({
   out <- wd %>%
   paste0(city, "/detour_index.gpkg") %>%
     read_sf() %>%
@@ -28,7 +28,10 @@ for (city in cities) {
     group_by(pop_round) %>%
     summarise(di = mean(di), city = first(city)) %>%
     bind_rows(out)
-}
+  })}
+
+write.csv(out, "Z:/MA/di_per_pop_cum.csv", row.names = FALSE)
+
 agg_df <- read_sf("Z:/cities_europe_core/cities_full.gpkg") %>%
   st_drop_geometry() %>%
   mutate(city = substr(URAU_COD_1, 1, 5)) %>%
