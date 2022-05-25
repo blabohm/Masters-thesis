@@ -14,7 +14,7 @@ wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
 d <- 1000
 nodes <- paste0(wd, "nodes.gpkg")
-edges <- paste0(wd, "scenario1/edges.gpkg")
+edges <- paste0(wd, "edges_new.gpkg")
 
 # ACTUAL PARK ENTRIES
 lvp_query <- paste0("SELECT * FROM nodes WHERE identifier IS '", id, "'")
@@ -47,8 +47,8 @@ gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
 out_dir <- paste0(wd, "base_indices/")
 index_dir <- paste0(out_dir, "indices/")
 dir.create(index_dir, recursive = TRUE)
-file.copy(nodes, out_dir)
-file.copy(edges, out_dir)
+file.copy(nodes, paste0(out_dir, "nodes.gpkg"))
+file.copy(edges, paste0(out_dir, "edges.gpkg"))
 calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
             out_directory = index_dir)
 

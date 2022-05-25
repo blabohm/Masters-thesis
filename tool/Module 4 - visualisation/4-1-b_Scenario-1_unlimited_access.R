@@ -32,19 +32,20 @@ lvp_outline <- wd %>%
   st_union() %>%
   st_cast("MULTILINESTRING", warn = FALSE)
 
-n <-  (st_length(lvp_outline) / 5) %>% round() %>% as.numeric()
+n <-  (st_length(lvp_outline) / 10) %>% round() %>% as.numeric()
 
 # BLEND NEW PARK ENTRIES INTO NETWORK
-new_gse <- lvp_outline %>%
-  st_sample(size = n, type = "regular") %>%
-  st_cast("POINT") %>%
-  st_as_sf() %>%
-  mutate(area = gs$area,
-         identifier = id,
-         ID = NA,
-         population = NA) %>%
-  rename(geom = x)
+# new_gse <- lvp_outline %>%
+#   st_sample(size = n, type = "regular") %>%
+#   st_cast("POINT") %>%
+#   st_as_sf() %>%
+#   mutate(area = gs$area,
+#          identifier = id,
+#          ID = NA,
+#          population = NA) %>%
+#   rename(geom = x)
 #write_sf(new_gse, paste0(wd, "new_gse.gpkg"))
+new_gse <- read_sf(paste0(wd, "new_gse.gpkg"))
 
 net <- edges %>%
   read_sf(wkt_filter = lvp_filter) %>%
@@ -53,7 +54,7 @@ net <- edges %>%
   st_network_blend(new_gse) %>%
   activate("edges") %>%
   st_as_sf()
-write_sf(net, paste0(wd, "edges_new.gpkg"))
+#write_sf(net, paste0(wd, "edges_new.gpkg"))
 
 #CALC INDICES
 be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
@@ -69,6 +70,7 @@ edges %>%
   mutate(edge_id = row_number()) %>%
   select(edge_id) %>%
   write_sf(paste0(out_dir, "edges.gpkg"))
+net <- read_sf(paste0(out_dir, "edges.gpkg"), wkt_filter = lvp_filter)
 
 nodes %>%
   read_sf() %>%
@@ -78,25 +80,24 @@ nodes %>%
   bind_rows(new_gse) %>%
   write_sf(paste0(out_dir,"nodes.gpkg"))
 
-gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+gs_ids <- read_sf(paste0(out_dir,"nodes.gpkg"), wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
          identifier != id) %>%
   pull(identifier) %>%
   unique()
 index_dir <- paste0(out_dir, "indices/")
 dir.create(index_dir)
-calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
-            out_directory = index_dir)
-
+# calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+#             out_directory = index_dir)
 
 out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
-#write_output(out, network = net, out_dir = out_dir, ID = id)
+write_output(out, network = net, out_dir = index_dir, ID = id)
 
 
-# flist <- list.files(paste0(wd, "indices/"),
-#                     pattern = paste(gs_ids, collapse = "|"),
-#                     full.names = TRUE)
-# file.copy(flist, out_dir)
+flist <- list.files(paste0(wd, "base_indices/indices/"),
+                    pattern = paste(gs_ids, collapse = "|"),
+                    full.names = TRUE)
+file.copy(flist, index_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
 gatherDI(building_polygons = build_poly, index_dir = index_dir,

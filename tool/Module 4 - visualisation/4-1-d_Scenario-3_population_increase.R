@@ -10,7 +10,7 @@ getwd() %>%
   list.files(pattern = "3.*\\.R", full.names = TRUE) %>%
   for (file in .) source(file)
 
-wd <- "D:/output/DE008/"
+#wd <- "D:/output/DE008/"
 wd <- "C:/Users/labohben/Desktop/DE008/"
 id <- "23473-DE008L2"
 d <- 1000
@@ -53,13 +53,8 @@ be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
             ID,
             geom)
 
-# new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-#   filter(!is.na(area))
-# net <- edges %>%
-#   read_sf(wkt_filter = lvp_filter) %>%
-#   mutate(edge_id = row_number()) %>%
-#   select(edge_id)
-#out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+  filter(!is.na(area))
 out_dir <- paste0(wd, "scenario3/")
 index_dir <- paste0(out_dir, "indices/")
 dir.create(index_dir, recursive = TRUE)
@@ -70,19 +65,21 @@ nodes %>%
   bind_rows(be) %>%
   write_sf(paste0(out_dir, "nodes.gpkg"))
 #write_output(out, network = net, out_dir = out_dir, ID = id)
-gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+gs_ids <- read_sf(paste0(out_dir, "nodes.gpkg"), wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
          identifier != id) %>%
   pull(identifier) %>%
   unique()
 file.copy(edges, out_dir)
-calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
-            out_directory = index_dir)
+net <- read_sf(paste0(out_dir, "edges.gpkg"), wkt_filter = lvp_filter)
+# calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+#             out_directory = index_dir)
+out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
 
-# flist <- list.files(paste0(wd, "indices/"),
-#                     pattern = paste(gs_ids, collapse = "|"),
-#                     full.names = TRUE)
-# file.copy(flist, out_dir)
+flist <- list.files(paste0(wd, "base_indices/indices/"),
+                    pattern = paste(gs_ids, collapse = "|"),
+                    full.names = TRUE)
+file.copy(flist, index_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
 gatherDI(building_polygons = build_poly, index_dir = index_dir,

@@ -45,13 +45,13 @@ new_building_entries <- target_gs %>%
 
 # BLEND NEW BUILDINGS TO NETWORK
 #CALC INDICES
-# be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-#   filter(population > 0) %>%
-#   bind_rows(new_building_entries)
+be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+  filter(population > 0) %>%
+  bind_rows(new_building_entries)
 #
-# new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-#   filter(!is.na(area),
-#          !(identifier %in% target_ids))
+new_gse <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+  filter(!is.na(area),
+         !(identifier %in% target_ids))
 out_dir <- paste0(wd, "scenario2/")
 index_dir <- paste0(out_dir, "indices/")
 dir.create(index_dir, recursive = TRUE)
@@ -62,8 +62,6 @@ nodes %>%
   bind_rows(new_building_entries) %>%
   write_sf(paste0(out_dir,"nodes.gpkg"))
 
-#out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
-#write_output(out, network = net, out_dir = out_dir, ID = id)
 
 gs_ids <- read_sf(paste0(out_dir,"nodes.gpkg"), wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier),
@@ -71,13 +69,16 @@ gs_ids <- read_sf(paste0(out_dir,"nodes.gpkg"), wkt_filter = lvp_filter) %>%
   pull(identifier) %>%
   unique()
 file.copy(edges, out_dir)
-calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
-            out_directory = index_dir)
+net <- read_sf(paste0(out_dir, "edges.gpkg"), wkt_filter = lvp_filter)
+out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+write_output(out, network = net, out_dir = index_dir, ID = id)
+# calcIndices(green_space_IDs = gs_ids, in_directory = out_dir,
+#             out_directory = index_dir)
 
-# flist <- list.files(paste0(wd, "indices/"),
-#                     pattern = paste(gs_ids, collapse = "|"),
-#                     full.names = TRUE)
-# file.copy(flist, out_dir)
+flist <- list.files(paste0(wd, "base_indices/indices/"),
+                    pattern = paste(gs_ids, collapse = "|"),
+                    full.names = TRUE)
+file.copy(flist, index_dir)
 
 build_poly <- paste0(wd, "buildings.gpkg")
 gatherDI(building_polygons = build_poly, index_dir = index_dir,
