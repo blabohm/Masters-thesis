@@ -139,12 +139,92 @@ gatherLS <- function(edges, index_dir, output_dir)
   ls_out <-
     tmpDf %>%
     group_by(edge_id) %>%
-    summarise(ls = mean(ls))
+    summarise(ls = sum(ls))
 
   edges %>%
     st_read(quiet = TRUE) %>%
     left_join(ls_out) %>%
     st_write(output_dir)
+}
+
+
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+# drive <- "D:/temp/"
+# edges <- paste0(drive, "/edges.gpkg")
+# index_dir <- paste0(drive, "/indices/")
+################################################################################
+
+appendLS <- function(edges, index_dir, output_dir, lyr)
+{
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+
+  ls_files <- list.files(index_dir,
+                         pattern = "edges[1-9]*.*csv$",
+                         full.names = TRUE)
+
+  for (i in ls_files) {
+    require(dplyr, quietly = TRUE)
+    require(sf, quietly = TRUE)
+    ls_values <- read.csv(i)
+    if (nrow(ls_values) > 0) if (unique(ls_values$ls) != Inf) {
+      if (i != first(ls_files)) tmpDf <- bind_rows(tmpDf, ls_values) else tmpDf <- ls_values
+    }
+  }
+  ls_out <-
+    tmpDf %>%
+    group_by(edge_id) %>%
+    summarise(ls = sum(ls))
+
+  edges %>%
+    st_read(quiet = TRUE) %>%
+    left_join(ls_out) %>%
+    st_write(output_dir, layer = lyr)
+}
+
+
+################################################################################
+# 1. FUNCTION DESCRIPTION (SHORT)
+# REQUIRED SETTINGS:
+# setting_name: Setting description
+# OPTIONAL SETTINGS:
+# setting_name: Setting description - DEFAULT values
+################################################################################
+# drive <- "D:/temp/"
+# building_polygons <- paste0(drive, "/buildings.gpkg")
+# index_dir <- paste0(drive, "/indices/")
+################################################################################
+
+appendDI <- function(building_polygons, index_dir, output_dir, lyr)
+{
+  require(dplyr, quietly = TRUE)
+  require(sf, quietly = TRUE)
+  #building_polygons
+  di_files <- list.files(index_dir,
+                         pattern = "nodes[1-9]*.*csv$",
+                         full.names = TRUE)
+
+  for (i in di_files) {
+    di_values <- read.csv(i)
+    if (nrow(di_values) > 0) if (unique(di_values$di) != Inf) {
+      if (i != first(di_files)) tmpDf <- bind_rows(tmpDf, di_values) else tmpDf <- di_values
+    }
+  }
+  di_out <-
+    tmpDf %>%
+    group_by(ID) %>%
+    summarise(di = mean(di))
+
+  building_polygons %>%
+    st_read(quiet = TRUE) %>%
+    left_join(di_out) %>%
+    st_write(output_dir, layer = lyr)
 }
 
 
