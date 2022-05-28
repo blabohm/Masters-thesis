@@ -4,6 +4,7 @@ library(sf)
 library(sfnetworks)
 library(ggplot2)
 library(tidygraph)
+library(stringr)
 getwd() %>%
   paste0("/tool/Module 3 - index building/functions/") %>%
   list.files(pattern = "3.*\\.R", full.names = TRUE) %>%
@@ -130,6 +131,8 @@ new_building_entries <- target_gs %>%
 
 # BLEND NEW BUILDINGS TO NETWORK
 #CALC INDICES
+net <- edges %>%
+  read_sf(wkt_filter = lvp_filter)
 be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0) %>%
   bind_rows(new_building_entries)
@@ -137,17 +140,58 @@ index_dir2 <- paste0(out_dir, "indices2/")
 dir.create(index_dir2)
 gs_ids2 <- gs_ids[!(gs_ids %in% target_ids)]
 for (i in gs_ids2) {
-  gs <- read_sf(nodes, wkt_filter = lvp_filter) %>%
-    filter(identifier == i)
-  out <- add_params(build_entries = be, gs_entries = gs, network = net)
+  gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
+  gse <- read_sf(nodes, query = gse_q)
+  out <- add_params(build_entries = be, gs_entries = gse, network = net)
   write_output(out, network = net, out_dir = index_dir2, ID = i)
 }
 
-appendDI(building_polygons = build_poly, index_dir = index_dir2,
-         output_dir = paste0(out_dir, "di.gpkg"), lyr = "scenario_2")
-appendLS(edges = edges, index_dir = index_dir2,
-         output_dir = paste0(out_dir, "ls.gpkg"), lyr = "scenario_2")
+gatherDI(building_polygons = build_poly, index_dir = index_dir2,
+         output_dir = paste0(out_dir, "di2.gpkg"))
+gatherLS(edges = edges, index_dir = index_dir2,
+         output_dir = paste0(out_dir, "ls2.gpkg"))
 
 
 ################################################################################
 # Scenario 3
+ua_pop <- read_sf(ua_dir, wkt_filter = lvp_filter, layer = ua_lyr) %>%
+  filter(grepl("^11",  code_2018)) %>%
+  st_drop_geometry()
+hd_pop <- ua_pop %>%
+  mutate(pop_per_m = Pop2018 / area) %>%
+  group_by(code_2018) %>%
+  summarise(pop_high = quantile(pop_per_m, .95))
+be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+  filter(population > 0) %>%
+  select(-c(area)) %>%
+  mutate(identifier = str_extract(ID, ".*L2")) %>%
+  left_join(ua_pop) %>%
+  left_join(hd_pop) %>%
+  mutate(Pop2018_new = area * pop_high,
+         population_new = round(population / Pop2018 * Pop2018_new),
+         population_new = ifelse(population_new < population,
+                                 round(population * 1.2), population_new)) %>%
+  transmute(identifier = NA,
+            area = NA,
+            population = population_new,
+            ID,
+            geom)
+index_dir3 <- paste0(out_dir, "indices3/")
+dir.create(index_dir3)
+for (i in gs_ids) {
+  gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
+  gse <- read_sf(nodes, query = gse_q)
+  out <- add_params(build_entries = be, gs_entries = gse, network = net)
+  write_output(out, network = net, out_dir = index_dir3, ID = i)
+}
+
+gatherDI(building_polygons = build_poly, index_dir = index_dir3,
+         output_dir = paste0(out_dir, "di3.gpkg"))
+gatherLS(edges = edges, index_dir = index_dir3,
+         output_dir = paste0(out_dir, "ls3.gpkg"))
+
+
+################################################################################
+# Scenario 4
+
+
