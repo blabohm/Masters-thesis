@@ -64,7 +64,7 @@ edges %>%
   mutate(edge_id = row_number()) %>%
   select(edge_id) %>%
   write_sf(paste0(out_dir, "edges.gpkg"))
-edges <- paste0(out_dir, "edges.gpkg")
+edges_new <- paste0(out_dir, "edges.gpkg")
 
 file.copy(nodes, out_dir)
 index_dir <- paste0(out_dir, "indices/")
@@ -87,25 +87,27 @@ gatherLS(edges = edges, index_dir = index_dir,
 
 ################################################################################
 # Scenario 1 - Unlimited access
-be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+net <- edges_new %>%
+  read_sf(wkt_filter = lvp_filter)
+be1 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0)
-out <- add_params(build_entries = be, gs_entries = new_gse, network = net)
+out1 <- add_params(build_entries = be1, gs_entries = new_gse, network = net)
 index_dir1 <- paste0(out_dir, "indices1/")
 dir.create(index_dir1)
-flist <- list.files(index_dir,
+flist1 <- list.files(index_dir,
                     pattern = paste(gs_ids[!grepl(id, gs_ids)], collapse = "|"),
                     full.names = TRUE)
-file.copy(flist, index_dir1)
-write_output(out, network = net, out_dir = index_dir1, ID = id)
+file.copy(flist1, index_dir1)
+write_output(out1, network = net, out_dir = index_dir1, ID = id)
 
 gatherDI(building_polygons = build_poly, index_dir = index_dir1,
          output_dir = paste0(out_dir, "di1.gpkg"))
-gatherLS(edges = edges, index_dir = index_dir1,
+gatherLS(edges = edges_new, index_dir = index_dir1,
          output_dir = paste0(out_dir, "ls1.gpkg"))
 
 
 ################################################################################
-# Scenario 2
+# Scenario 2 - Green space development
 # REPLACE PARK ENTRIES WITH BUILDING ENTRIES
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
                 "23508-DE008L2", "23509-DE008L2")
@@ -131,9 +133,9 @@ new_building_entries <- target_gs %>%
 
 # BLEND NEW BUILDINGS TO NETWORK
 #CALC INDICES
-net <- edges %>%
+net <- edges_new %>%
   read_sf(wkt_filter = lvp_filter)
-be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+be2 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0) %>%
   bind_rows(new_building_entries)
 index_dir2 <- paste0(out_dir, "indices2/")
@@ -142,18 +144,18 @@ gs_ids2 <- gs_ids[!(gs_ids %in% target_ids)]
 for (i in gs_ids2) {
   gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
   gse <- read_sf(nodes, query = gse_q)
-  out <- add_params(build_entries = be, gs_entries = gse, network = net)
+  out <- add_params(build_entries = be2, gs_entries = gse, network = net)
   write_output(out, network = net, out_dir = index_dir2, ID = i)
 }
 
 gatherDI(building_polygons = build_poly, index_dir = index_dir2,
          output_dir = paste0(out_dir, "di2.gpkg"))
-gatherLS(edges = edges, index_dir = index_dir2,
+gatherLS(edges = edges_new, index_dir = index_dir2,
          output_dir = paste0(out_dir, "ls2.gpkg"))
 
 
 ################################################################################
-# Scenario 3
+# Scenario 3 - Population increase
 ua_pop <- read_sf(ua_dir, wkt_filter = lvp_filter, layer = ua_lyr) %>%
   filter(grepl("^11",  code_2018)) %>%
   st_drop_geometry()
@@ -161,7 +163,7 @@ hd_pop <- ua_pop %>%
   mutate(pop_per_m = Pop2018 / area) %>%
   group_by(code_2018) %>%
   summarise(pop_high = quantile(pop_per_m, .95))
-be <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+be3 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
   filter(population > 0) %>%
   select(-c(area)) %>%
   mutate(identifier = str_extract(ID, ".*L2")) %>%
@@ -181,17 +183,44 @@ dir.create(index_dir3)
 for (i in gs_ids) {
   gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
   gse <- read_sf(nodes, query = gse_q)
-  out <- add_params(build_entries = be, gs_entries = gse, network = net)
+  out <- add_params(build_entries = be3, gs_entries = gse, network = net)
   write_output(out, network = net, out_dir = index_dir3, ID = i)
 }
 
 gatherDI(building_polygons = build_poly, index_dir = index_dir3,
          output_dir = paste0(out_dir, "di3.gpkg"))
-gatherLS(edges = edges, index_dir = index_dir3,
+gatherLS(edges = edges_New, index_dir = index_dir3,
          output_dir = paste0(out_dir, "ls3.gpkg"))
 
 
 ################################################################################
 # Scenario 4
+# be: pop-increase + gs development
+# gse: inside lvp_filter - lvp gse + new_gse
+# network: normal
+net <- edges_new %>%
+  read_sf(wkt_filter = lvp_filter)
 
+be4 <- be3 %>%
+  bind_rows(new_building_entries)
 
+gse_q4 <- paste0("SELECT * FROM nodes WHERE identifier IS not null")
+gse4 <- nodes %>%
+  read_sf(wkt_filter = lvp_filter, query = gse_q4) %>%
+  filter(!(identifier %in% c(id, target_ids)),
+         area > 0) %>%
+  bind_rows(new_gse)
+gs_ids4 <- gs_ids2
+
+index_dir4 <- paste0(out_dir, "indices4/")
+dir.create(index_dir4)
+for (i in gs_ids4) {
+  gse <- filter(gse4, identifier == i)
+  out <- add_params(build_entries = be4, gs_entries = gse, network = net)
+  write_output(out, network = net, out_dir = index_dir4, ID = i)
+}
+
+gatherDI(building_polygons = build_poly, index_dir = index_dir4,
+         output_dir = paste0(out_dir, "di4.gpkg"))
+gatherLS(edges = edges_new, index_dir = index_dir4,
+         output_dir = paste0(out_dir, "ls4.gpkg"))

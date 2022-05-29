@@ -1,7 +1,7 @@
 library(ggplot2)
 library(sf)
 library(dplyr)
-
+library(RColorBrewer)
 wd <- "D:/output/DE008/"
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
@@ -18,17 +18,7 @@ gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
 
 build_poly <- paste0(wd, "buildings.gpkg")
 
-base_di <- paste0(wd, "scenarios/di.gpkg")
-scen1_di <- paste0(wd, "scenarios/di1_delta.gpkg")
-scen2_di <- paste0(wd, "scenarios/di2_delta.gpkg")
-scen3_di <- paste0(wd, "scenarios/di3_delta.gpkg")
-scen4_di <- paste0(wd, "scenarios/di4_delta.gpkg")
-
-base_ls <- paste0(wd, "scenarios/ls.gpkg")
-scen1_ls <- paste0(wd, "scenarios/ls1_delta.gpkg")
-scen2_ls <- paste0(wd, "scenarios/ls2_delta.gpkg")
-scen3_ls <- paste0(wd, "scenarios/ls3_delta.gpkg")
-scen4_ls <- paste0(wd, "scenarios/ls4_delta.gpkg")
+ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
 
 base_plot <- ggplot() +
   geom_sf(data = read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom),
@@ -47,15 +37,24 @@ di_plot <- base_plot +
 
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
-  geom_sf(data = read_sf(base_ls, query = ls_query) %>% arrange(ls), aes(color = ls), size = 2) +
+  geom_sf(data = select(ls_values, ls) %>% arrange(ls), aes(color = ls), size = 2) +
   scale_color_distiller(palette = "RdBu", trans = "log") +
   coord_sf(xlim = c(bbox[1], bbox[3]),
            ylim = c(bbox[2], bbox[4]))
 
-ls3_query <- paste0("SELECT * FROM ls3 WHERE ls is not null")
-base_plot +
-  geom_sf(data = read_sf(scen3_ls, query = ls3_query) %>% arrange(ls), aes(color = ls), size = 2) +
-  scale_color_distiller(palette = "RdBu", trans = "log") +
+# bp <- brewer.pal(6, "Spectral")
+n <- ls_values %>%
+  filter(!is.na(d_ls1) ,
+         d_ls1 != 0) %>%
+  pull(d_ls1) %>%
+  quantile(c(0, .05, .25, .5, .75, 1))# %>%
+#   scales::rescale(to = c(0, 1))
+ls1_plot <- base_plot +
+  geom_sf(data = select(ls_values, d_ls1) %>% na.omit() %>%
+            filter(d_ls1 != 0) %>% arrange(d_ls1),
+          aes(color = d_ls1), size = 2) +
+  scale_color_distiller(palette = "RdBu") +
+#  scale_color_stepsn(colours = bp, values = n) +
   coord_sf(xlim = c(bbox[1], bbox[3]),
            ylim = c(bbox[2], bbox[4]))
 
