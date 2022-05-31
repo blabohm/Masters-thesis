@@ -30,29 +30,39 @@ for (city in cities) {
     bind_rows(out)
   })}
 
-write.csv(out, "Z:/MA/di_per_pop_cum.csv", row.names = FALSE)
-
-agg_df <- read_sf("Z:/cities_europe_core/cities_full.gpkg") %>%
+out <- read.csv("Z:/MA/di_per_pop_cum.csv") %>% na.omit()
+city_boundaries <- gsub("output/", "input/cities.gpkg", wd)
+city_info <- read.csv("Z:/city_info.csv") %>%
+  tibble() %>%
+  mutate(city_code = substr(URAU_COD_1, 1, 5),
+         URAU_NAME = ifelse(city_code == "XK003", "Mitrovica", URAU_NAME))
+perc_coverage <- read.csv("Z:/MA/percent_OSM_coverage.csv")
+city_sf <- read_sf(city_boundaries) %>%
+  rename(city_code = URAU_CODE) %>%
+  left_join(perc_coverage) %>%
+  left_join(city_info, by = "city_code")
+city_vec <- filter(city_sf, percent_coverage > .85) %>% pull(city_code)
+plot_df <- city_sf %>% select(-c(SelectBenn.x, SelectBenn.y, Shape_Leng, Shape_Area,
+                           URAU_COD_1, FUA_CODE.x, FUA_CODE.y, OBJECTID)) %>%
   st_drop_geometry() %>%
-  mutate(city = substr(URAU_COD_1, 1, 5)) %>%
-  select(city, CNTR_CODE, URAU_NAME, RegionEU, RegionUN)
+  right_join(rename(out, "city_code" = "city"))
 
-out_agg <- left_join(out, agg_df)
-
-out_cntr <- out_agg %>%
+out_cntr <- plot_df %>%
   group_by(CNTR_CODE, pop_round) %>%
-  arrange(di, pop_round) %>%
-  summarise(di = mean(di))
+  arrange(di) %>%
+  summarise(di = mean(di)) %>%
+  mutate(di = round(di, digits = 1)) %>%
+  group_by(CNTR_CODE, di) %>%
+  summarise(pop_round = mean(pop_round))
 
-out_region <- out_agg %>%
+
+out_region <- plot_df %>%
   group_by(RegionUN, pop_round) %>%
-  arrange(di, pop_round) %>%
-  summarise(di = mean(di))
-
-out_region1 <- out_agg %>%
-  group_by(RegionEU, pop_round) %>%
-  arrange(di, pop_round) %>%
-  summarise(di = mean(di))
+  arrange(di) %>%
+  summarise(di = mean(di)) %>%
+  mutate(di = round(di, digits = 1)) %>%
+  group_by(RegionUN, di) %>%
+  summarise(pop_round = mean(pop_round))
 
 out %>%
   ggplot(aes(x = di, y = pop_round, col = city)) + geom_line()
@@ -62,9 +72,6 @@ out_cntr %>%
 
 out_region %>%
   ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
-
-out_region1 %>%
-  ggplot(aes(x = di, y = pop_round, col = RegionEU)) + geom_line()
 
 plot_ly(data = out, x = ~di, y = ~pop_round, color = ~city) %>%
   add_lines()
