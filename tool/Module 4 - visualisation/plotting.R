@@ -2,7 +2,8 @@ library(ggplot2)
 library(sf)
 library(dplyr)
 library(RColorBrewer)
-wd <- "D:/output/DE008/"
+library(ggspatial)
+wd <- "C:/Users/labohben/Desktop/DE008/"
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
@@ -11,14 +12,18 @@ lvp_q <- paste0("SELECT area, geom FROM ",  st_layers(gs_dir)$name[1],
 lvp <- read_sf(gs_dir, query = lvp_q)
 gs_q <- paste0("SELECT area, geom, identifier FROM ",  st_layers(gs_dir)$name[1],
                 " WHERE code_2018 is 14100 OR code_2018 is 31000")
-bbox <- read_sf("D:/output/DE008/bbox.gpkg") %>% st_bbox()
-bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
-
-gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
 
 build_poly <- paste0(wd, "buildings.gpkg")
-
 ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
+
+bbox <- ls_values %>% st_bbox()
+bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
+xmin <- bbox[1] + 1100
+xmax <- bbox[3] - 1100
+ymin <- bbox[2] + 1100
+ymax <- bbox[4] - 1100
+gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
+
 
 base_plot <- ggplot() +
   geom_sf(data = st_buffer(st_as_sfc(bbox), 1000), fill = "gray93") +
@@ -28,8 +33,8 @@ base_plot <- ggplot() +
   geom_sf(data = lvp, fill = "gray75", color = "gray75") +
   geom_sf(data = read_sf(edges, wkt_filter = bbox_filter) %>% select(geom),
           color = "gray80", size = 1)
-base_plot
 
+base_plot
 ################################################################################
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
@@ -40,11 +45,12 @@ ls_plot <- base_plot +
   arrange(ls) %>%
   geom_sf(data = ., aes(color = ls), size = 2) +
   scale_color_distiller(palette = "RdBu") +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
   labs(title = "Lene Voigt Park, Leipzig \nLocal Significance (LS)",
-       color = "LS")
-
+       color = "LS") +
+  annotation_scale(aes(style = "ticks"))
+ls_plot
 
 ################################################################################
 # display.brewer.pal(5, "RdBu")
@@ -79,17 +85,18 @@ ls1_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
 #  scale_color_stepsn(colours = bp, values = n) +
 #  scale_color_steps2(low = bp[4], mid = bp[3], high = bp[1], midpoint = 0) +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin + 650, xmax - 400),
+           ylim = c(ymin + 400, ymax - 300)) +
   labs(title = "Scenario 1: Unlimited access",
-       color = expression(Delta ~ "LS"))
-
+       color = expression(Delta ~ "LS")) +
+  annotation_scale(aes(style = "ticks"))
+ls1_plot
 
 ################################################################################
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
                 "23508-DE008L2", "23509-DE008L2")
 ls2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
+  geom_sf(data = filter(gs, identifier %in% target_ids), aes(fill = "")) +
   ls_values %>%
   select(d_ls2) %>%
   filter(!is.na(d_ls2), d_ls2 != 0) %>%
@@ -97,11 +104,14 @@ ls2_plot <- base_plot +
   mutate(d_ls2 = mk_log(d_ls2)) %>%
   geom_sf(data = ., aes(color = d_ls2), size = 2) +
   scale_color_distiller(palette = "RdBu") +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin + 600, xmax - 450),
+           ylim = c(ymin + 700, ymax + 100)) +
   labs(title = "Scenario 2: Green place development",
-       color = expression(Delta ~ "LS"))
-
+       color = expression(Delta ~ "LS"),
+       fill = "Developed \ngreen spaces") +
+  scale_fill_manual(aesthetics = c(color = "brown2")) +
+  annotation_scale(aes(style = "ticks"))
+ls2_plot
 
 ################################################################################
 ls3_plot <- base_plot +
@@ -112,10 +122,12 @@ ls3_plot <- base_plot +
   mutate(d_ls3 = mk_log(d_ls3)) %>%
   geom_sf(data = ., aes(color = d_ls3), size = 2) +
   scale_color_distiller(palette = "RdBu") +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
   labs(title = "Scenario 3: Population increase",
-       color = expression(Delta ~ "LS"))
+       color = expression(Delta ~ "LS")) +
+  annotation_scale(aes(style = "ticks"))
+ls3_plot
 
 ################################################################################
 ls4_plot <- base_plot +
@@ -126,11 +138,13 @@ ls4_plot <- base_plot +
   mutate(d_ls4 = mk_log(d_ls4)) %>%
   geom_sf(data = ., aes(color = d_ls4), size = 2) +
   scale_color_distiller(palette = "RdBu") +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
   labs(title = "Scenario 4: Ensemble model",
-       color = expression(Delta ~ "LS"))
+       color = expression(Delta ~ "LS")) +
+  annotation_scale(aes(style = "ticks"))
 
+ls4_plot
 # ggplot() +
 #   coord_equal(xlim = c(0, 3), ylim = c(0, 1), expand = FALSE) +
 #   annotation_custom(ggplotGrob(di_plot), xmin = 0, xmax = 1.5, ymin = 0, ymax = 1) +
@@ -148,10 +162,11 @@ di_plot <- base_plot +
   geom_sf(data = ., aes(fill = di, color = di)) +
   scale_fill_distiller(palette = "RdBu") +
   scale_color_distiller(palette = "RdBu") +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
   labs(title = "Lene Voigt Park, Leipzig \nDetour index (DI)",
-       fill = "DI", color = "DI")
+       fill = "DI", color = "DI") +
+  annotation_scale(aes(style = "ticks"))
 di_plot
 
 
@@ -169,10 +184,11 @@ di1_plot <- base_plot +
   geom_sf(data = ., aes(fill = d_di1, color = d_di1)) +
   scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
   scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin + 650, xmax - 400),
+           ylim = c(ymin + 400, ymax - 300)) +
   labs(title = "Scenario 1: Unlimited access",
-       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI"))
+       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
+  annotation_scale(aes(style = "ticks"))
 di1_plot
 
 
@@ -190,10 +206,11 @@ di2_plot <- base_plot +
   geom_sf(data = ., aes(fill = d_di2, color = d_di2)) +
   scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
   scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin + 600, xmax - 450),
+           ylim = c(ymin + 700, ymax + 100)) +
   labs(title = "Scenario 2: Green place development",
-       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI"))
+       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
+  annotation_scale(aes(style = "ticks"))
 di2_plot
 
 
@@ -211,10 +228,32 @@ di4_plot <- base_plot +
   geom_sf(data = ., aes(fill = d_di4, color = d_di4)) +
   scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
   scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  coord_sf(xlim = c(bbox[1], bbox[3]),
-           ylim = c(bbox[2], bbox[4])) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
   labs(title = "Scenario 4: Ensemble model",
-       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI"))
+       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
+  annotation_scale(aes(style = "ticks"))
 di4_plot
 
+
+# saving
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls.pdf",
+       plot = ls_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls1.pdf",
+       plot = ls1_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls2.pdf",
+       plot = ls2_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls3.pdf",
+       plot = ls3_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls4.pdf",
+       plot = ls4_plot, width = 11.69, height = 8.27)
+
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di.pdf",
+       plot = di_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di1.pdf",
+       plot = di1_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di2.pdf",
+       plot = di2_plot, width = 11.69, height = 8.27)
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di4.pdf",
+       plot = di4_plot, width = 11.69, height = 8.27)
 

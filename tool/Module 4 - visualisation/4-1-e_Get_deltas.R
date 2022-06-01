@@ -1,9 +1,9 @@
 library(dplyr)
 library(sf)
 library(ggplot2)
-wd <- "D:/output/DE008/scenarios/"
+wd <- "C:/Users/labohben/Desktop/DE008/scenarios/"
 ls_scen <- list.files(wd, pattern = "ls", full.names = TRUE)
-di_scen <- list.files(wd, pattern = "di", full.names = TRUE)
+di_scen <- list.files(wd, pattern = "di.*.gpkg", full.names = TRUE)
 
 ls_query <- paste0("SELECT * FROM ", st_layers(ls_scen[1])$name[1],
                    " WHERE ls is not null")
@@ -45,6 +45,8 @@ for (di_file in di_scen) {
 
 di_values <- di_df %>%
   st_drop_geometry() %>%
+  na.omit() %>%
+  distinct() %>%
   tidyr::pivot_wider(names_from = scenario, values_from = di) %>%
   mutate(d_di1 = di1 - base,
          d_di2 = di2 - base,

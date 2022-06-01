@@ -11,13 +11,13 @@ getwd() %>%
   for (file in .) source(file)
 
 # INPUT DIRECTORIES
-wd <- "D:/output/DE008/"
+wd <- "C:/Users/labohben/Desktop/DE008/"
 nodes <- paste0(wd, "nodes.gpkg")
 edges <- paste0(wd, "edges.gpkg")
 
 # PARK ID AND DISTANCE
 id <- "23473-DE008L2"
-d <- 1000
+d <- 2000
 
 # ACTUAL PARK ENTRIES
 lvp_query <- paste0("SELECT * FROM nodes WHERE identifier IS '", id, "'")
@@ -33,7 +33,7 @@ gs <- read_sf(gs_dir, query = gsq)
 # BLEND NEW GREEN SPACE ENTRIES TO NETWORK (FOR COMPARABILITY OF SCENARIOS)
 lvp_outline <- read_sf(paste0(wd, "lvp_outline.gpkg")) %>% st_union() %>%
   st_cast("MULTILINESTRING") %>% st_as_sf()
-n <-  (st_length(lvp_outline) / 10) %>% round() %>% as.numeric()
+n <-  (st_length(lvp_outline) / 5) %>% round() %>% as.numeric()
 
 # BLEND NEW PARK ENTRIES INTO NETWORK
 new_gse <- lvp_outline %>%
@@ -57,21 +57,21 @@ net <- edges %>%
 out_dir <- paste0(wd, "scenarios/")
 dir.create(out_dir)
 
-edges %>%
-  read_sf() %>%
-  filter(!(edge_id %in% net$edge_id)) %>%
-  bind_rows(net) %>%
+net %>%
   mutate(edge_id = row_number()) %>%
   select(edge_id) %>%
   write_sf(paste0(out_dir, "edges.gpkg"))
 edges_new <- paste0(out_dir, "edges.gpkg")
 
-file.copy(nodes, out_dir)
+nodes %>%
+  read_sf(wkt_filter = lvp_filter) %>%
+  write_sf(paste0(out_dir, "nodes.gpkg"))
+nodes_new <- paste0(out_dir, "nodes.gpkg")
 index_dir <- paste0(out_dir, "indices/")
 dir.create(index_dir)
 
 # Base indices
-gs_ids <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+gs_ids <- read_sf(nodes_new, wkt_filter = lvp_filter) %>%
   filter(!is.na(identifier)) %>%
   pull(identifier) %>%
   unique()
@@ -87,16 +87,15 @@ gatherLS(edges = edges, index_dir = index_dir,
 
 ################################################################################
 # Scenario 1 - Unlimited access
-net <- edges_new %>%
-  read_sf(wkt_filter = lvp_filter)
-be1 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+net <- read_sf(edges_new)
+be1 <- read_sf(nodes_new) %>%
   filter(population > 0)
 out1 <- add_params(build_entries = be1, gs_entries = new_gse, network = net)
 index_dir1 <- paste0(out_dir, "indices1/")
 dir.create(index_dir1)
 flist1 <- list.files(index_dir,
-                    pattern = paste(gs_ids[!grepl(id, gs_ids)], collapse = "|"),
-                    full.names = TRUE)
+                     pattern = paste(gs_ids[!grepl(id, gs_ids)], collapse = "|"),
+                     full.names = TRUE)
 file.copy(flist1, index_dir1)
 write_output(out1, network = net, out_dir = index_dir1, ID = id)
 
@@ -114,7 +113,7 @@ target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
 target_query <- paste0("SELECT * FROM nodes WHERE ",
                        paste0("identifier = '",
                               target_ids, "'", collapse = " OR "))
-target_gs <- read_sf(nodes, query = target_query)
+target_gs <- read_sf(nodes_new, query = target_query)
 
 ua_dir <- paste0(wd, "/DE008L2_LEIPZIG_UA2018_v013.gpkg")
 ua_lyr <-  st_layers(ua_dir)$name[1]
@@ -133,9 +132,8 @@ new_building_entries <- target_gs %>%
 
 # BLEND NEW BUILDINGS TO NETWORK
 #CALC INDICES
-net <- edges_new %>%
-  read_sf(wkt_filter = lvp_filter)
-be2 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+net <- read_sf(edges_new)
+be2 <- read_sf(nodes_new) %>%
   filter(population > 0) %>%
   bind_rows(new_building_entries)
 index_dir2 <- paste0(out_dir, "indices2/")
@@ -143,7 +141,7 @@ dir.create(index_dir2)
 gs_ids2 <- gs_ids[!(gs_ids %in% target_ids)]
 for (i in gs_ids2) {
   gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
-  gse <- read_sf(nodes, query = gse_q)
+  gse <- read_sf(nodes_new, query = gse_q)
   out <- add_params(build_entries = be2, gs_entries = gse, network = net)
   write_output(out, network = net, out_dir = index_dir2, ID = i)
 }
@@ -163,7 +161,7 @@ hd_pop <- ua_pop %>%
   mutate(pop_per_m = Pop2018 / area) %>%
   group_by(code_2018) %>%
   summarise(pop_high = quantile(pop_per_m, .95))
-be3 <- read_sf(nodes, wkt_filter = lvp_filter) %>%
+be3 <- read_sf(nodes_new) %>%
   filter(population > 0) %>%
   select(-c(area)) %>%
   mutate(identifier = str_extract(ID, ".*L2")) %>%
@@ -182,14 +180,14 @@ index_dir3 <- paste0(out_dir, "indices3/")
 dir.create(index_dir3)
 for (i in gs_ids) {
   gse_q <- paste0("SELECT * FROM nodes WHERE identifier IS '", i, "'")
-  gse <- read_sf(nodes, query = gse_q)
+  gse <- read_sf(nodes_new, query = gse_q)
   out <- add_params(build_entries = be3, gs_entries = gse, network = net)
   write_output(out, network = net, out_dir = index_dir3, ID = i)
 }
 
 gatherDI(building_polygons = build_poly, index_dir = index_dir3,
          output_dir = paste0(out_dir, "di3.gpkg"))
-gatherLS(edges = edges_New, index_dir = index_dir3,
+gatherLS(edges = edges_new, index_dir = index_dir3,
          output_dir = paste0(out_dir, "ls3.gpkg"))
 
 
@@ -198,15 +196,12 @@ gatherLS(edges = edges_New, index_dir = index_dir3,
 # be: pop-increase + gs development
 # gse: inside lvp_filter - lvp gse + new_gse
 # network: normal
-net <- edges_new %>%
-  read_sf(wkt_filter = lvp_filter)
-
-be4 <- be3 %>%
-  bind_rows(new_building_entries)
+net <- read_sf(edges_new)
+be4 <- bind_rows(be3, new_building_entries)
 
 gse_q4 <- paste0("SELECT * FROM nodes WHERE identifier IS not null")
-gse4 <- nodes %>%
-  read_sf(wkt_filter = lvp_filter, query = gse_q4) %>%
+gse4 <- nodes_new %>%
+  read_sf(query = gse_q4) %>%
   filter(!(identifier %in% c(id, target_ids)),
          area > 0) %>%
   bind_rows(new_gse)

@@ -6,7 +6,7 @@ library(plotly)
 wd <- "Z:/output/"
 cities <- list.files(wd)
 out <- tibble()
-#city <- cities[1]
+city <- cities[1]
 
 for (city in cities) {
   print(paste(which(cities == city), "of", length(cities)))
@@ -15,7 +15,6 @@ for (city in cities) {
   paste0(city, "/detour_index.gpkg") %>%
     read_sf() %>%
     st_drop_geometry() %>%
-    #filter(!is.na(di)) %>%
     mutate(city = city,
            di = case_when(di > 1 ~ 1,
                           #is.na(di) ~ 0,
@@ -24,13 +23,13 @@ for (city in cities) {
     mutate(pop_cum = cumsum(population),
            pop_sum = sum(population),
            pop_rel = pop_cum / pop_sum,
-           pop_round = round(pop_rel, digits = 2)) %>%
-    group_by(pop_round) %>%
-    summarise(di = mean(di), city = first(city)) %>%
+           di = round(di, digits = 2)) %>%
+    group_by(di) %>%
+    summarise(pop = mean(pop_rel), city = first(city)) %>%
     bind_rows(out)
   })}
 
-out <- read.csv("Z:/MA/di_per_pop_cum.csv") %>% na.omit()
+#out <- read.csv("Z:/MA/di_per_pop_cum.csv") %>% na.omit()
 city_boundaries <- gsub("output/", "input/cities.gpkg", wd)
 city_info <- read.csv("Z:/city_info.csv") %>%
   tibble() %>%
@@ -42,33 +41,46 @@ city_sf <- read_sf(city_boundaries) %>%
   left_join(perc_coverage) %>%
   left_join(city_info, by = "city_code")
 city_vec <- filter(city_sf, percent_coverage > .85) %>% pull(city_code)
-plot_df <- city_sf %>% select(-c(SelectBenn.x, SelectBenn.y, Shape_Leng, Shape_Area,
-                           URAU_COD_1, FUA_CODE.x, FUA_CODE.y, OBJECTID)) %>%
+plot_df <- city_sf %>%
   st_drop_geometry() %>%
   right_join(rename(out, "city_code" = "city"))
 
+plot_sf <- out %>%
+  mutate(di = ifelse(is.na(di), 0, di),
+         pop_di = di * pop) %>%
+  group_by(city) %>%
+  summarise(di = mean(di), pop = mean(pop), pop_di = mean(pop_di)) %>%
+  rename(city_code = city) %>%
+  right_join(city_sf) %>%
+  st_as_sf()
+
+ggplot() +
+  geom_sf(data = plot_sf, aes(fill = di, color = di))
+ggplot() +
+  geom_sf(data = plot_sf, aes(fill = pop_di, color = pop_di))
+
 out_cntr <- plot_df %>%
-  group_by(CNTR_CODE, pop_round) %>%
-  arrange(di) %>%
-  summarise(di = mean(di)) %>%
-  mutate(di = round(di, digits = 1)) %>%
+#  group_by(CNTR_CODE, pop) %>%
+  # arrange(di) %>%
+  # summarise(di = mean(di)) %>%
+  # mutate(di = round(di, digits = 1)) %>%
   group_by(CNTR_CODE, di) %>%
-  summarise(pop_round = mean(pop_round))
+  summarise(pop = mean(pop))
 
 
 out_region <- plot_df %>%
-  group_by(RegionUN, pop_round) %>%
-  arrange(di) %>%
-  summarise(di = mean(di)) %>%
-  mutate(di = round(di, digits = 1)) %>%
+  # group_by(RegionUN, pop) %>%
+  # arrange(di) %>%
+  # summarise(di = mean(di)) %>%
+  # mutate(di = round(di, digits = 1)) %>%
   group_by(RegionUN, di) %>%
-  summarise(pop_round = mean(pop_round))
+  summarise(pop_round = mean(pop))
 
 out %>%
-  ggplot(aes(x = di, y = pop_round, col = city)) + geom_line()
+  ggplot(aes(x = di, y = pop, col = city)) + geom_line()
 
 out_cntr %>%
-  ggplot(aes(x = di, y = pop_round, col = CNTR_CODE)) + geom_line()
+  ggplot(aes(x = di, y = pop, col = CNTR_CODE)) + geom_line()
 
 out_region %>%
   ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
