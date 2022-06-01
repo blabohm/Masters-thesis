@@ -36,11 +36,13 @@ city_info <- read.csv("Z:/city_info.csv") %>%
   mutate(city_code = substr(URAU_COD_1, 1, 5),
          URAU_NAME = ifelse(city_code == "XK003", "Mitrovica", URAU_NAME))
 perc_coverage <- read.csv("Z:/MA/percent_OSM_coverage.csv")
+
 city_sf <- read_sf(city_boundaries) %>%
   rename(city_code = URAU_CODE) %>%
   left_join(perc_coverage) %>%
-  left_join(city_info, by = "city_code")
-city_vec <- filter(city_sf, percent_coverage > .85) %>% pull(city_code)
+  left_join(city_info, by = "city_code") %>%
+  filter(percent_coverage > .85)
+
 plot_df <- city_sf %>%
   st_drop_geometry() %>%
   right_join(rename(out, "city_code" = "city"))
@@ -51,7 +53,7 @@ plot_sf <- out %>%
   group_by(city) %>%
   summarise(di = mean(di), pop = mean(pop), pop_di = mean(pop_di)) %>%
   rename(city_code = city) %>%
-  right_join(city_sf) %>%
+  inner_join(city_sf) %>%
   st_as_sf()
 
 ggplot() +
