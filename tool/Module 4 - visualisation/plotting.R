@@ -95,6 +95,7 @@ ls1_plot
 ################################################################################
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
                 "23508-DE008L2", "23509-DE008L2")
+
 ls2_plot <- base_plot +
   geom_sf(data = filter(gs, identifier %in% target_ids), aes(fill = "")) +
   ls_values %>%
@@ -106,7 +107,7 @@ ls2_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Scenario 2: Green place development",
+  labs(title = "Scenario 2: Green space development",
        color = expression(Delta ~ "LS"),
        fill = "Developed \ngreen spaces") +
   scale_fill_manual(aesthetics = c(color = "brown2")) +
@@ -173,17 +174,17 @@ di_plot
 ################################################################################
 
 bp <- brewer.pal(5, "RdBu")
+#n <- scales::rescale(c(1, .1, .01, .005, 0, -.005, -.01, -.1, -1), to = c(0, 1))
 di1_plot <- base_plot +
   di_values %>%
-  mutate(di = ifelse(di > 1, 1, di),
-         di1 = ifelse(di1 > 1, 1, di1),
-         d_di1 = di1 - di) %>%
   select(d_di1) %>%
-  filter(!is.na(d_di1),
-         d_di1 != 0) %>%
+  mutate(d_di1 = ifelse((d_di1 <= .005 & d_di1 >= -.005), 0, d_di1)) %>%
+  filter(!is.na(d_di1), d_di1 != 0) %>%
   geom_sf(data = ., aes(fill = d_di1, color = d_di1)) +
-  scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
+  # scale_fill_stepsn(colours = bp, values = n[2:8]) +
+  # scale_color_stepsn(colours = bp, values = n[2:8]) +
+  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
   labs(title = "Scenario 1: Unlimited access",
@@ -196,19 +197,17 @@ di1_plot
 
 bp <- brewer.pal(5, "RdBu")
 di2_plot <- base_plot +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
   di_values %>%
-  mutate(di = ifelse(di > 1, 1, di),
-         di2 = ifelse(di2 > 1, 1, di2),
-         d_di2 = di2 - di) %>%
   select(d_di2) %>%
-  filter(!is.na(d_di2),
-         d_di2 != 0) %>%
+  mutate(d_di2 = ifelse((d_di2 <= .01 & d_di2 >= -.01), 0, d_di2)) %>%
+  filter(!is.na(d_di2), d_di2 != 0) %>%
   geom_sf(data = ., aes(fill = d_di2, color = d_di2)) +
-  scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
+  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Scenario 2: Green place development",
+  labs(title = "Scenario 2: Green space development",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks"))
 di2_plot
@@ -219,15 +218,12 @@ di2_plot
 bp <- brewer.pal(5, "RdBu")
 di4_plot <- base_plot +
   di_values %>%
-  mutate(di = ifelse(di > 1, 1, di),
-         di4 = ifelse(di4 > 1, 1, di4),
-         d_di4 = di4 - di) %>%
   select(d_di4) %>%
-  filter(!is.na(d_di4),
-         d_di4 != 0) %>%
+  mutate(d_di4 = ifelse((d_di4 <= .01 & d_di4 >= -.01), 0, d_di4)) %>%
+  filter(!is.na(d_di4), d_di4 != 0) %>%
   geom_sf(data = ., aes(fill = d_di4, color = d_di4)) +
-  scale_color_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
-  scale_fill_steps2(low = bp[1], mid = bp[3], high = bp[5], midpoint = 0) +
+  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
   labs(title = "Scenario 4: Ensemble model",
@@ -235,7 +231,19 @@ di4_plot <- base_plot +
   annotation_scale(aes(style = "ticks"))
 di4_plot
 
+ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
+lyr <- st_layers(ua)$name[1]
+#q <- paste0("SELECT * FROM ", lyr, " WHERE code_2018 LIKE '11' + '%'")
+ua_res <- read_sf(ua, layer = lyr, wkt_filter = bbox_filter) %>%
+  select(code_2018) %>%
+  filter(grepl("^11", .$code_2018)) %>%
+  mutate(code_2018 = factor(code_2018))
 
+ua3_plot <- base_plot +
+  geom_sf(data = ua_res, aes(fill = code_2018)) %>%
+  scale_fill_viridis_b()
+  scale_fill_manual(values = c("red", "green", "blue"))
+ua3_plot
 # saving
 ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls.pdf",
        plot = ls_plot, width = 11.69, height = 8.27)
