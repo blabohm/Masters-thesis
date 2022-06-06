@@ -70,7 +70,7 @@ blend <- function(net_tile, nodes)
 {
   require(sfnetworks)
   sfnetworks::as_sfnetwork(net_tile) %>%
-    sfnetworks::st_network_blend(nodes) %>%
+    sfnetworks::st_network_blend(nodes, tolerance = 1e-4) %>%
     return()
 }
 
