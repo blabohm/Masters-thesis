@@ -6,7 +6,7 @@ library(plotly)
 wd <- "Z:/output/"
 cities <- list.files(wd)
 out <- tibble()
-city <- cities[1]
+#city <- cities[1]
 
 for (city in cities) {
   print(paste(which(cities == city), "of", length(cities)))
@@ -29,7 +29,8 @@ for (city in cities) {
     bind_rows(out)
   })}
 
-#out <- read.csv("Z:/MA/di_per_pop_cum.csv") %>% na.omit()
+#write.csv(out, "Z:/MA/di_per_pop_cum1.csv")
+out <- read.csv("Z:/MA/di_per_pop_cum1.csv") %>% na.omit()
 city_boundaries <- gsub("output/", "input/cities.gpkg", wd)
 city_info <- read.csv("Z:/city_info.csv") %>%
   tibble() %>%
@@ -62,32 +63,36 @@ ggplot() +
   geom_sf(data = plot_sf, aes(fill = pop_di, color = pop_di))
 
 out_cntr <- plot_df %>%
-#  group_by(CNTR_CODE, pop) %>%
-  # arrange(di) %>%
-  # summarise(di = mean(di)) %>%
-  # mutate(di = round(di, digits = 1)) %>%
   group_by(CNTR_CODE, di) %>%
-  summarise(pop = mean(pop))
-
+  summarise(pop = mean(pop)) %>%
+  mutate(CNTR_CODE = factor(CNTR_CODE))
 
 out_region <- plot_df %>%
-  # group_by(RegionUN, pop) %>%
-  # arrange(di) %>%
-  # summarise(di = mean(di)) %>%
-  # mutate(di = round(di, digits = 1)) %>%
   group_by(RegionUN, di) %>%
   summarise(pop_round = mean(pop))
 
 out %>%
+  na.omit() %>%
   ggplot(aes(x = di, y = pop, col = city)) + geom_line()
 
+install.packages("ggrepel")
+library(ggrepel)
+data_ends <- out_cntr %>% group_by(CNTR_CODE) %>% summarise(pop = last(pop), di = last(di))
 out_cntr %>%
-  ggplot(aes(x = di, y = pop, col = CNTR_CODE)) + geom_line()
+  na.omit() %>%
+  ggplot(aes(x = di, y = pop, col = CNTR_CODE)) +
+  geom_line() +
+  theme(legend.position = "none") +
+  geom_label_repel(aes(label = paste0(CNTR_CODE, ":", round(pop, digits = 2))),
+                   data = data_ends, max.overlaps = 70)
 
 out_region %>%
+  na.omit() %>%
   ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
 
-plot_ly(data = out, x = ~di, y = ~pop_round, color = ~city) %>%
+plot_ly(data = out, x = ~di, y = ~pop, color = ~city) %>%
+  add_lines()
+plot_ly(data = out_cntr, x = ~di, y = ~pop, color = ~CNTR_CODE) %>%
   add_lines()
 out_sav <- out
 out <- out_sav

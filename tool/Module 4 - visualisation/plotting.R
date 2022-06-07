@@ -115,7 +115,20 @@ ls2_plot <- base_plot +
 ls2_plot
 
 ################################################################################
+ggplot() +
+  geom_sf(data = pop_dat, aes(fill = population, color = population)) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax))
+
+build <- read_sf(build_poly) %>% select(ID)
+pop_dat <- read_sf(paste0(wd, "scen3_be.gpkg")) %>%
+  st_drop_geometry() %>%
+  mutate(population = ifelse(population > 50, 50, population)) %>%
+  left_join(build) %>% st_as_sf()
+
 ls3_plot <- base_plot +
+  geom_sf(data = pop_dat, aes(fill = population)) +
+  scale_fill_distiller(palette = "RdBu") +
   ls_values %>%
   select(d_ls3) %>%
   filter(!is.na(d_ls3), d_ls3 != 0) %>%
@@ -200,7 +213,7 @@ di2_plot <- base_plot +
   geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
   di_values %>%
   select(d_di2) %>%
-  mutate(d_di2 = ifelse((d_di2 <= .01 & d_di2 >= -.01), 0, d_di2)) %>%
+  mutate(d_di2 = ifelse((d_di2 <= .005 & d_di2 >= -.005), 0, d_di2)) %>%
   filter(!is.na(d_di2), d_di2 != 0) %>%
   geom_sf(data = ., aes(fill = d_di2, color = d_di2)) +
   scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
@@ -219,7 +232,7 @@ bp <- brewer.pal(5, "RdBu")
 di4_plot <- base_plot +
   di_values %>%
   select(d_di4) %>%
-  mutate(d_di4 = ifelse((d_di4 <= .01 & d_di4 >= -.01), 0, d_di4)) %>%
+  mutate(d_di4 = ifelse((d_di4 <= .005 & d_di4 >= -.005), 0, d_di4)) %>%
   filter(!is.na(d_di4), d_di4 != 0) %>%
   geom_sf(data = ., aes(fill = d_di4, color = d_di4)) +
   scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
@@ -235,15 +248,20 @@ ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
 lyr <- st_layers(ua)$name[1]
 #q <- paste0("SELECT * FROM ", lyr, " WHERE code_2018 LIKE '11' + '%'")
 ua_res <- read_sf(ua, layer = lyr, wkt_filter = bbox_filter) %>%
-  select(code_2018) %>%
+  #select(code_2018) %>%
   filter(grepl("^11", .$code_2018)) %>%
   mutate(code_2018 = factor(code_2018))
 
 ua3_plot <- base_plot +
-  geom_sf(data = ua_res, aes(fill = code_2018)) %>%
-  scale_fill_viridis_b()
-  scale_fill_manual(values = c("red", "green", "blue"))
+  geom_sf(data = ua_res, aes(fill = Pop2018)) +
+#  scale_fill_manual(values = c("red4", "red3", "red1")) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
+  # labs(title = "Scenario 3: Population increase",
+  #      color = expression(Delta ~ "LS")) +
+  annotation_scale(aes(style = "ticks"))
 ua3_plot
+
 # saving
 ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls.pdf",
        plot = ls_plot, width = 11.69, height = 8.27)
@@ -264,4 +282,7 @@ ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di2.pdf",
        plot = di2_plot, width = 11.69, height = 8.27)
 ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di4.pdf",
        plot = di4_plot, width = 11.69, height = 8.27)
+
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ua3.pdf",
+       plot = ua3_plot, width = 11.69, height = 8.27)
 

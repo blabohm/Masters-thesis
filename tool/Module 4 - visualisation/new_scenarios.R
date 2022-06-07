@@ -176,6 +176,7 @@ be3 <- read_sf(nodes_new) %>%
             population = population_new,
             ID,
             geom)
+write_sf(be3, paste0(wd, "scen3_be.gpkg"))
 index_dir3 <- paste0(out_dir, "indices3/")
 dir.create(index_dir3)
 for (i in gs_ids) {
