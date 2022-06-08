@@ -1,6 +1,0 @@
-move notes from laptop to Z:/
-copy paste all notes into the respective chapters
-move scenario qgis project to Z:/
-cluster EU lines (by country / statistically)
-plot maps with R
-ppppppush!
