@@ -11,26 +11,26 @@ nuts <- read_sf("Z:/nuts/NUTS_RG_20M_2021_3035.gpkg") %>%
   filter(LEVL_CODE == 0) %>%
   select(NUTS_ID)
 
-for (city in cities) {
-  print(paste(which(cities == city), "of", length(cities)))
-  try({
-    out <- wd %>%
-      paste0(city, "/detour_index.gpkg") %>%
-      read_sf() %>%
-      st_drop_geometry() %>%
-      mutate(city = city,
-             di = case_when(di > 1 ~ 1,
-                            #is.na(di) ~ 0,
-                            TRUE ~ di)) %>%
-      arrange(di) %>%
-      mutate(pop_cum = cumsum(population),
-             pop_sum = sum(population),
-             pop_rel = pop_cum / pop_sum,
-             di = round(di, digits = 2)) %>%
-      group_by(di) %>%
-      summarise(pop = mean(pop_rel), city = first(city)) %>%
-      bind_rows(out)
-  })}
+# for (city in cities) {
+#   print(paste(which(cities == city), "of", length(cities)))
+#   try({
+#     out <- wd %>%
+#       paste0(city, "/detour_index.gpkg") %>%
+#       read_sf() %>%
+#       st_drop_geometry() %>%
+#       mutate(city = city,
+#              di = case_when(di > 1 ~ 1,
+#                             #is.na(di) ~ 0,
+#                             TRUE ~ di)) %>%
+#       arrange(di) %>%
+#       mutate(pop_cum = cumsum(population),
+#              pop_sum = sum(population),
+#              pop_rel = pop_cum / pop_sum,
+#              di = round(di, digits = 2)) %>%
+#       group_by(di) %>%
+#       summarise(pop = mean(pop_rel), city = first(city)) %>%
+#       bind_rows(out)
+#   })}
 
 #write.csv(out, "Z:/MA/di_per_pop_cum1.csv")
 out <- read.csv("Z:/MA/di_per_pop_cum1.csv") %>% na.omit()
@@ -71,19 +71,20 @@ plot_sf <- out %>%
   st_as_sf() %>%
   arrange(top20)
 
-ggplot() +
-  geom_sf(data = plot_sf, aes(fill = di, color = di))
-ggplot() +
-  geom_sf(data = plot_sf, aes(fill = top20, color = top20))
-ggplot() +
-  geom_sf(data = plot_sf, aes(fill = pop, size = di))
+# ggplot() +
+#   geom_sf(data = plot_sf, aes(fill = di, color = di))
+# ggplot() +
+#   geom_sf(data = plot_sf, aes(fill = top20, color = top20))
+# ggplot() +
+#   geom_sf(data = plot_sf, aes(fill = pop, size = di))
 
 plot_cent <- st_point_on_surface(plot_sf)
 
 city_labs <- filter(plot_cent, grepl("001|NL002", city_code)) %>%
   mutate(URAU_NAME = ifelse(grepl("NL002", city_code), "Amsterdam", URAU_NAME)) %>%
   filter(city_code != "NL001") %>% select(URAU_NAME)
-ggplot() +
+
+p_top20 <- ggplot() +
   geom_sf(data = nuts, fill = "gray75") +
   # geom_sf(data = plot_cent, aes(fill = top20, color = top20,
   #                               size = pop)#, alpha = .8
@@ -96,6 +97,9 @@ ggplot() +
   geom_sf_text(data = city_labs, aes(label = URAU_NAME), color = "white",
                nudge_x = -50000, nudge_y = -50000, check_overlap = TRUE) +
   theme_dark()
+
+ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/pop_in_top20di.pdf",
+       plot = p_top20, width = 11.69, height = 8.27)
 
 out_cntr <- plot_df %>%
   group_by(CNTR_CODE, di) %>%
@@ -111,14 +115,17 @@ out %>%
   ggplot(aes(x = di, y = pop, col = city)) + geom_line()
 
 library(ggrepel)
-data_ends <- out_cntr %>% group_by(CNTR_CODE) %>% summarise(pop = last(pop), di = last(di))
+data_ends <- out_cntr %>%
+  group_by(CNTR_CODE) %>%
+  summarise(pop = last(pop), di = last(di))
+
 out_cntr %>%
   na.omit() %>%
   arrange(pop) %>%
-  ggplot(aes(x = di, y = pop, col = CNTR_CODE)) +
-  geom_line(size = 1) +
+  ggplot(aes(x = di, y = pop)) +
+  geom_line(aes(col = CNTR_CODE), size = 1) +
   scale_color_viridis_d() +
-  theme(legend.position = "none") +
+  theme(legend.position = "top") +
   geom_label_repel(aes(label = #paste0(CNTR_CODE, ":", round(pop, digits = 2))
                        CNTR_CODE
                        ),
