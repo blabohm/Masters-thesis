@@ -119,6 +119,13 @@ data_ends <- out_cntr %>%
   group_by(CNTR_CODE) %>%
   summarise(pop = last(pop), di = last(di))
 
+num_df <- plot_df %>%
+  filter(!is.na(CNTR_CODE)) %>%
+  group_by(city_code) %>%
+  summarise(CNTR_CODE = first(CNTR_CODE)) %>%
+  group_by(CNTR_CODE) %>%
+  summarize(n = n()) %>%
+  left_join(data_ends)
 out_cntr %>%
   na.omit() %>%
   arrange(pop) %>%
