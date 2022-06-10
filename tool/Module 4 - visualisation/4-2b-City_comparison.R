@@ -92,7 +92,7 @@ p_top20 <- ggplot() +
                nudge_x = -50000, nudge_y = -50000, check_overlap = TRUE) +
   theme_dark()
 
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/pop_in_top20di.pdf",
+ggsave(filename = "D:/MA/plots/pop_in_top20di.pdf",
        plot = p_top20, width = 11.69, height = 8.27)
 
 out_cntr <- plot_df %>%
@@ -131,6 +131,8 @@ di_pop_plot <- out_cntr %>%
   max.overlaps = 5, nudge_x = .1, size = 3, direction = "y",
   hjust = 0, force = 0.5, force_pull = 0.1) +
   xlim(c(.4, 1))
+ggsave(filename = "D:/MA/plots/di_pop_plot.pdf",
+       plot = di_pop_plot, width = 11.69, height = 8.27)
 
 # out_region %>%
 #   na.omit() %>%
@@ -157,16 +159,16 @@ ls_plot <- plot_sf %>%
   geom_boxplot(alpha = .2) +
   ggtitle("Sum of LS at green space entries (city mean)")
 
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls_mean_plot.pdf",
+ggsave(filename = "D:/MA/plots/ls_mean_plot.pdf",
        plot = ls_mean_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls_plot.pdf",
+ggsave(filename = "D:/MA/plots/ls_plot.pdf",
        plot = ls_plot, width = 11.69, height = 8.27)
 
 ls_map <- ggplot() +
   geom_sf(data = nuts, fill = "gray75") +
   geom_sf(data = mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
-            arrange(desc(log(ls_mean))),
-          aes(color = ls_cov, size = log(ls_mean))) +
+            arrange((log(ls_mean))),
+          aes(size = ls_cov, color = log(ls_mean))) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
   geom_sf_text(data = city_labs, aes(label = URAU_NAME), color = "white",
@@ -174,5 +176,5 @@ ls_map <- ggplot() +
   theme_dark() +
   ggtitle("Mean LS at green space entries (city mean)")
 ls_map
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls_map.pdf",
+ggsave(filename = "D:/MA/plots/ls_map.pdf",
        plot = ls_map, width = 11.69, height = 8.27)
