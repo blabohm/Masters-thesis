@@ -77,20 +77,25 @@ plot_sf <- out %>%
 city_labs <- filter(plot_sf, grepl("001|NL002", city_code)) %>%
   mutate(URAU_NAME = ifelse(grepl("NL002", city_code), "Amsterdam", URAU_NAME)) %>%
   filter(city_code != "NL001") %>% select(URAU_NAME)
+cntr_labs <- st_point_on_surface(nuts)
 
 p_top20 <- ggplot() +
-  geom_sf(data = nuts, fill = "gray75") +
+  geom_sf(data = nuts, fill = "gray60") +
   # geom_sf(data = plot_cent, aes(fill = top20, color = top20,
   #                               size = pop)#, alpha = .8
   # ) +
   geom_sf(data = plot_sf, aes(fill = pop, color = pop,
                               size = top20)#, alpha = .8
   ) +
+  geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
+          alpha = 0.5, color = "gray85", size = .75) +
+
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
-  geom_sf_text(data = city_labs, aes(label = URAU_NAME), color = "white",
-               nudge_x = -50000, nudge_y = -50000, check_overlap = TRUE) +
-  theme_dark()
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
+               check_overlap = TRUE) +
+#  theme_dark() +
+  ggtitle("Percent of population with DI > 0.8")
 
 ggsave(filename = "D:/MA/plots/pop_in_top20di.pdf",
        plot = p_top20, width = 11.69, height = 8.27)
@@ -148,32 +153,36 @@ ls_mean_plot <- plot_sf %>%
   group_by(CNTR_CODE) %>%
   mutate(med_ls = quantile(log(ls_mean), .5)) %>%
   ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls_mean))) +
-  geom_jitter(alpha = .5, width = 0) +
+  geom_jitter(alpha = .25, width = 0) +
   geom_boxplot(alpha = .2) +
-  ggtitle("Mean LS at green space entries (city mean)")
-ls_plot <- plot_sf %>%
-  group_by(CNTR_CODE) %>%
-  mutate(med_ls = quantile(log(ls), .5)) %>%
-  ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls))) +
-  geom_jitter(alpha = .5, width = 0) +
-  geom_boxplot(alpha = .2) +
-  ggtitle("Sum of LS at green space entries (city mean)")
-
+  ggtitle("Mean LS at green space entries (city mean)") +
+  theme(axis.title.x = element_blank()) +
+  ylab(expression(bar("LS")))
 ggsave(filename = "D:/MA/plots/ls_mean_plot.pdf",
-       plot = ls_mean_plot, width = 11.69, height = 8.27)
-ggsave(filename = "D:/MA/plots/ls_plot.pdf",
-       plot = ls_plot, width = 11.69, height = 8.27)
+       plot = ls_mean_plot, width = 11.69, height = 2.5)
+
+# ls_plot <- plot_sf %>%
+#   group_by(CNTR_CODE) %>%
+#   mutate(med_ls = quantile(log(ls), .5)) %>%
+#   ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls))) +
+#   geom_jitter(alpha = .5, width = 0) +
+#   geom_boxplot(alpha = .2) +
+#   ggtitle("Sum of LS at green space entries (city mean)")
+# ggsave(filename = "D:/MA/plots/ls_plot.pdf",
+#        plot = ls_plot, width = 11.69, height = 8.27)
 
 ls_map <- ggplot() +
-  geom_sf(data = nuts, fill = "gray75") +
+  geom_sf(data = nuts, fill = "gray60") +
   geom_sf(data = mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
             arrange((log(ls_mean))),
           aes(size = ls_cov, color = log(ls_mean))) +
+  geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
+          alpha = 0.5, color = "gray85", size = .75) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
-  geom_sf_text(data = city_labs, aes(label = URAU_NAME), color = "white",
-               nudge_x = -50000, nudge_y = -50000, check_overlap = TRUE) +
-  theme_dark() +
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
+               check_overlap = TRUE) +
+#  theme_dark() +
   ggtitle("Mean LS at green space entries (city mean)")
 ls_map
 ggsave(filename = "D:/MA/plots/ls_map.pdf",
