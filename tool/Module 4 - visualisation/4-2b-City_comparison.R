@@ -3,9 +3,8 @@ library(sf)
 library(ggplot2)
 library(plotly)
 library(ggrepel)
-
-wd <- "D:/output/"
-cities <- list.files(wd)
+wd <- "Z:/"
+#cities <- list.files(wd)
 #out <- tibble()
 #city <- cities[1]
 nuts <- read_sf(paste0(wd, "/NUTS_RG_20M_2021_3035.gpkg")) %>%
@@ -35,7 +34,7 @@ nuts <- read_sf(paste0(wd, "/NUTS_RG_20M_2021_3035.gpkg")) %>%
 
 #write.csv(out, "Z:/MA/di_per_pop_cum1.csv")
 out <- read.csv(paste0(wd, "di_per_pop_cum1.csv")) %>% na.omit()
-city_boundaries <- gsub("output/", "input/cities.gpkg", wd)
+city_boundaries <- gsub("/", "/input/cities.gpkg", wd)
 city_info <- read.csv(paste0(wd, "city_info.csv")) %>%
   tibble() %>%
   mutate(city_code = substr(URAU_COD_1, 1, 5),
@@ -81,22 +80,21 @@ cntr_labs <- st_point_on_surface(nuts)
 
 p_top20 <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
-  # geom_sf(data = plot_cent, aes(fill = top20, color = top20,
-  #                               size = pop)#, alpha = .8
-  # ) +
-  geom_sf(data = plot_sf, aes(fill = pop, color = pop,
-                              size = top20)#, alpha = .8
-  ) +
+  geom_sf(data = plot_sf, aes(color = top20,
+                                size = pop)) +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
-
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
-  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
                check_overlap = TRUE) +
-#  theme_dark() +
-  ggtitle("Percent of population with DI > 0.8")
-
+  scale_color_distiller(palette = "RdYlBu") +
+  ggtitle("Percent of population with DI > 0.8") +
+  labs(color = "DI > 0.8 \n[%]", size = "DI \ncoverage") +
+  theme(legend.position = c(.075, .75),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
+p_top20
 ggsave(filename = "D:/MA/plots/pop_in_top20di.pdf",
        plot = p_top20, width = 11.69, height = 8.27)
 
@@ -113,10 +111,6 @@ out %>%
   na.omit() %>%
   ggplot(aes(x = di, y = pop, col = city)) + geom_line()
 
-data_ends <- out_cntr %>%
-  group_by(CNTR_CODE) %>%
-  summarise(pop = last(pop), di = last(di))
-
 num_df <- plot_df %>%
   filter(!is.na(CNTR_CODE)) %>%
   group_by(city_code) %>%
@@ -125,19 +119,42 @@ num_df <- plot_df %>%
   summarize(n = n()) %>%
   left_join(data_ends)
 
-di_pop_plot <- out_cntr %>%
-  na.omit() %>%
+countries <- paste(c("FI", "SE", "LU", "AL", "XK", "RS", "RO", "DE", "PL", "FR",
+                   "IT", "NO"), collapse = "|")
+plot_colors <- transmute(out_cntr, CNTR_CODE, plot_colors = case_when(
+  grepl(countries, CNTR_CODE) ~ "red",
+  TRUE ~ "grey50")) %>% distinct()
+data_ends <- out_cntr %>%
+  group_by(CNTR_CODE) %>%
+  summarise(pop = last(pop), di = last(di)) %>%
   arrange(pop) %>%
+  left_join(plot_colors)
+data_ends1 <- data_ends %>% filter(plot_colors == "grey50")
+data_ends2 <- data_ends %>% filter(plot_colors != "grey50")
+
+scale <- rep(RColorBrewer::brewer.pal(11, "RdYlBu")[c(1:4, 8:11)], 2)
+di_plot <- out_cntr %>%
+  filter(!grepl(countries, CNTR_CODE)) %>%
   ggplot(aes(x = di, y = pop)) +
-  geom_line(aes(col = CNTR_CODE), size = 1) +
-  scale_color_viridis_d() +
+  geom_line(aes(... = CNTR_CODE),
+            color = "grey50", size = 1) + out_cntr %>%
+  filter(grepl(countries, CNTR_CODE)) %>%
+  geom_line(data = ., aes(col = CNTR_CODE), size = 1) +
+  scale_color_manual(values = sample(scale, 12)) +
   theme(legend.position = "none") +
-  geom_label_repel(aes(label = CNTR_CODE), data = data_ends,
-  max.overlaps = 5, nudge_x = .1, size = 3, direction = "y",
-  hjust = 0, force = 0.5, force_pull = 0.1) +
-  xlim(c(.4, 1))
-ggsave(filename = "D:/MA/plots/di_pop_plot.pdf",
-       plot = di_pop_plot, width = 11.69, height = 8.27)
+  geom_label_repel(aes(label = CNTR_CODE), color = "grey50",
+                   data = data_ends1, max.overlaps = 5, size = 4,
+                   direction = "y", nudge_x = .05,
+                   force = 0.5, force_pull = 5) +
+  geom_label_repel(aes(label = CNTR_CODE, color = CNTR_CODE), #color = "red3",
+                   data = data_ends2, max.overlaps = 5, size = 4,
+                   direction = "y", nudge_x = -.05,
+                   force = 0.5, force_pull = 5) +
+  xlim(c(.4, 1)) +
+  xlab("DI") + ylab("population [%]") + ggtitle("DI vs. cumulative population")
+ggsave(filename = "D:/MA/plots/di_plot.pdf",
+       plot = di_plot, width = 11.69, height = 8.27)
+
 
 # out_region %>%
 #   na.omit() %>%
@@ -176,14 +193,21 @@ ls_map <- ggplot() +
   geom_sf(data = mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
             arrange((log(ls_mean))),
           aes(size = ls_cov, color = log(ls_mean))) +
+  scale_color_distiller(palette = "RdYlBu") +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
-  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
                check_overlap = TRUE) +
-#  theme_dark() +
-  ggtitle("Mean LS at green space entries (city mean)")
+  # geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
+  #              check_overlap = TRUE, size = 5) +
+  #  theme_dark() +
+  ggtitle("Mean LS at green space entries (city mean)") +
+  labs(color = expression(bar("LS")), size = "LS \ncoverage") +
+  theme(legend.position = c(.075, .75),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank())
 ls_map
 ggsave(filename = "D:/MA/plots/ls_map.pdf",
        plot = ls_map, width = 11.69, height = 8.27)

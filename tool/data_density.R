@@ -38,24 +38,33 @@ city_info <- read.csv("Z:/city_info.csv") %>%
   mutate(city_code = substr(URAU_COD_1, 1, 5),
         URAU_NAME = ifelse(city_code == "XK003", "Mitrovica", URAU_NAME))
 
-perc_coverage <- read.csv("Z:/MA/percent_OSM_coverage.csv")
+perc_coverage <- read.csv("Z:/percent_OSM_coverage.csv")
 city_sf <- read_sf(city_boundaries) %>%
   rename(city_code = URAU_CODE) %>%
   left_join(perc_coverage) %>%
-  left_join(city_info, by = "city_code")
+  left_join(city_info, by = "city_code") %>%
+  st_point_on_surface()
 
 nuts <- read_sf("Z:/nuts/NUTS_RG_20M_2021_3035.gpkg") %>%
   filter(LEVL_CODE == 0) %>%
   select(NUTS_ID)
+cntr_labs <- st_point_on_surface(nuts)
 
 ggplot() +
-  geom_sf(data = nuts) +
-  geom_sf(data = city_sf, aes(col = percent_coverage, fill = percent_coverage)) +
+  geom_sf(data = nuts, fill = "gray60") +
+  geom_sf(data = city_sf, aes(col = percent_coverage),
+          size = 3) +
+  scale_color_distiller(palette = "RdYlBu") +
+  geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
+          alpha = 0.5, color = "gray85", size = .75) +
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
+               check_overlap = TRUE) +
   labs(title = "Percent of UA residential class polygons covered by OSM buildings",
-       color = "Percent coverage") +
+       color = "Percent \ncoverage") +
   guides(fill = "none") +
-  theme(legend.position = "bottom") +
- # scale_color_viridis_d(begin = 0, end = 1) +
+  theme(legend.position = c(.075, .75),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000))
 
