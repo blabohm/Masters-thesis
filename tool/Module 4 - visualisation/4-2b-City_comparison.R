@@ -4,6 +4,7 @@ library(ggplot2)
 library(plotly)
 library(ggrepel)
 wd <- "Z:/"
+github <- "C:/Users/labohben/Documents/GitHub/MA/plots/"
 #cities <- list.files(wd)
 #out <- tibble()
 #city <- cities[1]
@@ -95,7 +96,7 @@ p_top20 <- ggplot() +
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
 p_top20
-ggsave(filename = "D:/MA/plots/pop_in_top20di.pdf",
+ggsave(filename = paste0(github,"/3-6a_di_map.pdf"),
        plot = p_top20, width = 11.69, height = 8.27)
 
 out_cntr <- plot_df %>%
@@ -152,7 +153,7 @@ di_plot <- out_cntr %>%
                    force = 0.5, force_pull = 5) +
   xlim(c(.4, 1)) +
   xlab("DI") + ylab("population [%]") + ggtitle("DI vs. cumulative population")
-ggsave(filename = "D:/MA/plots/di_plot.pdf",
+ggsave(filename = paste0(github, "/3-6b_di_plot.pdf"),
        plot = di_plot, width = 11.69, height = 8.27)
 
 
@@ -160,10 +161,10 @@ ggsave(filename = "D:/MA/plots/di_plot.pdf",
 #   na.omit() %>%
 #   ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
 
-plot_ly(data = out, x = ~di, y = ~pop, color = ~city) %>%
-  add_lines()
-plot_ly(data = out_cntr, x = ~di, y = ~pop, color = ~CNTR_CODE) %>%
-  add_lines()
+# plot_ly(data = out, x = ~di, y = ~pop, color = ~city) %>%
+#   add_lines()
+# plot_ly(data = out_cntr, x = ~di, y = ~pop, color = ~CNTR_CODE) %>%
+#   add_lines()
 
 
 ls_mean_plot <- plot_sf %>%
@@ -174,8 +175,12 @@ ls_mean_plot <- plot_sf %>%
   geom_boxplot(alpha = .2) +
   ggtitle("Mean LS at green space entries (city mean)") +
   theme(axis.title.x = element_blank()) +
-  ylab(expression(bar("LS")))
-ggsave(filename = "D:/MA/plots/ls_mean_plot.pdf",
+  ylab(expression(bar("LS"))) +
+  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .75),
+             col = "green", linetype = "dashed", size = .8) +
+  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .25), col = "green",
+             linetype = "dashed", size = .8)
+ggsave(filename = paste0(github, "/3-7b_ls_plot.pdf"),
        plot = ls_mean_plot, width = 11.69, height = 2.5)
 
 # ls_plot <- plot_sf %>%
@@ -209,5 +214,5 @@ ls_map <- ggplot() +
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
 ls_map
-ggsave(filename = "D:/MA/plots/ls_map.pdf",
+ggsave(filename = paste0(github, "/3-7a_ls_map.pdf"),
        plot = ls_map, width = 11.69, height = 8.27)

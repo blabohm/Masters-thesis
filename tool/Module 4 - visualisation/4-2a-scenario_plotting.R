@@ -3,6 +3,8 @@ library(sf)
 library(dplyr)
 library(RColorBrewer)
 library(ggspatial)
+
+github <- "C:/Users/labohben/Documents/GitHub/MA/"
 wd <- "C:/Users/labohben/Desktop/DE008/"
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
@@ -33,8 +35,7 @@ base_plot <- ggplot() +
   geom_sf(data = lvp, fill = "gray75", color = "gray75") +
   geom_sf(data = read_sf(edges, wkt_filter = bbox_filter) %>% select(geom),
           color = "gray80", size = 1)
-
-base_plot
+#base_plot
 ################################################################################
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
@@ -50,7 +51,7 @@ ls_plot <- base_plot +
   labs(title = "Lene Voigt Park, Leipzig \nLocal Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks"))
-ls_plot
+#ls_plot
 
 ################################################################################
 # display.brewer.pal(5, "RdBu")
@@ -90,7 +91,7 @@ ls1_plot <- base_plot +
   labs(title = "Scenario 1: Unlimited access",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks"))
-ls1_plot
+#ls1_plot
 
 ################################################################################
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
@@ -112,14 +113,9 @@ ls2_plot <- base_plot +
        fill = "Developed \ngreen spaces") +
   scale_fill_manual(aesthetics = c(color = "brown2")) +
   annotation_scale(aes(style = "ticks"))
-ls2_plot
+#ls2_plot
 
 ################################################################################
-ggplot() +
-  geom_sf(data = pop_dat, aes(fill = population, color = population)) +
-  coord_sf(xlim = c(xmin, xmax),
-           ylim = c(ymin, ymax))
-
 build <- read_sf(build_poly) %>% select(ID)
 pop_dat <- read_sf(paste0(wd, "scen3_be.gpkg")) %>%
   st_drop_geometry() %>%
@@ -141,7 +137,7 @@ ls3_plot <- base_plot +
   labs(title = "Scenario 3: Population increase",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks"))
-ls3_plot
+#ls3_plot
 
 ################################################################################
 ls4_plot <- base_plot +
@@ -158,7 +154,7 @@ ls4_plot <- base_plot +
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks"))
 
-ls4_plot
+#ls4_plot
 # ggplot() +
 #   coord_equal(xlim = c(0, 3), ylim = c(0, 1), expand = FALSE) +
 #   annotation_custom(ggplotGrob(di_plot), xmin = 0, xmax = 1.5, ymin = 0, ymax = 1) +
@@ -181,7 +177,7 @@ di_plot <- base_plot +
   labs(title = "Lene Voigt Park, Leipzig \nDetour index (DI)",
        fill = "DI", color = "DI") +
   annotation_scale(aes(style = "ticks"))
-di_plot
+#di_plot
 
 
 ################################################################################
@@ -203,7 +199,7 @@ di1_plot <- base_plot +
   labs(title = "Scenario 1: Unlimited access",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks"))
-di1_plot
+#di1_plot
 
 
 ################################################################################
@@ -223,7 +219,7 @@ di2_plot <- base_plot +
   labs(title = "Scenario 2: Green space development",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks"))
-di2_plot
+#di2_plot
 
 
 ################################################################################
@@ -242,47 +238,47 @@ di4_plot <- base_plot +
   labs(title = "Scenario 4: Ensemble model",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks"))
-di4_plot
-
-ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
-lyr <- st_layers(ua)$name[1]
-#q <- paste0("SELECT * FROM ", lyr, " WHERE code_2018 LIKE '11' + '%'")
-ua_res <- read_sf(ua, layer = lyr, wkt_filter = bbox_filter) %>%
-  #select(code_2018) %>%
-  filter(grepl("^11", .$code_2018)) %>%
-  mutate(code_2018 = factor(code_2018))
-
-ua3_plot <- base_plot +
-  geom_sf(data = ua_res, aes(fill = Pop2018)) +
-#  scale_fill_manual(values = c("red4", "red3", "red1")) +
-  coord_sf(xlim = c(xmin, xmax),
-           ylim = c(ymin, ymax)) +
-  # labs(title = "Scenario 3: Population increase",
-  #      color = expression(Delta ~ "LS")) +
-  annotation_scale(aes(style = "ticks"))
-ua3_plot
+#di4_plot
+#
+# ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
+# lyr <- st_layers(ua)$name[1]
+# #q <- paste0("SELECT * FROM ", lyr, " WHERE code_2018 LIKE '11' + '%'")
+# ua_res <- read_sf(ua, layer = lyr, wkt_filter = bbox_filter) %>%
+#   #select(code_2018) %>%
+#   filter(grepl("^11", .$code_2018)) %>%
+#   mutate(code_2018 = factor(code_2018))
+#
+# ua3_plot <- base_plot +
+#   geom_sf(data = ua_res, aes(fill = Pop2018)) +
+# #  scale_fill_manual(values = c("red4", "red3", "red1")) +
+#   coord_sf(xlim = c(xmin, xmax),
+#            ylim = c(ymin, ymax)) +
+#   # labs(title = "Scenario 3: Population increase",
+#   #      color = expression(Delta ~ "LS")) +
+#   annotation_scale(aes(style = "ticks"))
+# #ua3_plot
 
 # saving
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls.pdf",
+ggsave(filename = paste0(github, "/plots/3-1a_ls.pdf"),
        plot = ls_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls1.pdf",
+ggsave(filename = paste0(github, "/plots/3-2a_ls1.pdf"),
        plot = ls1_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls2.pdf",
+ggsave(filename = paste0(github, "/plots/3-3a_ls2.pdf"),
        plot = ls2_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls3.pdf",
+ggsave(filename = paste0(github, "/plots/3-4a_ls3.pdf"),
        plot = ls3_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ls4.pdf",
+ggsave(filename = paste0(github, "/plots/3-5a_ls4.pdf"),
        plot = ls4_plot, width = 11.69, height = 8.27)
 
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di.pdf",
+ggsave(filename = paste0(github, "/plots/3-1b_di.pdf"),
        plot = di_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di1.pdf",
+ggsave(filename = paste0(github, "/plots/3-2b_di1.pdf"),
        plot = di1_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di2.pdf",
+ggsave(filename = paste0(github, "/plots/3-3b_di2.pdf"),
        plot = di2_plot, width = 11.69, height = 8.27)
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/di4.pdf",
+ggsave(filename = paste0(github, "/plots/3-5b_di4.pdf"),
        plot = di4_plot, width = 11.69, height = 8.27)
 
-ggsave(filename = "C:/Users/labohben/Documents/GitHub/MA/plots/ua3.pdf",
-       plot = ua3_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/ua3.pdf"),
+#        plot = ua3_plot, width = 11.69, height = 8.27)
 
