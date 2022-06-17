@@ -120,7 +120,7 @@ add_indices <- function(build_entries, sf_network)
   require(sf, quietly = TRUE)
   require(sfnetworks, quietly = TRUE)
   build_entries %>%
-    mutate(ls = population * area / net_dist,
+    mutate(ls = (population * area) / (net_dist ^ 2),
            di = euklid_dis / net_dist) %>%
     return()
 }
