@@ -31,11 +31,13 @@ base_plot <- ggplot() +
   geom_sf(data = st_buffer(st_as_sfc(bbox), 1000), fill = "gray93") +
   geom_sf(data = read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom),
           fill = "gray99", color = "gray99") +
-  geom_sf(data = gs, fill = "gray85", color = "gray85") +
-  geom_sf(data = lvp, fill = "gray75", color = "gray75") +
+  geom_sf(data = gs, fill = "darkolivegreen1", color = "darkolivegreen1",
+          alpha = .3) +
+  geom_sf(data = lvp, fill = "darkolivegreen4", color = "darkolivegreen4",
+          alpha = .3) +
   geom_sf(data = read_sf(edges, wkt_filter = bbox_filter) %>% select(geom),
           color = "gray80", size = 1)
-#base_plot
+base_plot
 ################################################################################
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
@@ -51,7 +53,7 @@ ls_plot <- base_plot +
   labs(title = "Lene Voigt Park, Leipzig \nLocal Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks"))
-#ls_plot
+ls_plot
 
 ################################################################################
 # display.brewer.pal(5, "RdBu")
