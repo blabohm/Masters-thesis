@@ -4,19 +4,34 @@ library(dplyr)
 library(RColorBrewer)
 library(ggspatial)
 
-github <- "C:/Users/labohben/Documents/GitHub/MA/"
-wd <- "C:/Users/labohben/Desktop/DE008/"
+DRIVE <- "D:/"
+github <- paste0(DRIVE, "MA/")
+wd <- paste0(DRIVE,"output/DE008/")
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
 lvp_q <- paste0("SELECT area, geom FROM ",  st_layers(gs_dir)$name[1],
               " WHERE identifier LIKE '", id, "'")
 lvp <- read_sf(gs_dir, query = lvp_q)
+lvp_label <- st_point_on_surface(lvp) %>% mutate(lab = "Lene Voigt Park")
 gs_q <- paste0("SELECT area, geom, identifier FROM ",  st_layers(gs_dir)$name[1],
                 " WHERE code_2018 is 14100 OR code_2018 is 31000")
 
 build_poly <- paste0(wd, "buildings.gpkg")
 ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
+
+umlaute <- function(variable) {
+  variable <- gsub("Ã¼","ü",variable)
+  variable <- gsub("ÃŸ","ß",variable)
+  variable <- gsub("Ã¶r|Ã¶","ö",variable)
+  variable <- gsub("Ã¤","ä",variable)
+  return(variable)
+}
+street_labs <- read_sf(paste0(DRIVE, "lvp_osm.gpkg")) %>%
+  filter(!is.na(name), highway != "highway") %>%
+  mutate(name = umlaute(name)) %>%
+  select(name) %>%
+  st_transform(3035)
 
 bbox <- ls_values %>% st_bbox()
 bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
@@ -25,20 +40,24 @@ xmax <- bbox[3] - 1100
 ymin <- bbox[2] + 1100
 ymax <- bbox[4] - 1100
 gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
-
+build_sf <- read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom)
+net_sf <- read_sf(edges, wkt_filter = bbox_filter) %>% select(geom)
 
 base_plot <- ggplot() +
   geom_sf(data = st_buffer(st_as_sfc(bbox), 1000), fill = "gray93") +
-  geom_sf(data = read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom),
+  geom_sf(data = build_sf,
           fill = "gray99", color = "gray99") +
   geom_sf(data = gs, fill = "darkolivegreen1", color = "darkolivegreen1",
           alpha = .3) +
   geom_sf(data = lvp, fill = "darkolivegreen4", color = "darkolivegreen4",
           alpha = .3) +
-  geom_sf(data = read_sf(edges, wkt_filter = bbox_filter) %>% select(geom),
-          color = "gray80", size = 1)
+  geom_sf(data = net_sf,
+          color = "gray80", size = 1) +
+  geom_sf_text(data = street_labs, aes(label = name), color = "gray10")
+
 base_plot
 ################################################################################
+
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
   ls_values %>%
@@ -172,14 +191,14 @@ di_plot <- base_plot +
   select(di) %>%
   filter(!is.na(di)) %>%
   geom_sf(data = ., aes(fill = di, color = di)) +
-  scale_fill_distiller(palette = "RdBu") +
-  scale_color_distiller(palette = "RdBu") +
+  scale_fill_distiller(palette = "RdBu", direction = 1) +
+  scale_color_distiller(palette = "RdBu", direction = 1) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
   labs(title = "Lene Voigt Park, Leipzig \nDetour index (DI)",
        fill = "DI", color = "DI") +
   annotation_scale(aes(style = "ticks"))
-#di_plot
+di_plot
 
 
 ################################################################################
@@ -206,7 +225,7 @@ di1_plot <- base_plot +
 
 ################################################################################
 
-bp <- brewer.pal(5, "RdBu")
+bp <- brewer.pal(5, "RdBu") %>% rev()
 di2_plot <- base_plot +
   geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
   di_values %>%
