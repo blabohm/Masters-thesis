@@ -3,22 +3,28 @@ library(sf)
 library(dplyr)
 library(RColorBrewer)
 library(ggspatial)
+library(cowplot)
 
-DRIVE <- "D:/"
-github <- paste0(DRIVE, "MA/")
-wd <- paste0(DRIVE,"output/DE008/")
+github <- "C:/Users/labohben/Documents/GitHub/MA/"
+wd <- "C:/Users/labohben/Desktop/DE008/"
+#DRIVE <- "D:/"
+#github <- paste0(DRIVE, "MA/")
+#wd <- paste0(DRIVE,"output/DE008/")
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
 lvp_q <- paste0("SELECT area, geom FROM ",  st_layers(gs_dir)$name[1],
               " WHERE identifier LIKE '", id, "'")
 lvp <- read_sf(gs_dir, query = lvp_q)
-lvp_label <- st_point_on_surface(lvp) %>% mutate(lab = "Lene Voigt Park")
+lvp_label <- st_point_on_surface(lvp) %>% mutate(name = "Lene Voigt Park")
 gs_q <- paste0("SELECT area, geom, identifier FROM ",  st_layers(gs_dir)$name[1],
                 " WHERE code_2018 is 14100 OR code_2018 is 31000")
 
+
+
 build_poly <- paste0(wd, "buildings.gpkg")
 ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
+
 
 umlaute <- function(variable) {
   variable <- gsub("Ã¼","ü",variable)
@@ -27,11 +33,19 @@ umlaute <- function(variable) {
   variable <- gsub("Ã¤","ä",variable)
   return(variable)
 }
-street_labs <- read_sf(paste0(DRIVE, "lvp_osm.gpkg")) %>%
+
+street_labs <- read_sf(paste0(wd, "lvp_osm.gpkg")) %>%
   filter(!is.na(name), highway != "highway") %>%
   mutate(name = umlaute(name)) %>%
   select(name) %>%
-  st_transform(3035)
+  st_transform(3035) %>%
+  filter(name %in% c("Riebeckstraße", "Josephinenstraße")) %>%
+  group_by(name) %>%
+  summarise() %>%
+  st_union(by_feature = TRUE) %>%
+  st_point_on_surface()
+
+
 
 bbox <- ls_values %>% st_bbox()
 bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
@@ -47,16 +61,41 @@ base_plot <- ggplot() +
   geom_sf(data = st_buffer(st_as_sfc(bbox), 1000), fill = "gray93") +
   geom_sf(data = build_sf,
           fill = "gray99", color = "gray99") +
-  geom_sf(data = gs, fill = "darkolivegreen1", color = "darkolivegreen1",
-          alpha = .3) +
-  geom_sf(data = lvp, fill = "darkolivegreen4", color = "darkolivegreen4",
-          alpha = .3) +
-  geom_sf(data = net_sf,
-          color = "gray80", size = 1) +
-  geom_sf_text(data = street_labs, aes(label = name), color = "gray10")
+  geom_sf(data = lvp, fill = "darkolivegreen4", color = NA,
+          alpha = .2) +
+  geom_sf(data = net_sf, color = "gray80", size = 1) +
+  geom_sf(data = gs, fill = "darkolivegreen1", color = NA,
+          alpha = .2)
 
 base_plot
 ################################################################################
+lpz <- paste0(wd, "cities.gpkg") %>%
+  read_sf(query = "SELECT * FROM cities WHERE URAU_CODE = 'DE008'") %>%
+  st_transform(3035)
+lpz_box <- st_bbox(lpz)
+ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
+water <- read_sf(ua, query = paste("SELECT * FROM", st_layers(ua)$name[1],
+                                   "WHERE code_2018 = '50000'"),
+                 wkt_filter = st_as_text(lpz$geom))
+# roads <- read_sf(ua, query = paste("SELECT * FROM", st_layers(ua)$name[1],
+#                                    "WHERE code_2018 = '12210'"),
+#                  wkt_filter = st_as_text(lpz_box$geom))
+overview_plot <- ggplot(lpz) +
+  geom_sf(data = water, color = "lightblue", fill = "lightblue") +
+  #  geom_sf(data = roads, color = "grey30") +
+  geom_sf(fill = NA) +
+  geom_sf(data = st_point_on_surface(lvp), color = "red", size = 3) +
+  coord_sf(xlim = c(lpz_box[1], lpz_box[3]),
+           ylim = c(lpz_box[2], lpz_box[4]))  +
+  geom_sf_text(data = lvp, aes(label = "Lene Voigt Park"), size = 3, nudge_y = 2e3) +
+  ggtitle("Leipzig") +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        plot.background = element_rect(color = "black"),
+        plot.title.position = "panel",
+  )
+overview_plot
 
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
@@ -69,11 +108,42 @@ ls_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Lene Voigt Park, Leipzig \nLocal Significance (LS)",
+  labs(title = "Local Significance (LS)",
        color = "LS") +
-  annotation_scale(aes(style = "ticks"))
+  annotation_scale(aes(style = "ticks")) +
+  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
+  geom_sf_text(data = lvp_label, aes(label = name), color = "gray10") +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
 ls_plot
 
+di_values <- read_sf(paste0(wd, "scenarios/di_values.gpkg"))
+
+di_plot <- base_plot +
+  di_values %>%
+  select(di) %>%
+  filter(!is.na(di)) %>%
+  geom_sf(data = ., aes(fill = di, color = di)) +
+  scale_fill_distiller(palette = "RdYlBu", direction = 1) +
+  scale_color_distiller(palette = "RdYlBu", direction = 1) +
+  coord_sf(xlim = c(xmin, xmax),
+           ylim = c(ymin, ymax)) +
+  labs(title = "Detour Index (DI)", fill = "DI", color = "DI") +
+  annotation_scale(aes(style = "ticks"))  +
+  annotation_custom(grob = ggplotGrob(overview_plot),
+                    xmin = xmin - 100,
+                    xmax = (xmin + ((ymax - ymin) / 3) * .88) - 100,
+                    ymin = ymin,
+                    ymax = ymin + (ymax - ymin) / 3) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+di_plot
+
+plot_grid(ls_plot, di_plot, nrow = 2) %>%
+  ggsave(plot = ., filename = paste0(github, "/plots/3-1_ls_di_plot.pdf"),
+         width = 8.27, height = 11.69)
 ################################################################################
 # display.brewer.pal(5, "RdBu")
 # bp <- brewer.pal(5, "RdBu")
@@ -112,8 +182,28 @@ ls1_plot <- base_plot +
   labs(title = "Scenario 1: Unlimited access",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks"))
-#ls1_plot
-
+ls1_plot
+bp <- brewer.pal(5, "RdBu")
+#n <- scales::rescale(c(1, .1, .01, .005, 0, -.005, -.01, -.1, -1), to = c(0, 1))
+di1_plot <- base_plot +
+  di_values %>%
+  select(d_di1) %>%
+  mutate(d_di1 = ifelse((d_di1 <= .005 & d_di1 >= -.005), 0, d_di1)) %>%
+  filter(!is.na(d_di1), d_di1 != 0) %>%
+  geom_sf(data = ., aes(fill = d_di1, color = d_di1)) +
+  # scale_fill_stepsn(colours = bp, values = n[2:8]) +
+  # scale_color_stepsn(colours = bp, values = n[2:8]) +
+  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  coord_sf(xlim = c(xmin + 650, xmax - 400),
+           ylim = c(ymin + 400, ymax - 300)) +
+  labs(title = "Scenario 1: Unlimited access",
+       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
+  annotation_scale(aes(style = "ticks"))
+di1_plot
+plot_grid(ls1_plot, di1_plot, nrow = 2) %>%
+  ggsave(plot = ., filename = paste0(github, "/plots/ls_di_plot.pdf"),
+         width = 8.27, height = 11.69)
 ################################################################################
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
                 "23508-DE008L2", "23509-DE008L2")
@@ -184,43 +274,11 @@ ls4_plot <- base_plot +
 
 ################################################################################
 ################################################################################
-di_values <- read_sf(paste0(wd, "scenarios/di_values.gpkg"))
-
-di_plot <- base_plot +
-  di_values %>%
-  select(di) %>%
-  filter(!is.na(di)) %>%
-  geom_sf(data = ., aes(fill = di, color = di)) +
-  scale_fill_distiller(palette = "RdBu", direction = 1) +
-  scale_color_distiller(palette = "RdBu", direction = 1) +
-  coord_sf(xlim = c(xmin, xmax),
-           ylim = c(ymin, ymax)) +
-  labs(title = "Lene Voigt Park, Leipzig \nDetour index (DI)",
-       fill = "DI", color = "DI") +
-  annotation_scale(aes(style = "ticks"))
-di_plot
 
 
 ################################################################################
 
-bp <- brewer.pal(5, "RdBu")
-#n <- scales::rescale(c(1, .1, .01, .005, 0, -.005, -.01, -.1, -1), to = c(0, 1))
-di1_plot <- base_plot +
-  di_values %>%
-  select(d_di1) %>%
-  mutate(d_di1 = ifelse((d_di1 <= .005 & d_di1 >= -.005), 0, d_di1)) %>%
-  filter(!is.na(d_di1), d_di1 != 0) %>%
-  geom_sf(data = ., aes(fill = d_di1, color = d_di1)) +
-  # scale_fill_stepsn(colours = bp, values = n[2:8]) +
-  # scale_color_stepsn(colours = bp, values = n[2:8]) +
-  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
-  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
-  coord_sf(xlim = c(xmin + 650, xmax - 400),
-           ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "Scenario 1: Unlimited access",
-       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
-  annotation_scale(aes(style = "ticks"))
-#di1_plot
+
 
 
 ################################################################################
@@ -280,6 +338,8 @@ di4_plot <- base_plot +
 # #ua3_plot
 
 # saving
+
+
 ggsave(filename = paste0(github, "/plots/3-1a_ls.pdf"),
        plot = ls_plot, width = 11.69, height = 8.27)
 ggsave(filename = paste0(github, "/plots/3-2a_ls1.pdf"),

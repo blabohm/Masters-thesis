@@ -63,8 +63,8 @@ ggplot() +
        color = "Percent \ncoverage") +
   guides(fill = "none") +
   theme(legend.position = c(.075, .75),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank()) +
+        axis.title = element_blank(),
+        axis.text = element_blank()) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000))
 
