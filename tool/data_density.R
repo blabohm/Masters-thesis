@@ -45,7 +45,7 @@ city_sf <- read_sf(city_boundaries) %>%
   left_join(city_info, by = "city_code") %>%
   st_point_on_surface()
 
-nuts <- read_sf("Z:/nuts/NUTS_RG_20M_2021_3035.gpkg") %>%
+nuts <- read_sf("Z:/NUTS_RG_20M_2021_3035.gpkg") %>%
   filter(LEVL_CODE == 0) %>%
   select(NUTS_ID)
 cntr_labs <- st_point_on_surface(nuts)

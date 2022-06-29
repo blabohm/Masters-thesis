@@ -81,8 +81,9 @@ cntr_labs <- st_point_on_surface(nuts)
 
 p_top20 <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
-  geom_sf(data = plot_sf, aes(color = top20,
-                                size = pop)) +
+  geom_sf(data = arrange(plot_sf, top20),
+          aes(color = top20#, size = pop
+              ), size = 3, alpha = .8) +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
   coord_sf(xlim = c(2700000, 5748970),
@@ -91,7 +92,8 @@ p_top20 <- ggplot() +
                check_overlap = TRUE) +
   scale_color_distiller(palette = "RdYlBu") +
   ggtitle("Percent of population with DI > 0.8") +
-  labs(color = "DI > 0.8 \n[%]", size = "DI \ncoverage") +
+  labs(color = "DI > 0.8 \n[%]"#, size = "DI \ncoverage"
+       ) +
   theme(legend.position = c(.075, .75),
         axis.title.x = element_blank(),
         axis.title.y = element_blank())
