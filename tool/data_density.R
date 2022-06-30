@@ -11,6 +11,7 @@ wd <- "Z:/output/"
 cities <- list.files(wd)
 ua_directory <- gsub("output/", "input/UA2018/", wd)
 city_boundaries <- gsub("output/", "input/cities.gpkg", wd)
+github <- "C:/Users/labohben/Documents/GitHub/MA/plots/"
 
 # perc_coverage <- tibble()
 # for (city_code in cities[18:832]) {
@@ -50,7 +51,7 @@ nuts <- read_sf("Z:/NUTS_RG_20M_2021_3035.gpkg") %>%
   select(NUTS_ID)
 cntr_labs <- st_point_on_surface(nuts)
 
-ggplot() +
+osm_plot <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
   geom_sf(data = city_sf, aes(col = percent_coverage),
           size = 3) +
@@ -67,4 +68,5 @@ ggplot() +
         axis.text = element_blank()) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000))
-
+ggsave(plot = osm_plot, filename = paste0(github, "/osm_coverage.pdf"),
+         height = 8.27, width = 11.69)

@@ -111,7 +111,7 @@ ls_plot <- base_plot +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
+#  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
   geom_sf_text(data = lvp_label, aes(label = name), color = "gray10") +
   theme(axis.title = element_blank(),
         axis.text = element_blank(),
@@ -125,8 +125,10 @@ di_plot <- base_plot +
   select(di) %>%
   filter(!is.na(di)) %>%
   geom_sf(data = ., aes(fill = di, color = di)) +
-  scale_fill_distiller(palette = "RdYlBu", direction = 1) +
-  scale_color_distiller(palette = "RdYlBu", direction = 1) +
+  scale_fill_distiller(palette = "RdYlBu", direction = 1,
+                       breaks = c(0, .2, .4, .6, .8)) +
+  scale_color_distiller(palette = "RdYlBu", direction = 1,
+                        breaks = c(0, .2, .4, .6, .8)) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
   labs(title = "Detour Index (DI)", fill = "DI", color = "DI") +
@@ -202,7 +204,7 @@ di1_plot <- base_plot +
   annotation_scale(aes(style = "ticks"))
 di1_plot
 plot_grid(ls1_plot, di1_plot, nrow = 2) %>%
-  ggsave(plot = ., filename = paste0(github, "/plots/ls_di_plot.pdf"),
+  ggsave(plot = ., filename = paste0(github, "/plots/ls1_di1_plot.pdf"),
          width = 8.27, height = 11.69)
 ################################################################################
 target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
@@ -224,7 +226,24 @@ ls2_plot <- base_plot +
        fill = "Developed \ngreen spaces") +
   scale_fill_manual(aesthetics = c(color = "brown2")) +
   annotation_scale(aes(style = "ticks"))
-#ls2_plot
+ls2_plot
+
+bp <- brewer.pal(5, "RdBu") %>% rev()
+di2_plot <- base_plot +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
+  di_values %>%
+  select(d_di2) %>%
+  mutate(d_di2 = ifelse((d_di2 <= .005 & d_di2 >= -.005), 0, d_di2)) %>%
+  filter(!is.na(d_di2), d_di2 != 0) %>%
+  geom_sf(data = ., aes(fill = d_di2, color = d_di2)) +
+  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
+  coord_sf(xlim = c(xmin + 600, xmax - 450),
+           ylim = c(ymin + 700, ymax + 100)) +
+  labs(title = "Scenario 2: Green space development",
+       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
+  annotation_scale(aes(style = "ticks"))
+di2_plot
 
 ################################################################################
 build <- read_sf(build_poly) %>% select(ID)
@@ -283,22 +302,6 @@ ls4_plot <- base_plot +
 
 ################################################################################
 
-bp <- brewer.pal(5, "RdBu") %>% rev()
-di2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
-  di_values %>%
-  select(d_di2) %>%
-  mutate(d_di2 = ifelse((d_di2 <= .005 & d_di2 >= -.005), 0, d_di2)) %>%
-  filter(!is.na(d_di2), d_di2 != 0) %>%
-  geom_sf(data = ., aes(fill = d_di2, color = d_di2)) +
-  scale_color_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
-  scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
-  coord_sf(xlim = c(xmin + 600, xmax - 450),
-           ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Scenario 2: Green space development",
-       fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
-  annotation_scale(aes(style = "ticks"))
-#di2_plot
 
 
 ################################################################################
