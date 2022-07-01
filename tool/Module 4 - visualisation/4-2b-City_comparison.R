@@ -4,7 +4,9 @@ library(ggplot2)
 library(plotly)
 library(ggrepel)
 wd <- "Z:/"
+wd <- "D:/output/"
 github <- "C:/Users/labohben/Documents/GitHub/MA/plots/"
+github <- "D:/MA/plots/"
 #cities <- list.files(wd)
 #out <- tibble()
 #city <- cities[1]
@@ -35,7 +37,10 @@ nuts <- read_sf(paste0(wd, "/NUTS_RG_20M_2021_3035.gpkg")) %>%
 
 #write.csv(out, "Z:/MA/di_per_pop_cum1.csv")
 out <- read.csv(paste0(wd, "di_per_pop_cum1.csv")) %>% na.omit()
+
 city_boundaries <- gsub("/", "/input/cities.gpkg", wd)
+city_boundaries <- gsub("/output/", "/input/cities.gpkg", wd)
+
 city_info <- read.csv(paste0(wd, "city_info.csv")) %>%
   tibble() %>%
   mutate(city_code = substr(URAU_COD_1, 1, 5),
@@ -199,7 +204,9 @@ ls_map <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
   geom_sf(data = mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
             arrange((log(ls_mean))),
-          aes(size = ls_cov, color = log(ls_mean))) +
+          aes(
+            #size = ls_cov,
+            color = log(ls_mean)), shape = 18, size = 3) +
   scale_color_distiller(palette = "RdYlBu") +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
@@ -214,7 +221,9 @@ ls_map <- ggplot() +
   labs(color = expression(bar("LS")), size = "LS \ncoverage") +
   theme(legend.position = c(.075, .75),
         axis.title.x = element_blank(),
-        axis.title.y = element_blank())
+        axis.title.y = element_blank(),
+        panel.background = element_rect("grey30"))
+
 ls_map
 ggsave(filename = paste0(github, "/3-7a_ls_map.pdf"),
        plot = ls_map, width = 11.69, height = 8.27)
