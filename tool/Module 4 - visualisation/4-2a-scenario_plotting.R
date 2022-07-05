@@ -7,9 +7,9 @@ library(cowplot)
 
 github <- "C:/Users/labohben/Documents/GitHub/MA/"
 wd <- "C:/Users/labohben/Desktop/DE008/"
-#DRIVE <- "D:/"
-#github <- paste0(DRIVE, "MA/")
-#wd <- paste0(DRIVE,"output/DE008/")
+DRIVE <- "D:/"
+github <- paste0(DRIVE, "MA/")
+wd <- paste0(DRIVE,"output/DE008/")
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
@@ -26,6 +26,14 @@ build_poly <- paste0(wd, "buildings.gpkg")
 ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
 
 
+
+bbox <- ls_values %>% st_bbox()
+bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
+xmin <- bbox[1] + 1100
+xmax <- bbox[3] - 1100
+ymin <- bbox[2] + 1100
+ymax <- bbox[4] - 1100
+
 umlaute <- function(variable) {
   variable <- gsub("Ã¼","ü",variable)
   variable <- gsub("ÃŸ","ß",variable)
@@ -35,24 +43,19 @@ umlaute <- function(variable) {
 }
 
 street_labs <- read_sf(paste0(wd, "lvp_osm.gpkg")) %>%
+  st_transform(3035) %>%
   filter(!is.na(name), highway != "highway") %>%
+  st_filter(st_as_sfc(bbox)) %>%
   mutate(name = umlaute(name)) %>%
   select(name) %>%
-  st_transform(3035) %>%
   filter(name %in% c("Riebeckstraße", "Josephinenstraße")) %>%
   group_by(name) %>%
   summarise() %>%
   st_union(by_feature = TRUE) %>%
-  st_point_on_surface()
+  st_point_on_surface() %>%
+  bind_rows(lvp_label) %>%
+  mutate(lab = LETTERS[1:nrow(.)])
 
-
-
-bbox <- ls_values %>% st_bbox()
-bbox_filter <- bbox %>% st_as_sfc() %>% st_as_text()
-xmin <- bbox[1] + 1100
-xmax <- bbox[3] - 1100
-ymin <- bbox[2] + 1100
-ymax <- bbox[4] - 1100
 gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
 build_sf <- read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom)
 net_sf <- read_sf(edges, wkt_filter = bbox_filter) %>% select(geom)
@@ -112,7 +115,7 @@ ls_plot <- base_plot +
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
 #  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
-  geom_sf_text(data = lvp_label, aes(label = name), color = "gray10") +
+  geom_sf_label(data = street_labs, aes(label = lab), color = "gray10") +
   theme(axis.title = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank())
@@ -181,10 +184,14 @@ ls1_plot <- base_plot +
 #  scale_color_steps2(low = bp[4], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "Scenario 1: Unlimited access",
+  labs(title = "Alternative 1: Unlimited access",
        color = expression(Delta ~ "LS")) +
-  annotation_scale(aes(style = "ticks"))
-ls1_plot
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+#ls1_plot
+
 bp <- brewer.pal(5, "RdBu")
 #n <- scales::rescale(c(1, .1, .01, .005, 0, -.005, -.01, -.1, -1), to = c(0, 1))
 di1_plot <- base_plot +
@@ -199,10 +206,13 @@ di1_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "Scenario 1: Unlimited access",
+  labs(#title = "Scenario 1: Unlimited access",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
-  annotation_scale(aes(style = "ticks"))
-di1_plot
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+#di1_plot
 plot_grid(ls1_plot, di1_plot, nrow = 2) %>%
   ggsave(plot = ., filename = paste0(github, "/plots/ls1_di1_plot.pdf"),
          width = 8.27, height = 11.69)
@@ -221,12 +231,15 @@ ls2_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Scenario 2: Green space development",
+  labs(title = "Alternative 2: Green space development",
        color = expression(Delta ~ "LS"),
        fill = "Developed \ngreen spaces") +
   scale_fill_manual(aesthetics = c(color = "brown2")) +
-  annotation_scale(aes(style = "ticks"))
-ls2_plot
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+#ls2_plot
 
 bp <- brewer.pal(5, "RdBu") %>% rev()
 di2_plot <- base_plot +
@@ -240,10 +253,13 @@ di2_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Scenario 2: Green space development",
+  labs(#title = "Scenario 2: Green space development",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
-  annotation_scale(aes(style = "ticks"))
-di2_plot
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+#di2_plot
 
 ################################################################################
 build <- read_sf(build_poly) %>% select(ID)
@@ -253,8 +269,8 @@ pop_dat <- read_sf(paste0(wd, "scen3_be.gpkg")) %>%
   left_join(build) %>% st_as_sf()
 
 ls3_plot <- base_plot +
-  geom_sf(data = pop_dat, aes(fill = population)) +
-  scale_fill_distiller(palette = "RdBu") +
+ # geom_sf(data = pop_dat, aes(fill = population)) +
+#  scale_fill_distiller(palette = "RdBu") +
   ls_values %>%
   select(d_ls3) %>%
   filter(!is.na(d_ls3), d_ls3 != 0) %>%
@@ -264,9 +280,12 @@ ls3_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Scenario 3: Population increase",
+  labs(title = "Alternative 3: Population increase",
        color = expression(Delta ~ "LS")) +
-  annotation_scale(aes(style = "ticks"))
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
 #ls3_plot
 
 ################################################################################
@@ -280,28 +299,18 @@ ls4_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Scenario 4: Ensemble model",
+  labs(title = "Alternative 4: Ensemble model",
        color = expression(Delta ~ "LS")) +
-  annotation_scale(aes(style = "ticks"))
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
 
 #ls4_plot
 # ggplot() +
 #   coord_equal(xlim = c(0, 3), ylim = c(0, 1), expand = FALSE) +
 #   annotation_custom(ggplotGrob(di_plot), xmin = 0, xmax = 1.5, ymin = 0, ymax = 1) +
 #   annotation_custom(ggplotGrob(ls_plot), xmin = 1.5, xmax = 3, ymin = 0, ymax = 1)
-
-
-################################################################################
-################################################################################
-
-
-################################################################################
-
-
-
-
-################################################################################
-
 
 
 ################################################################################
@@ -317,9 +326,20 @@ di4_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Scenario 4: Ensemble model",
+  labs(#title = "Scenario 4: Ensemble model",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
-  annotation_scale(aes(style = "ticks"))
+  annotation_scale(aes(style = "ticks")) +
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank())
+
+plot_grid(ls1_plot, di1_plot,
+          ls2_plot, di2_plot,
+          ls3_plot, NULL,
+          ls4_plot, di4_plot,
+          nrow = 4, ncol = 2) %>%
+  ggsave(plot = ., filename = paste0(github, "/plots/3-3-1_alternatives_plot.pdf"),
+         width = 8.27, height = 11.69)
 #di4_plot
 #
 # ua <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v013.gpkg")
