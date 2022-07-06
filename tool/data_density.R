@@ -50,11 +50,15 @@ nuts <- read_sf("Z:/NUTS_RG_20M_2021_3035.gpkg") %>%
   filter(LEVL_CODE == 0) %>%
   select(NUTS_ID)
 cntr_labs <- st_point_on_surface(nuts)
+lpz <- filter(city_sf, grepl("DE008", city_code)) %>% st_point_on_surface()
 
 osm_plot <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
   geom_sf(data = city_sf, aes(col = percent_coverage),
           size = 3) +
+  geom_sf(data = lpz, aes(fill = URAU_NAME, color = percent_coverage),
+          shape = "\u2605", size = 15) +
+  scale_fill_manual(name = "Leipzig", values = "green", label = "") +
   scale_color_distiller(palette = "RdYlBu") +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
@@ -62,11 +66,13 @@ osm_plot <- ggplot() +
                check_overlap = TRUE) +
   labs(title = "Percent of UA residential class polygons covered by OSM buildings",
        color = "Percent \ncoverage") +
-  guides(fill = "none") +
+#  guides(fill = "none") +
   theme(legend.position = c(.075, .75),
         axis.title = element_blank(),
         axis.text = element_blank()) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000))
-ggsave(plot = osm_plot, filename = paste0(github, "/osm_coverage.pdf"),
+osm_plot
+
+ggsave(plot = osm_plot, filename = paste0(github, "/2-1_osm_coverage.pdf"),
          height = 8.27, width = 11.69)

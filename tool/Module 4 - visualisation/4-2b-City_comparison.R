@@ -206,7 +206,8 @@ ls_map <- ggplot() +
             arrange((log(ls_mean))),
           aes(
             #size = ls_cov,
-            color = log(ls_mean)), shape = 18, size = 3) +
+            color = log(ls_mean)), shape = 18, size = 5) +
+  scale_color_step
   scale_color_distiller(palette = "RdYlBu") +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
