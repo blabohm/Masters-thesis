@@ -21,10 +21,9 @@ gs_q <- paste0("SELECT area, geom, identifier FROM ",  st_layers(gs_dir)$name[1]
                 " WHERE code_2018 is 14100 OR code_2018 is 31000")
 
 
-
 build_poly <- paste0(wd, "buildings.gpkg")
 ls_values <- read_sf(paste0(wd, "scenarios/ls_values.gpkg"))
-
+di_values <- read_sf(paste0(wd, "scenarios/di_values.gpkg"))
 
 
 bbox <- ls_values %>% st_bbox()
@@ -33,7 +32,10 @@ xmin <- bbox[1] + 1100
 xmax <- bbox[3] - 1100
 ymin <- bbox[2] + 1100
 ymax <- bbox[4] - 1100
-
+xmin <- bbox[1] + 600
+xmax <- bbox[3] - 600
+ymin <- bbox[2] + 600
+ymax <- bbox[4] - 600
 umlaute <- function(variable) {
   variable <- gsub("Ã¼","ü",variable)
   variable <- gsub("ÃŸ","ß",variable)
@@ -117,11 +119,9 @@ ls_plot <- base_plot +
 #  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
   geom_sf_label(data = street_labs, aes(label = lab), color = "gray10") +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        legend.box.spacing = margin(l = 0))
+        axis.ticks = element_blank())
 ls_plot
 
-di_values <- read_sf(paste0(wd, "scenarios/di_values.gpkg"))
 
 di_plot <- base_plot +
   di_values %>%
@@ -142,8 +142,7 @@ di_plot <- base_plot +
                     ymin = ymin,
                     ymax = ymin + (ymax - ymin) / 3) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        legend.box.spacing = margin(l = 0))
+        axis.ticks = element_blank())
 di_plot
 
 plot_grid(ls_plot, di_plot, nrow = 2) %>%
@@ -180,16 +179,17 @@ ls1_plot <- base_plot +
   mutate(d_ls1 = mk_log(d_ls1)) %>%
   geom_sf(data = ., aes(color = d_ls1), size = 2) +
   scale_color_distiller(palette = "RdBu") +
-#  scale_color_stepsn(colours = bp, values = n) +
-#  scale_color_steps2(low = bp[4], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "Alternative 1: Unlimited access",
-       color = expression(Delta ~ "LS")) +
+  labs(title = "a)", color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.box.spacing = margin(l = 0))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
 #ls1_plot
 
 bp <- brewer.pal(5, "RdBu")
@@ -206,13 +206,17 @@ di1_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(#title = "Scenario 1: Unlimited access",
+  labs(title = "b)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
-di1_plot
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
+#di1_plot
 
 # plot_grid(ls1_plot, di1_plot, nrow = 2) %>%
 #   ggsave(plot = ., filename = paste0(github, "/plots/ls1_di1_plot.pdf"),
@@ -232,17 +236,20 @@ ls2_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "Alternative 2: Densification",
+  labs(title = "c)",
        color = expression(Delta ~ "LS"),
        fill = "Developed \ngreen spaces") +
   scale_fill_manual(aesthetics = c(color = "brown2")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
 #ls2_plot
 
-bp <- brewer.pal(5, "RdBu")
 di2_plot <- base_plot +
   geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
   di_values %>%
@@ -254,12 +261,16 @@ di2_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(#title = "Scenario 2: Green space development",
+  labs(title = "d)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
 #di2_plot
 
 ################################################################################
@@ -270,7 +281,7 @@ pop_dat <- read_sf(paste0(wd, "scen3_be.gpkg")) %>%
   left_join(build) %>% st_as_sf()
 
 ls3_plot <- base_plot +
- geom_sf(data = pop_dat, aes(fill = population)) +
+# geom_sf(data = pop_dat, aes(fill = population)) +
   scale_fill_distiller(palette = "RdBu") +
   ls_values %>%
   select(d_ls3) %>%
@@ -281,12 +292,16 @@ ls3_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Alternative 3: Population increase",
+  labs(title = "e)",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
 #ls3_plot
 
 ################################################################################
@@ -300,12 +315,16 @@ ls4_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "Alternative 4: Ensemble model",
+  labs(title = "f)",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
 #ls4_plot
 # ggplot() +
 #   coord_equal(xlim = c(0, 3), ylim = c(0, 1), expand = FALSE) +
@@ -315,7 +334,7 @@ ls4_plot <- base_plot +
 
 ################################################################################
 
-bp <- brewer.pal(5, "RdBu")
+#bp <- brewer.pal(5, "RdBu")
 di4_plot <- base_plot +
   di_values %>%
   select(d_di4) %>%
@@ -326,21 +345,27 @@ di4_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(#title = "Scenario 4: Ensemble model",
+  labs(title = "g)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank(),
-        legend.position = c(.95, .175))
+        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
+        legend.position = c(1, 0),
+        legend.justification = c(1, 0),
+        legend.key.height = unit(.2, units = "cm"),
+        legend.key.width = unit(.05, units = "cm"))
+
 
 plot_grid(ls1_plot, di1_plot,
           ls2_plot, di2_plot,
           ls3_plot, NULL,
           ls4_plot, di4_plot,
-          nrow = 4, ncol = 2, align = "hv", axis = "tblr",
+          nrow = 4, ncol = 2, align = "h",
+          axis = "tlbr",
           rel_widths = c(1, 1), rel_heights = c(1, 1)
           ) %>%
-  ggsave(plot = ., filename = paste0(github, "/plots/3-3-1_alternatives_plot.pdf"),
+  ggsave(plot = ., filename = paste0(github, "/plots/3-4_alternatives_plot.pdf"),
          width = 8.27, height = 11.69)
 #di4_plot
 #

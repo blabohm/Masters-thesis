@@ -3,6 +3,8 @@ library(sf)
 library(ggplot2)
 library(plotly)
 library(ggrepel)
+library(cowplot)
+
 wd <- "Z:/"
 wd <- "D:/output/"
 github <- "C:/Users/labohben/Documents/GitHub/MA/plots/"
@@ -84,27 +86,7 @@ city_labs <- filter(plot_sf, grepl("001|NL002", city_code)) %>%
   filter(city_code != "NL001") %>% select(URAU_NAME)
 cntr_labs <- st_point_on_surface(nuts)
 
-p_top20 <- ggplot() +
-  geom_sf(data = nuts, fill = "gray60") +
-  geom_sf(data = arrange(plot_sf, top20),
-          aes(color = top20#, size = pop
-              ), size = 3, alpha = .8) +
-  geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
-          alpha = 0.5, color = "gray85", size = .75) +
-  coord_sf(xlim = c(2700000, 5748970),
-           ylim = c(1500000, 4500000)) +
-  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
-               check_overlap = TRUE) +
-  scale_color_distiller(palette = "RdYlBu") +
-  ggtitle("Percent of population with DI > 0.8") +
-  labs(color = "DI > 0.8 \n[%]"#, size = "DI \ncoverage"
-       ) +
-  theme(legend.position = c(.075, .75),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-p_top20
-ggsave(filename = paste0(github,"/3-6a_di_map.pdf"),
-       plot = p_top20, width = 11.69, height = 8.27)
+
 
 out_cntr <- plot_df %>%
   group_by(CNTR_CODE, di) %>%
@@ -127,8 +109,43 @@ num_df <- plot_df %>%
   summarize(n = n()) %>%
   left_join(data_ends)
 
+#########
+# DI MAP
+#########
+
+di_labs <- c(10, 20, 30)
+di_breaks <- c(0, .25, .5, .75, 1)
+di_vals <- quantile(plot_sf$top20, di_breaks) %>%
+  scales::rescale(c(0, 1))
+n_groups <- length(di_breaks)
+di_cols <- RColorBrewer::brewer.pal(6, "RdYlBu")
+
+di_map <- ggplot() +
+  geom_sf(data = nuts, fill = "gray60") +
+  geom_sf(data = arrange(plot_sf, top20),
+          aes(color = top20), shape = 18, size = 5) +
+  scale_color_stepsn(colors = di_cols, values = di_vals,
+                     n.breaks = n_groups, labels = di_labs) +
+  geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
+          alpha = 0.5, color = "gray85", size = .75) +
+  coord_sf(xlim = c(2700000, 5748970),
+           ylim = c(1500000, 4500000)) +
+  geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
+               check_overlap = TRUE) +
+  ggtitle("Percent of population with DI > 0.8") +
+  labs(color = "DI > 0.8 \n[%]") +
+  annotation_scale(aes(style = "ticks"), bar_cols = rep("gray95", 2))  +
+  theme(legend.position = c(0, 1),
+        legend.justification = c(0, 1),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank())#,
+        #panel.background = element_rect("grey30")
+#########
+# DI PLOT
+#########
 countries <- paste(c("FI", "SE", "LU", "AL", "XK", "RS", "RO", "DE", "PL", "FR",
-                   "IT", "NO"), collapse = "|")
+                     "IT", "NO"), collapse = "|")
 plot_colors <- transmute(out_cntr, CNTR_CODE, plot_colors = case_when(
   grepl(countries, CNTR_CODE) ~ "red",
   TRUE ~ "grey50")) %>% distinct()
@@ -139,8 +156,8 @@ data_ends <- out_cntr %>%
   left_join(plot_colors)
 data_ends1 <- data_ends %>% filter(plot_colors == "grey50")
 data_ends2 <- data_ends %>% filter(plot_colors != "grey50")
-
 scale <- rep(RColorBrewer::brewer.pal(11, "RdYlBu")[c(1:4, 8:11)], 2)
+
 di_plot <- out_cntr %>%
   filter(!grepl(countries, CNTR_CODE)) %>%
   ggplot(aes(x = di, y = pop)) +
@@ -150,81 +167,76 @@ di_plot <- out_cntr %>%
   geom_line(data = ., aes(col = CNTR_CODE), size = 1) +
   scale_color_manual(values = sample(scale, 12)) +
   theme(legend.position = "none") +
-  geom_label_repel(aes(label = CNTR_CODE), color = "grey50",
-                   data = data_ends1, max.overlaps = 5, size = 4,
-                   direction = "y", nudge_x = .05,
-                   force = 0.5, force_pull = 5) +
-  geom_label_repel(aes(label = CNTR_CODE, color = CNTR_CODE), #color = "red3",
+  # geom_label_repel(aes(label = CNTR_CODE), color = "grey50",
+  #                  data = data_ends1, max.overlaps = 5, size = 3,
+  #                  direction = "y", nudge_x = .05,
+  #                  force = 25, force_pull = .5) +
+  geom_label_repel(aes(label = CNTR_CODE, color = CNTR_CODE),
                    data = data_ends2, max.overlaps = 5, size = 4,
                    direction = "y", nudge_x = -.05,
-                   force = 0.5, force_pull = 5) +
+                   force = .5, force_pull = 5
+                   ) +
   xlim(c(.4, 1)) +
-  xlab("DI") + ylab("population [%]") + ggtitle("DI vs. cumulative population")
-ggsave(filename = paste0(github, "/3-6b_di_plot.pdf"),
-       plot = di_plot, width = 11.69, height = 8.27)
+  xlab("DI") + ylab("population [%]") #+ ggtitle("DI vs. cumulative population")
 
+plot_grid(di_map, di_plot, nrow = 2, axis = "lr", #align = "hv",
+          rel_heights = c(1, .5)) %>%
+ggsave(filename = paste0(github, "/3-3a_di_map+plot.pdf"),
+       plot = ., height = 11.69, width = 8.27, )
 
-# out_region %>%
-#   na.omit() %>%
-#   ggplot(aes(x = di, y = pop_round, col = RegionUN)) + geom_line()
-
-# plot_ly(data = out, x = ~di, y = ~pop, color = ~city) %>%
-#   add_lines()
-# plot_ly(data = out_cntr, x = ~di, y = ~pop, color = ~CNTR_CODE) %>%
-#   add_lines()
-
-
-ls_mean_plot <- plot_sf %>%
-  group_by(CNTR_CODE) %>%
-  mutate(med_ls = quantile(log(ls_mean), .5)) %>%
-  ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls_mean))) +
-  geom_jitter(alpha = .25, width = 0) +
-  geom_boxplot(alpha = .2) +
-  ggtitle("Mean LS at green space entries (city mean)") +
-  theme(axis.title.x = element_blank()) +
-  ylab(expression(bar("LS"))) +
-  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .75),
-             col = "green", linetype = "dashed", size = .8) +
-  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .25), col = "green",
-             linetype = "dashed", size = .8)
-ggsave(filename = paste0(github, "/3-7b_ls_plot.pdf"),
-       plot = ls_mean_plot, width = 11.69, height = 2.5)
-
-# ls_plot <- plot_sf %>%
-#   group_by(CNTR_CODE) %>%
-#   mutate(med_ls = quantile(log(ls), .5)) %>%
-#   ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls))) +
-#   geom_jitter(alpha = .5, width = 0) +
-#   geom_boxplot(alpha = .2) +
-#   ggtitle("Sum of LS at green space entries (city mean)")
-# ggsave(filename = "D:/MA/plots/ls_plot.pdf",
-#        plot = ls_plot, width = 11.69, height = 8.27)
+#########
+# LS MAP
+#########
+ls_plot_df <- mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
+  arrange((log(ls_mean)))
+ls_labs <- c("lowest", "below average", "above average", "highest")
+ls_breaks <- c(0, .25, .5, .75, 1)
+ls_vals <- quantile(log(ls_plot_df$ls_mean), ls_breaks) %>%
+  scales::rescale(c(0, 1))
+n_groups <- length(ls_breaks)
+ls_cols <- RColorBrewer::brewer.pal(n_groups, "RdYlBu") %>% rev()
 
 ls_map <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
-  geom_sf(data = mutate(plot_sf, ls_cov = n_parks_ls / n_parks) %>%
-            arrange((log(ls_mean))),
-          aes(
-            #size = ls_cov,
-            color = log(ls_mean)), shape = 18, size = 5) +
-  scale_color_step
-  scale_color_distiller(palette = "RdYlBu") +
+  geom_sf(data = ls_plot_df, aes(color = log(ls_mean)), shape = 18, size = 5) +
+  scale_color_stepsn(colors = ls_cols, values = ls_vals,
+                     n.breaks = n_groups, labels = ls_labs) +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
           alpha = 0.5, color = "gray85", size = .75) +
   coord_sf(xlim = c(2700000, 5748970),
            ylim = c(1500000, 4500000)) +
   geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray30",
                check_overlap = TRUE) +
-  # geom_sf_text(data = cntr_labs, aes(label = NUTS_ID), color = "gray95",
-  #              check_overlap = TRUE, size = 5) +
-  #  theme_dark() +
   ggtitle("Mean LS at green space entries (city mean)") +
   labs(color = expression(bar("LS")), size = "LS \ncoverage") +
-  theme(legend.position = c(.075, .75),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank(),
-        panel.background = element_rect("grey30"))
+  annotation_scale(aes(style = "ticks"), bar_cols = rep("gray95", 2))  +
+  theme(legend.position = c(0, 1),
+        legend.justification = c(0, 1),
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank()#,
+        #panel.background = element_rect("grey30")
+        )
 
-ls_map
-ggsave(filename = paste0(github, "/3-7a_ls_map.pdf"),
-       plot = ls_map, width = 11.69, height = 8.27)
+#########
+# LS PLOT
+#########
+ls_mean_plot <- plot_sf %>%
+  group_by(CNTR_CODE) %>%
+  mutate(med_ls = quantile(log(ls_mean), .5)) %>%
+  ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls_mean))) +
+  geom_jitter(alpha = .25, width = 0) +
+  geom_boxplot(alpha = .2, width = .5) +
+#  ggtitle("Mean LS at green space entries (city mean)") +
+  theme(axis.title.x = element_blank()) +
+  ylab(expression(bar("LS"))) +
+  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .75),
+             col = "green", linetype = "dashed", size = .8) +
+  geom_hline(yintercept = quantile(log(plot_sf$ls_mean), .25), col = "green",
+             linetype = "dashed", size = .8) +
+  coord_fixed(ratio = 1 / 2)
+
+plot_grid(ls_map, ls_mean_plot, nrow = 2, axis = "lr", #align = "hv",
+          rel_heights = c(1, .5)) %>%
+  ggsave(filename = paste0(github, "/3-3b_ls_map+plot.pdf"),
+       plot = ., height = 11.69, width = 8.27, )
