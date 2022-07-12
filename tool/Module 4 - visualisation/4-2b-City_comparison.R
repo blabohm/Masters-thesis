@@ -4,6 +4,7 @@ library(ggplot2)
 library(plotly)
 library(ggrepel)
 library(cowplot)
+library(ggspatial)
 
 wd <- "Z:/"
 wd <- "D:/output/"
@@ -101,14 +102,6 @@ out %>%
   na.omit() %>%
   ggplot(aes(x = di, y = pop, col = city)) + geom_line()
 
-num_df <- plot_df %>%
-  filter(!is.na(CNTR_CODE)) %>%
-  group_by(city_code) %>%
-  summarise(CNTR_CODE = first(CNTR_CODE)) %>%
-  group_by(CNTR_CODE) %>%
-  summarize(n = n()) %>%
-  left_join(data_ends)
-
 #########
 # DI MAP
 #########
@@ -141,6 +134,15 @@ di_map <- ggplot() +
         axis.title = element_blank(),
         axis.ticks = element_blank())#,
         #panel.background = element_rect("grey30")
+
+num_df <- plot_df %>%
+  filter(!is.na(CNTR_CODE)) %>%
+  group_by(city_code) %>%
+  summarise(CNTR_CODE = first(CNTR_CODE)) %>%
+  group_by(CNTR_CODE) %>%
+  summarize(n = n()) %>%
+  left_join(data_ends)
+
 #########
 # DI PLOT
 #########
@@ -179,7 +181,7 @@ di_plot <- out_cntr %>%
   xlim(c(.4, 1)) +
   xlab("DI") + ylab("population [%]") #+ ggtitle("DI vs. cumulative population")
 
-plot_grid(di_map, di_plot, nrow = 2, axis = "lr", #align = "hv",
+plot_grid(di_map, di_plot, ncol = 1, #axis = "tblr", align = "hv",
           rel_heights = c(1, .5)) %>%
 ggsave(filename = paste0(github, "/3-3a_di_map+plot.pdf"),
        plot = ., height = 11.69, width = 8.27, )
@@ -225,7 +227,7 @@ ls_mean_plot <- plot_sf %>%
   group_by(CNTR_CODE) %>%
   mutate(med_ls = quantile(log(ls_mean), .5)) %>%
   ggplot(aes(x = reorder(factor(CNTR_CODE), med_ls) , y = log(ls_mean))) +
-  geom_jitter(alpha = .25, width = 0) +
+  geom_jitter(alpha = .25, width = 0, fill = "grey50", shape = "circle small") +
   geom_boxplot(alpha = .2, width = .5) +
 #  ggtitle("Mean LS at green space entries (city mean)") +
   theme(axis.title.x = element_blank()) +
@@ -236,7 +238,7 @@ ls_mean_plot <- plot_sf %>%
              linetype = "dashed", size = .8) +
   coord_fixed(ratio = 1 / 2)
 
-plot_grid(ls_map, ls_mean_plot, nrow = 2, axis = "lr", #align = "hv",
-          rel_heights = c(1, .5)) %>%
+plot_grid(ls_map, ls_mean_plot, NULL, ncol = 1,# axis = "tblr", align = "hv",
+          rel_heights = c(1, .25, .25)) %>%
   ggsave(filename = paste0(github, "/3-3b_ls_map+plot.pdf"),
        plot = ., height = 11.69, width = 8.27, )

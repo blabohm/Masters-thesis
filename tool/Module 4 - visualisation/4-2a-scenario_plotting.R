@@ -32,10 +32,10 @@ xmin <- bbox[1] + 1100
 xmax <- bbox[3] - 1100
 ymin <- bbox[2] + 1100
 ymax <- bbox[4] - 1100
-xmin <- bbox[1] + 600
-xmax <- bbox[3] - 600
-ymin <- bbox[2] + 600
-ymax <- bbox[4] - 600
+# xmin <- bbox[1] + 600
+# xmax <- bbox[3] - 600
+# ymin <- bbox[2] + 600
+# ymax <- bbox[4] - 600
 umlaute <- function(variable) {
   variable <- gsub("Ã¼","ü",variable)
   variable <- gsub("ÃŸ","ß",variable)
