@@ -14,11 +14,11 @@ edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
 lvp_q <- paste0("SELECT area, geom FROM ",  st_layers(gs_dir)$name[1],
-              " WHERE identifier LIKE '", id, "'")
+                " WHERE identifier LIKE '", id, "'")
 lvp <- read_sf(gs_dir, query = lvp_q)
 lvp_label <- st_point_on_surface(lvp) %>% mutate(name = "Lene Voigt Park")
 gs_q <- paste0("SELECT area, geom, identifier FROM ",  st_layers(gs_dir)$name[1],
-                " WHERE code_2018 is 14100 OR code_2018 is 31000")
+               " WHERE code_2018 is 14100 OR code_2018 is 31000")
 
 
 build_poly <- paste0(wd, "buildings.gpkg")
@@ -32,10 +32,6 @@ xmin <- bbox[1] + 1100
 xmax <- bbox[3] - 1100
 ymin <- bbox[2] + 1100
 ymax <- bbox[4] - 1100
-xmin <- bbox[1] + 600
-xmax <- bbox[3] - 600
-ymin <- bbox[2] + 600
-ymax <- bbox[4] - 600
 umlaute <- function(variable) {
   variable <- gsub("Ã¼","ü",variable)
   variable <- gsub("ÃŸ","ß",variable)
@@ -116,7 +112,7 @@ ls_plot <- base_plot +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-#  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
+  #  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
   geom_sf_label(data = street_labs, aes(label = lab), color = "gray10") +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
@@ -227,20 +223,31 @@ p_theme <- theme(axis.title = element_blank(), axis.text = element_blank(),
                  legend.position = "none")
 p_scale <- annotation_scale(aes(style = "ticks"))
 
-rng <- range(c(ls1_data$d_ls1, ls2_data$d_ls2, ls3_data$d_ls3, ls4_data$d_ls4))
+# LS params
+ls_rng <- range(c(ls1_data$d_ls1, ls2_data$d_ls2,
+                  ls3_data$d_ls3, ls4_data$d_ls4))
 ls_bp <- brewer.pal(3, "RdBu")
-ls_color <- scale_color_gradient2(low = ls_bp[3], mid = ls_bp[2],
-                                  high = ls_bp[1],midpoint = 0,
-                                  limits = c(floor(rng[1]), ceiling(rng[2])))
-di_bp <- brewer.pal(3, "RdBu")
+ls_color <- scale_color_gradient2(low = last(ls_bp),
+                                  mid = nth(ls_bp, n = median(1:length(ls_bp))),
+                                  high = first(ls_bp),midpoint = 0,
+                                  limits = c(-15, 15))
+
+line_size <- 1.3
+
+# DI params
+di_rng <- range(c(di1_data$d_di1, di2_data$d_di2, di4_data$d_di4))
+di_bp <- brewer.pal(5, "RdBu")
 di_color <- scale_color_steps2(low = di_bp[1], mid = di_bp[3], high = di_bp[5],
-                               midpoint = 0)
+                               midpoint = 0,
+                               limits = c(-.3, .3))
 di_fill <- scale_fill_steps2(low = di_bp[1], mid = di_bp[3], high = di_bp[5],
-                             midpoint = 0)
+                             midpoint = 0,
+                             limits = c(-.3, .3))
 ################################################################################
 # PLOTS
 ls1_plot <- base_plot +
-  geom_sf(data = ls1_data, aes(color = d_ls1), size = 2) +
+  geom_sf(data = ls1_data, aes(color = d_ls1), size = line_size
+  ) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
   ls_color + p_scale + p_theme
@@ -253,17 +260,15 @@ di1_plot <- base_plot +
 
 ################################################################################
 ls2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), aes(fill = "")) +
-  geom_sf(data = ls2_data, aes(color = d_ls2), size = 2) +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "grey50") +
+  geom_sf(data = ls2_data, aes(color = d_ls2), size = line_size
+  ) +
   coord_sf(xlim = c(xmin + 525, xmax - 375),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(color = expression(Delta ~ "LS"),
-       fill = "Developed \ngreen spaces") +
-  scale_fill_manual(aesthetics = c(color = "brown2")) +
   ls_color + p_scale + p_theme
 
 di2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "grey50") +
   geom_sf(data = di2_data, aes(fill = d_di2, color = d_di2)) +
   coord_sf(xlim = c(xmin + 525, xmax - 375),
            ylim = c(ymin + 700, ymax + 100)) +
@@ -271,16 +276,18 @@ di2_plot <- base_plot +
 
 ################################################################################
 ls3_plot <- base_plot +
-# geom_sf(data = pop_dat, aes(fill = population)) +
+  # geom_sf(data = pop_dat, aes(fill = population)) +
   scale_fill_distiller(palette = "RdBu", ) +
-  geom_sf(data = ls3_data, aes(color = d_ls3), size = 2) +
+  geom_sf(data = ls3_data, aes(color = d_ls3), size = line_size
+  ) +
   coord_sf(xlim = c(xmin + 70, xmax - 70),
            ylim = c(ymin, ymax)) +
   ls_color + p_scale + p_theme
 
 ################################################################################
 ls4_plot <- base_plot +
-  geom_sf(data = ls4_data, aes(color = d_ls4), size = 2) +
+  geom_sf(data = ls4_data, aes(color = d_ls4), size = line_size
+  ) +
   coord_sf(xlim = c(xmin + 70, xmax - 70),
            ylim = c(ymin, ymax)) +
   ls_color + p_scale + p_theme
@@ -291,6 +298,12 @@ di4_plot <- base_plot +
   coord_sf(xlim = c(xmin + 70, xmax - 70),
            ylim = c(ymin, ymax)) +
   di_color + di_fill + p_scale + p_theme
+
+legend_alt2 <- (ggplot() +
+                  geom_sf(data = filter(gs, identifier %in% target_ids),
+                          aes(fill = "Converted \ngreen spaces")) +
+                  scale_fill_manual("", values = "grey50")) %>%
+  get_legend()
 
 legend_ls <- (ls4_plot +
                 theme(legend.position = "left") +
@@ -303,16 +316,18 @@ legend_di <- (di1_plot +
                      color = expression(Delta ~ "DI"))) %>%
   get_legend()
 
-legends <- plot_grid(legend_ls, legend_di, nrow = 1)
+legends <- plot_grid(legend_alt2, legend_ls, legend_di, nrow = 1)
 first_col <- plot_grid(ls1_plot, ls2_plot, ls3_plot, ls4_plot,
-                       nrow = 4, axis = "tlbr")
+                       nrow = 4, axis = "tlbr",
+                       labels = c("a", "c", "e", "f"))
 second_col <- plot_grid(di1_plot, di2_plot, legends, di4_plot,
-                       nrow = 4)
+                        nrow = 4,
+                        labels = c("b", "d", "", "g"))
 
 plot_grid(first_col, second_col,
           nrow = 1, ncol = 2, #align = "h",
           axis = "tlbr"#, labels = c("a", "b", "c", "d", "e", "", "", "f", "g")
-          ) %>%
+) %>%
   ggsave(plot = ., filename = paste0(github, "/plots/3-4_alternatives_plot.pdf"),
          width = 8.27, height = 11.69)
 
@@ -338,26 +353,26 @@ plot_grid(first_col, second_col,
 
 # saving
 
-
-ggsave(filename = paste0(github, "/plots/3-1a_ls.pdf"),
-       plot = ls_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-2a_ls1.pdf"),
-       plot = ls1_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-3a_ls2.pdf"),
-       plot = ls2_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-4a_ls3.pdf"),
-       plot = ls3_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-5a_ls4.pdf"),
-       plot = ls4_plot, width = 11.69, height = 8.27)
-
-ggsave(filename = paste0(github, "/plots/3-1b_di.pdf"),
-       plot = di_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-2b_di1.pdf"),
-       plot = di1_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-3b_di2.pdf"),
-       plot = di2_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-5b_di4.pdf"),
-       plot = di4_plot, width = 11.69, height = 8.27)
+#
+# ggsave(filename = paste0(github, "/plots/3-1a_ls.pdf"),
+#        plot = ls_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-2a_ls1.pdf"),
+#        plot = ls1_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-3a_ls2.pdf"),
+#        plot = ls2_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-4a_ls3.pdf"),
+#        plot = ls3_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-5a_ls4.pdf"),
+#        plot = ls4_plot, width = 11.69, height = 8.27)
+#
+# ggsave(filename = paste0(github, "/plots/3-1b_di.pdf"),
+#        plot = di_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-2b_di1.pdf"),
+#        plot = di1_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-3b_di2.pdf"),
+#        plot = di2_plot, width = 11.69, height = 8.27)
+# ggsave(filename = paste0(github, "/plots/3-5b_di4.pdf"),
+#        plot = di4_plot, width = 11.69, height = 8.27)
 
 # ggsave(filename = paste0(github, "/plots/ua3.pdf"),
 #        plot = ua3_plot, width = 11.69, height = 8.27)
