@@ -1,0 +1,207 @@
+\title{Using Maxent for mapping red deer habitat across the Caucasus and the northern Iran)}
+\author{Benjamin Labohm}
+\documentclass[10pt]{article}
+\usepackage{geometry}
+\geometry{a4paper, top=25mm, left=20mm, right=20mm, bottom=25mm,
+headsep=10mm, footskip=12mm}
+\setlength{\parindent}{0em} 
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{url}
+%\usepackage{microtype}
+%\usepackage{natbib}
+%\usepackage{subcaption}
+\usepackage[english]{babel}
+%\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{graphicx}
+%\usepackage{lscape}
+%\usepackage[toc,page]{appendix}
+\begin{document}
+\emergencystretch 3em
+\onecolumn
+
+{\center
+\vspace*{5cm}
+{\Huge Connecting green space supply and demand: modeling the walkable environment of European cities}
+\par\bigskip
+\Large{
+\textbf{Master's thesis}\\
+Humbold-Universit\"at zu Berlin
+
+Geography Department
+\\
+Benjamin Labohm
+
+Mat. Nr.: 
+545609
+\vfill
+}
+}
+\large{
+
+
+Supervisors: \\
+Prof. Dr. Dagmar Haase
+
+Humbold-Universit\"at zu Berlin
+
+Geography Department\\
+
+
+Dr. Manuel Wolff
+
+Humbold-Universit\"at zu Berlin
+
+Geography Department \\
+
+Berlin, 15.07.2022
+}
+
+\newpage
+\normalsize
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+
+\twocolumn[{\centering{\Large Connecting green space supply and demand: modeling the walkable environment of European cities\par}\vspace{3ex}
+	{\large Benjamin Labohm*\par}\vspace{2ex}
+	\today\par\vspace{4ex}}
+\textit{\small{*Geography Department, Humbold-Universit\"at zu Berlin, Rudower Chaussee 16, 12489 Berlin}} \\
+\smallbreak
+\hrule 
+
+\vspace*{.5cm}
+
+\textbf{Abstract}
+
+In an increasingly urbanized world, peoples’ access to green spaces is crucial. We used network characteristics to analyze the walkable environment – the connecting area between green space demand and supply – of European cities. To make the workflow replicable for future analysis, we used open source data and software. Our results reveal a mismatch in … . Future research should focus on … .
+
+\vspace*{.5cm}
+
+\hrule
+
+\par\vspace{2ex}]
+
+
+
+\vspace{.5cm}
+
+\normalsize
+
+
+\section{Introduction}
+
+Introduction
+%Part1: Accessibility to UGS
+In the Anthropocene, rapid urbanization takes place globally. 55% of the global population were living in cities by 2018 and 68% are projected to do so in 2050.
+A growing urban population depends increasingly on urban ecosystems (Elmqvist et al. 2021, UN 2019).
+Ecosystems supply ecosystem services (ES) which are critical to human well-being (Fisher et al. 2019). 
+Living in proximity of urban green spaces (UGS) can help alleviate the impacts of climate change on and aging urban population, as well as improve overall public health in cities (Kabisch et al. 2021a, Kabisch et al. 2021b).
+Thus, having access to UGS can enhance urban inhabitants’ quality of life (EU 2018, Poelman 2018).
+Likewise, the United Nations have agreed to provide universal access to public green spaces by 2030 in Sustainable Development Goal 11.7.
+
+In Europe, 74% of the population are living in cities (UN 2019).
+Here, the population pressure on UGS might be amplified by the compact city paradigm, which is popular among European city planners: A more compact city can result in shorter traveling distances but also in more overcrowding effects (Commission of European Communities, 1990; Burton, 2003, Wolff \& Haase D. 2019).
+Accordingly, more people living in proximity to and benefitting from an UGS also increase the pressure on its ecological functions (Wolff \& Haase D. 2019).
+In order to detect such mismatches in green space supply and demand and to provide equal access to UGS, mapping UGS accessibility is key (Larondelle \& Haase 2013).
+
+The walkable environment – the space in between urban dwellers and UGS – not only affects the quality of ES and, thus, the accessibility of UGS (Syrbe \& Walz 2012).
+Availability of UGS in walking distance can improve overall public health and increase the resilience of city dwellers (Kabisch et al. 2021, Richardson et al. 2013).
+A proper modeling of UGS accessibility must, therefore, put emphasis on modeling the walkable environment of a city (Wolff 2021).
+Yet, easy to use and open source tools for comparatively modeling the walkability of European cities are lacking (e.g. Kabisch et al. 2016).
+
+%Part 2: State of the art
+Availability and accessibility of UGS in Europe have been analyzed and compared in multiple studies.
+In their 2016 paper, Kabisch et al. carried out an assessment of green space availability in 299 EU cities. They used a population grid of 1 km² and land use data (urban atlas) to calculate the population within a buffer distance of UGS (Kabisch et al. 2016).
+The use of Euclidean (direct) distance in accessibility analysis has been found to underestimate spatial distances and to overestimate the provision of UGS in contrast to using network distance, though (Moseley et al. 2013, Sander et al. 2010).
+In 2016, the Joint Research Center (JRC) of the European Union developed an indicator for areas that are served by UGS in European cities. In their analysis, the authors used a 10 m² resolution land use data grid and a 100 m² population mosaic and a network-based approach (European Commission 2016).
+In another analysis from 2018, the JRC used urban atlas data and a street network to assess the area that urban dwellers can reach in a walking distance of 10 minutes. Their analysis also resulted in an area per population measure on a city level (Poelmann 2018).
+Distanzgewichtete Studien (2SFCA) / Kurze methodische Erklärung: Paper „springen“ über SCA drüber
+
+In a 2021 paper, Wolff coupled the population pressure and proximity perspectives by applying network characteristics. In his analysis, he found two promising indicators, the Detour Index (DI) and the Local Significance (LS) (Wolff 2021).
+The DI is a measure of the efficiency of a route taken to reach a goal (Bathelmy 2018).
+Hence, the DI can be used to model barriers that people have to overcome on their way to UGS (Wolff 2021).
+The LS is a simple measure to describe the relevance of different edges of a network (Esch 2014).
+With a little modification, the LS can be utilized to model use-intensity of those edges connecting population demand with UGS. As a consequence, LS might serve as a spatial indicator for overuse of UGS (Wolff 2021). 
+
+Previous research did rarely account for the mutual dependencies of supply and demand, or did it put the focus on the walkable environment (Syrbe \& Grunewald 2017).
+Using fixed distances for assessing green space accessibility might lead to numerical quantities instead of focusing on the location of the mismatch between ES supply and demand (Syrbe \& Grunewald 2017, Higgs et al. 2012).
+Furthermore, we saw mostly one perspective being used to assess green space accessibility (provision, population pressure or proximity).
+But a high provision of UGS in a city, for example, does not necessarily indicate an equal or adequate distribution of UGS (Poelman 2018).
+
+In addition to the previous points, the mentioned studies, if on a larger scale, were carried out on a coarse resolution (Kabisch et al. 2016, European Commission 2016).
+A higher resolution can reveal spatial patterns at a finer scale enabling targeted intervention while also reducing uncertainties that are introduced by e.g. a population grid or a city block aggregation as in urban atlas data (Bathelmy 2018, Esch et al. 2014).
+Achieving a high resolution on a large scale can be challenging, though, since freely available and comparable datasets are scarce (Feltynowski, 2018, Dumitru \& Wendling 2021).
+All things considered, knowledge about green space accessibility is important for planning and decision making and mapping the capacity, flow and demand of ES in urban areas has been found to facilitate urban planning (Baró et al, 2016).
+Improving the modeling of the walkable environment with a combination of population pressure and proximity aspects of green space accessibility might prove promising to detect mismatches between UGS supply and demand (Biernacka et al. 2020, Biernacka \& Kronenberg 2019).
+Finally, municipalities across European countries still provide a mixture of different indices for measuring green space supply and demand (Kabisch et al. 2016).
+Comparing cities can provide a basis for better understanding of urban processes, though (Wolff \& Haase A. 2019).
+Yet, there is no easy-to-handle and comparable tool using a high resolution on a European scale with publicly available data and software.
+Conceptualization
+The availability of UGS can be defined by the “amount of green area in a defined distance to where urban residents live” (Kabisch et al. 2016).
+Having actual access to UGS might be limited by additional factors, though. 
+The physical accessibility, for example, can be limited by fences, opening hours of an UGS, or the detours people have to take to reach them. 
+Additionally, accessibility may be limited by perceived overcrowding effects through population pressure (Kabisch et al 2016, Wollf et al. 2020).
+As use intensity can influence ES, it can create a mismatch between supply and demand (Syrbe \& Grunewald 2017). 
+
+Approaches that accounted for the supply and demand aspects of ES have usually postulated a population that is close to the places of ES origin. 
+Since ES are rarely consumed by humans at the same place where they are produced by the ecosystem, we distinguish service providing areas (SPA) and service demanding areas (SDA). 
+Service providing areas (SPA) represent the supplying side, the spatial unit where the ES are generated (Fisher et al. 2009, Syrbe and Walz, 2012, Dworczyk \& Burkhard 2021).
+In cities, UGS supply for example the cultural ES of recreation for residents (Dickinson \& Hobbs 2017).
+Service demanding areas (SDA) embody the places where the potential demand for ES arises, e.g. the places where people live. In the case of UGS in an urban environment, residential areas or buildings are an example for SDA (Dworczyk \& Burkhard 2021).
+
+In order to account for physical and perceived barriers to green space access, we have to take a look at the space between SPA and SDA, the service connecting areas (SCA).
+SCA can be used to show the flow of ES between SPA and SDA areas (Dworczyk \& Burkhard 2021, Syrbe \& Walz 2012)
+Regarding the scenario of UGS in cities, SCA are the walkable environment, i.e. the routes residents take to benefit from the ES in their neighborhood (Syrbe \& Grunewald 2017).
+Consequently, the SCA in this case are the walkable street network of a city.
+
+Three perspectives have been used in past studies to model the SCA for UGS: The proximity, provision and pressure perspectives.
+The proximity perspective considers the space between supply and demand, e.g. the walking distance between people’s homes and the UGS, thus highlighting the SCA. 
+A proximity perspective is necessary to account for barriers and other characteristics of the network. (Higgs et al. 2012, Wolff 2021).
+Furthermore, green space proximity measures have been found to be among the most important factors influencing perceived accessibility, especially for minority groups (Wang et al. 2015, Ibes, 2015).
+The widely used green space provision perspective models the flow from green area to buildings, thus, focusing on UGS provision (area / person).
+Secondly, the less often used population pressure perspective describes the flow from residential buildings (i.e. the population) to the UGS.
+The focus here is on the pressure of the residents on an UGS or their demand for green areas (person / area) (Kimpton 2017).
+
+
+%Part 3: Objectives
+Modeling the walkable environment of European cities by including the three perspectives mentioned above and using a network characteristics approach.
+We want to answer the questions:
+    1.) What does a modeling approach look like that estimates the walkability between green space supply and demand in cities based on high resolution data? 
+    2.) How to incorporate publicly accessible data and open source software in order to allow i.) a reproduction over time (e.g. with more recent data), and ii.) comparative approaches covering a large sample of cities.
+    3.) How can easily understandable and applicable indicators be used in order to support urban planning in detecting mismatches between demand and supply?
+The objectives that we derived from these questions are i.) to develop a modeling approach that applies walkability indices, ii.) to compare the results on a European scale, and iii.) to implement the indices by showing possible use cases for city planners.
+
+
+\section{Methods and Data}
+
+
+
+
+\section{Results}
+
+
+
+\section{Discussion}
+
+
+\section{Conclusions}
+
+
+%\bibliography{bibliography.bib}
+
+\onecolumn
+\newpage
+Erkl\"arung
+
+Ich erkl\"are, dass ich die vorliegende Arbeit nicht f\"ur andere Pr\"ufungen eingereicht, selbst\"andig und nur unter Verwendung der angegebenen Literatur und Hilfsmittel angefertigt habe. S\"amtliche fremde Quellen inklusive Internetquellen, Grafiken, Tabellen und Bilder, die ich unver\"andert oder abgewandelt wiedergegeben habe, habe ich als solche kenntlich gemacht. Mit ist bekannt, dass Verst\"oße gegen diese Grunds\"atze als T\"auschungsversuch bzw. T\"auschung geahndet werden.
+
+Berlin, den 12.10.2018\\
+
+\par\bigskip
+\par\bigskip
+
+Unterschrift
+\end{document}
