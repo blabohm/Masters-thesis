@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  14 JUL 2022 17:11
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  14 JUL 2022 21:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -242,11 +242,11 @@ Underfull \hbox (badness 10000) in paragraph at lines 201--202
 
 ] (MA.aux) ) 
 Here is how much of TeX's memory you used:
- 2996 strings out of 478582
- 48979 string characters out of 2856069
+ 2997 strings out of 478582
+ 48996 string characters out of 2856069
  372160 words of memory out of 3000000
- 21177 multiletter control sequences out of 15000+600000
- 471795 words of font info for 36 fonts, out of 8000000 for 9000
+ 21178 multiletter control sequences out of 15000+600000
+ 472094 words of font info for 37 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,5n,62p,519b,153s stack positions out of 10000i,1000n,20000p,200000b,80000s
  <C:\Users\benja\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/d
@@ -255,7 +255,7 @@ b><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/Programme/
 MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/Programme/MiKTeX/fonts/type
 1/public/amsfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts
 /cm/cmr17.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on MA.pdf (7 pages, 120052 bytes).
+Output written on MA.pdf (7 pages, 119043 bytes).
 PDF statistics:
  61 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
