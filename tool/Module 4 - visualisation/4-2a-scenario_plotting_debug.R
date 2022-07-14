@@ -68,7 +68,6 @@ base_plot <- ggplot() +
   geom_sf(data = gs, fill = "darkolivegreen1", color = NA,
           alpha = .2)
 
-base_plot
 ################################################################################
 lpz <- paste0(wd, "cities.gpkg") %>%
   read_sf(query = "SELECT * FROM cities WHERE URAU_CODE = 'DE008'") %>%
@@ -96,7 +95,6 @@ overview_plot <- ggplot(lpz) +
         plot.background = element_rect(color = "black"),
         plot.title.position = "panel",
   )
-overview_plot
 
 ls_query <- paste0("SELECT * FROM ls WHERE ls is not null")
 ls_plot <- base_plot +
@@ -112,11 +110,9 @@ ls_plot <- base_plot +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-  #  geom_sf_text(data = street_labs, aes(label = name), color = "gray10") +
   geom_sf_label(data = street_labs, aes(label = lab), color = "gray10") +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
-ls_plot
 
 
 di_plot <- base_plot +
@@ -139,7 +135,6 @@ di_plot <- base_plot +
                     ymax = ymin + (ymax - ymin) / 3) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
-di_plot
 
 plot_grid(ls_plot, di_plot, nrow = 2) %>%
   ggsave(plot = ., filename = paste0(github, "/plots/3-1_ls_di_plot.pdf"),
@@ -226,23 +221,24 @@ p_scale <- annotation_scale(aes(style = "ticks"))
 # LS params
 ls_rng <- range(c(ls1_data$d_ls1, ls2_data$d_ls2,
                   ls3_data$d_ls3, ls4_data$d_ls4))
-ls_bp <- brewer.pal(3, "RdBu")
-ls_color <- scale_color_gradient2(low = last(ls_bp),
-                                  mid = nth(ls_bp, n = median(1:length(ls_bp))),
-                                  high = first(ls_bp),midpoint = 0,
-                                  limits = c(-15, 15))
+ls_bp <- brewer.pal(11, "RdYlBu") %>% rev()
 
-line_size <- 1.3
+s <- scales::rescale(c(-10, -7.5, -5, 2.5, 0, 2.5, 5, 7.5, 10, 12.5, 15),
+                     c(0,1))
+ls_color <- scale_color_stepsn(colours = ls_bp,
+                               breaks = c(-10, -5, 0, 5, 10, 15),
+                               limits = c(-10, 20),
+                               values = s)
+
+line_size <- 1.2
 
 # DI params
 di_rng <- range(c(di1_data$d_di1, di2_data$d_di2, di4_data$d_di4))
 di_bp <- brewer.pal(5, "RdBu")
 di_color <- scale_color_steps2(low = di_bp[1], mid = di_bp[3], high = di_bp[5],
-                               midpoint = 0,
+                               midpoint = 0, aesthetics = c("color", "fill"),
                                limits = c(-.3, .3))
-di_fill <- scale_fill_steps2(low = di_bp[1], mid = di_bp[3], high = di_bp[5],
-                             midpoint = 0,
-                             limits = c(-.3, .3))
+
 ################################################################################
 # PLOTS
 ls1_plot <- base_plot +
@@ -256,7 +252,7 @@ di1_plot <- base_plot +
   geom_sf(data = di1_data, aes(fill = d_di1, color = d_di1)) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  di_color + di_fill + p_scale + p_theme
+  di_color + p_scale + p_theme
 
 ################################################################################
 ls2_plot <- base_plot +
@@ -272,7 +268,7 @@ di2_plot <- base_plot +
   geom_sf(data = di2_data, aes(fill = d_di2, color = d_di2)) +
   coord_sf(xlim = c(xmin + 525, xmax - 375),
            ylim = c(ymin + 700, ymax + 100)) +
-  di_color + di_fill + p_scale + p_theme
+  di_color + p_scale + p_theme
 
 ################################################################################
 ls3_plot <- base_plot +
@@ -297,7 +293,7 @@ di4_plot <- base_plot +
   geom_sf(data = di4_data, aes(fill = d_di4, color = d_di4)) +
   coord_sf(xlim = c(xmin + 70, xmax - 70),
            ylim = c(ymin, ymax)) +
-  di_color + di_fill + p_scale + p_theme
+  di_color + p_scale + p_theme
 
 legend_alt2 <- (ggplot() +
                   geom_sf(data = filter(gs, identifier %in% target_ids),
