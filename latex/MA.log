@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  14 JUL 2022 21:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  16 JUL 2022 00:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -57,15 +57,22 @@ Package: setspace 2011/12/19 v6.7a set line spacing
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
+(D:\Programme\MiKTeX\tex/latex/natbib\natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip49
+\bibsep=\skip50
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count196
+)
 (D:\Programme\MiKTeX\tex/generic/babel\babel.sty
 Package: babel 2022/02/26 3.73 The Babel package
-\babel@savecnt=\count196
+\babel@savecnt=\count197
 \U@D=\dimen147
 \l@unhyphenated=\language79
 
 (D:\Programme\MiKTeX\tex/generic/babel\txtbabel.def)
 \bbl@readstream=\read2
-\bbl@dirlevel=\count197
+\bbl@dirlevel=\count198
 
 *************************************
 * Local config file bblopts.cfg used
@@ -95,12 +102,12 @@ Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
 \cmidrulesep=\dimen155
 \cmidrulekern=\dimen156
 \defaultaddspace=\dimen157
-\@cmidla=\count198
-\@cmidlb=\count199
+\@cmidla=\count199
+\@cmidlb=\count266
 \@aboverulesep=\dimen158
 \@belowrulesep=\dimen159
-\@thisruleclass=\count266
-\@lastruleclass=\count267
+\@thisruleclass=\count267
+\@lastruleclass=\count268
 \@thisrulewidth=\dimen160
 )
 (D:\Programme\MiKTeX\tex/latex/graphics\graphicx.sty
@@ -125,7 +132,7 @@ File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
 )
 (D:\Programme\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count268
+\l__color_backend_stack_int=\count269
 \l__pdf_internal_box=\box50
 ) (MA.aux)
 \openout1 = `MA.aux'.
@@ -181,16 +188,16 @@ LaTeX Font Info:    ... okay on input line 20.
 
 (D:\Programme\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count269
+\scratchcounter=\count270
 \scratchdimen=\dimen163
 \scratchbox=\box51
-\nofMPsegments=\count270
-\nofMParguments=\count271
+\nofMPsegments=\count271
+\nofMParguments=\count272
 \everyMPshowfont=\toks18
-\MPscratchCnt=\count272
+\MPscratchCnt=\count273
 \MPscratchDim=\dimen164
-\MPnumerator=\count273
-\makeMPintoPDFobject=\count274
+\MPnumerator=\count274
+\makeMPintoPDFobject=\count275
 \everyMPtoPDFconversion=\toks19
 ) (D:\Programme\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -212,7 +219,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 56--57
 [1
 
 
-{C:/Users/benja/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] (MA.toc)
+{C:/Users/benja/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] (MA.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 3.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 3.
+)
 \tf@toc=\write3
 \openout3 = `MA.toc'.
 
@@ -226,38 +238,69 @@ Underfull \hbox (badness 10000) in paragraph at lines 85--85
 
  []
 
-
-Underfull \hbox (badness 1019) in paragraph at lines 105--109
-\OT1/cmr/m/n/10 mis-sion of Eu-ro-pean Com-mu-ni-ties, 1990; Bur-ton,
- []
-
 [4
 
-] [5] [6]
-Underfull \hbox (badness 10000) in paragraph at lines 201--202
+]
+Underfull \hbox (badness 1354) in paragraph at lines 128--132
+\OT1/cmr/m/n/10 green space ac-ces-si-bil-ity might lead to nu-mer-i-cal
+ []
+
+[5]
+<2-2_md-flowchart.pdf, id=24, 760.0395pt x 745.65576pt>
+File: 2-2_md-flowchart.pdf Graphic file (type pdf)
+<use 2-2_md-flowchart.pdf>
+Package pdftex.def Info: 2-2_md-flowchart.pdf  used on input line 187.
+(pdftex.def)             Requested size: 290.22107pt x 284.72884pt.
+
+
+Package natbib Warning: Citation `EuropeanComission.2022' on page 6 undefined o
+n input line 195.
+
+
+Underfull \hbox (badness 1990) in paragraph at lines 205--210
+\OT1/cmr/m/n/10 Europe-wide com-pa-ra-ble data for 788 Func-tional
+ []
+
+[6] [7 <./2-2_md-flowchart.pdf>] [8] [9] [10] [11]
+
+LaTeX Warning: Reference `•' on page 12 undefined on input line 441.
+
+
+LaTeX Warning: Reference `•' on page 12 undefined on input line 447.
+
+[12] [13] (MA.bbl [14]) [15]
+Underfull \hbox (badness 10000) in paragraph at lines 520--521
 
  []
 
-[7
 
-] (MA.aux) ) 
+Package natbib Warning: There were undefined citations.
+
+[16
+
+] (MA.aux)
+
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 2997 strings out of 478582
- 48996 string characters out of 2856069
- 372160 words of memory out of 3000000
- 21178 multiletter control sequences out of 15000+600000
- 472094 words of font info for 37 fonts, out of 8000000 for 9000
+ 3477 strings out of 478582
+ 55884 string characters out of 2856069
+ 381212 words of memory out of 3000000
+ 21650 multiletter control sequences out of 15000+600000
+ 472401 words of font info for 38 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,5n,62p,519b,153s stack positions out of 10000i,1000n,20000p,200000b,80000s
- <C:\Users\benja\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/d
-pi600\tcrm1000.pk><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pf
-b><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/Programme/
-MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/Programme/MiKTeX/fonts/type
-1/public/amsfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts
-/cm/cmr17.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on MA.pdf (7 pages, 119043 bytes).
+ 55i,6n,62p,825b,246s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ <C:\Users\benja\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
+1000.pk><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><D:/Prog
+ramme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/Programme/MiKTeX/fon
+ts/type1/public/amsfonts/cm/cmr10.pfb><D:/Programme/MiKTeX/fonts/type1/public/a
+msfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.
+pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programm
+e/MiKTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
+Output written on MA.pdf (16 pages, 358187 bytes).
 PDF statistics:
- 61 PDF objects out of 1000 (max. 8388607)
+ 111 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 6 words of extra memory for PDF output out of 10000 (max. 10000000)
 

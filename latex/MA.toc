@@ -1,6 +1,11 @@
 \babel@toc {english}{}\relax 
 \contentsline {section}{\numberline {1}Introduction}{4}{}%
+\contentsline {subsection}{\numberline {1.1}Conceptualization}{5}{}%
 \contentsline {section}{\numberline {2}Methods and Data}{6}{}%
-\contentsline {section}{\numberline {3}Results}{6}{}%
-\contentsline {section}{\numberline {4}Discussion}{6}{}%
-\contentsline {section}{\numberline {5}Conclusions}{6}{}%
+\contentsline {subsection}{\numberline {2.1}Study region}{6}{}%
+\contentsline {subsection}{\numberline {2.2}Data}{6}{}%
+\contentsline {subsection}{\numberline {2.3}Data processing}{7}{}%
+\contentsline {subsection}{\numberline {2.4}Analysis}{8}{}%
+\contentsline {section}{\numberline {3}Results}{9}{}%
+\contentsline {section}{\numberline {4}Discussion}{14}{}%
+\contentsline {section}{\numberline {5}Conclusions}{14}{}%

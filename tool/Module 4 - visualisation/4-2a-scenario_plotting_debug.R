@@ -227,8 +227,9 @@ s <- scales::rescale(c(-10, -7.5, -5, 2.5, 0, 2.5, 5, 7.5, 10, 12.5, 15),
                      c(0,1))
 ls_color <- scale_color_stepsn(colours = ls_bp,
                                breaks = c(-10, -5, 0, 5, 10, 15),
-                               limits = c(-10, 20),
-                               values = s)
+                               limits = c(-10, 15),
+                               #values = s,
+                               oob = scales::squish("ls"))
 
 line_size <- 1.2
 

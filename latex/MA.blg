@@ -1,0 +1,53 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: MA.aux
+Reallocating 'name_of_file' (item size: 1) to 8 items.
+The style file: apalike.bst
+Reallocating 'name_of_file' (item size: 1) to 13 items.
+Database file #1: bibliography.bib
+Warning--I didn't find a database entry for "EuropeanComission.2022"
+Warning--empty publisher in Poelman.2018
+Warning--empty publisher in UN.2018
+Warning--empty publisher in Wolff.2020b
+You've used 37 entries,
+            1935 wiz_defined-function locations,
+            707 strings with 10602 characters,
+and the built_in function-call counts, 14701 in all, are:
+= -- 1406
+> -- 695
+< -- 19
++ -- 248
+- -- 237
+* -- 1300
+:= -- 2633
+add.period$ -- 108
+call.type$ -- 37
+change.case$ -- 297
+chr.to.int$ -- 36
+cite$ -- 40
+duplicate$ -- 511
+empty$ -- 973
+format.name$ -- 292
+if$ -- 2786
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 41
+newline$ -- 183
+num.names$ -- 113
+pop$ -- 248
+preamble$ -- 1
+purify$ -- 303
+quote$ -- 0
+skip$ -- 379
+stack$ -- 0
+substring$ -- 979
+swap$ -- 35
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 210
+warning$ -- 3
+while$ -- 118
+width$ -- 0
+write$ -- 468
+(There were 4 warnings)
