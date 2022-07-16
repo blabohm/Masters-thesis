@@ -2,10 +2,12 @@
 \contentsline {section}{\numberline {1}Introduction}{4}{}%
 \contentsline {subsection}{\numberline {1.1}Conceptualization}{5}{}%
 \contentsline {section}{\numberline {2}Methods and Data}{6}{}%
-\contentsline {subsection}{\numberline {2.1}Study region}{6}{}%
-\contentsline {subsection}{\numberline {2.2}Data}{6}{}%
-\contentsline {subsection}{\numberline {2.3}Data processing}{7}{}%
-\contentsline {subsection}{\numberline {2.4}Analysis}{8}{}%
-\contentsline {section}{\numberline {3}Results}{9}{}%
-\contentsline {section}{\numberline {4}Discussion}{14}{}%
-\contentsline {section}{\numberline {5}Conclusions}{14}{}%
+\contentsline {subsection}{\numberline {2.1}Data}{6}{}%
+\contentsline {subsection}{\numberline {2.2}Data processing}{7}{}%
+\contentsline {subsection}{\numberline {2.3}Analysis}{8}{}%
+\contentsline {section}{\numberline {3}Results}{10}{}%
+\contentsline {subsection}{\numberline {3.1}Applying walkability indices}{10}{}%
+\contentsline {subsection}{\numberline {3.2}Comparing walkability indices}{12}{}%
+\contentsline {subsection}{\numberline {3.3}Implementing walkability indices}{15}{}%
+\contentsline {section}{\numberline {4}Discussion}{19}{}%
+\contentsline {section}{\numberline {5}Conclusions}{19}{}%

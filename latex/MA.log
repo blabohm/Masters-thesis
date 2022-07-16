@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  16 JUL 2022 00:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  16 JUL 2022 17:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -130,27 +130,35 @@ File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
 \Gin@req@height=\dimen161
 \Gin@req@width=\dimen162
 )
+(D:\Programme\MiKTeX\tex/latex/float\float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count269
+\float@exts=\toks18
+\float@box=\box50
+\@float@everytoks=\toks19
+\@floatcapt=\box51
+)
 (D:\Programme\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count269
-\l__pdf_internal_box=\box50
+\l__color_backend_stack_int=\count270
+\l__pdf_internal_box=\box52
 ) (MA.aux)
 \openout1 = `MA.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 20.
-LaTeX Font Info:    ... okay on input line 20.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
+LaTeX Font Info:    ... okay on input line 23.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -188,17 +196,17 @@ LaTeX Font Info:    ... okay on input line 20.
 
 (D:\Programme\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count270
+\scratchcounter=\count271
 \scratchdimen=\dimen163
-\scratchbox=\box51
-\nofMPsegments=\count271
-\nofMParguments=\count272
-\everyMPshowfont=\toks18
-\MPscratchCnt=\count273
+\scratchbox=\box53
+\nofMPsegments=\count272
+\nofMParguments=\count273
+\everyMPshowfont=\toks20
+\MPscratchCnt=\count274
 \MPscratchDim=\dimen164
-\MPnumerator=\count274
-\makeMPintoPDFobject=\count275
-\everyMPtoPDFconversion=\toks19
+\MPnumerator=\count275
+\makeMPintoPDFobject=\count276
+\everyMPtoPDFconversion=\toks21
 ) (D:\Programme\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -207,12 +215,12 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 (D:\Programme\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Underfull \hbox (badness 10000) in paragraph at lines 49--50
+Underfull \hbox (badness 10000) in paragraph at lines 52--53
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 56--57
+Underfull \hbox (badness 10000) in paragraph at lines 59--60
 
  []
 
@@ -229,78 +237,203 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 \openout3 = `MA.toc'.
 
 
-[2] (MA.lof)
+[2] (MA.lof
+LaTeX Font Info:    Trying to load font information for OML+cmr on input line 6
+.
+ (D:\Programme\MiKTeX\tex/latex/base\omlcmr.fd
+File: omlcmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
+(Font)              Font shape `OML/cmm/m/it' tried instead on input line 6.
+)
 \tf@lof=\write4
 \openout4 = `MA.lof'.
 
  [3]
-Underfull \hbox (badness 10000) in paragraph at lines 85--85
+Underfull \hbox (badness 10000) in paragraph at lines 88--88
 
  []
 
 [4
 
 ]
-Underfull \hbox (badness 1354) in paragraph at lines 128--132
+Underfull \hbox (badness 1354) in paragraph at lines 131--135
 \OT1/cmr/m/n/10 green space ac-ces-si-bil-ity might lead to nu-mer-i-cal
  []
 
 [5]
-<2-2_md-flowchart.pdf, id=24, 760.0395pt x 745.65576pt>
-File: 2-2_md-flowchart.pdf Graphic file (type pdf)
-<use 2-2_md-flowchart.pdf>
-Package pdftex.def Info: 2-2_md-flowchart.pdf  used on input line 187.
+<D:/MA/plots//2-2_md-flowchart.pdf, id=25, 760.0395pt x 745.65576pt>
+File: D:/MA/plots//2-2_md-flowchart.pdf Graphic file (type pdf)
+<use D:/MA/plots//2-2_md-flowchart.pdf>
+Package pdftex.def Info: D:/MA/plots//2-2_md-flowchart.pdf  used on input line 
+190.
 (pdftex.def)             Requested size: 290.22107pt x 284.72884pt.
-
-
-Package natbib Warning: Citation `EuropeanComission.2022' on page 6 undefined o
-n input line 195.
-
-
-Underfull \hbox (badness 1990) in paragraph at lines 205--210
+ [6]
+Underfull \hbox (badness 1990) in paragraph at lines 223--228
 \OT1/cmr/m/n/10 Europe-wide com-pa-ra-ble data for 788 Func-tional
  []
 
-[6] [7 <./2-2_md-flowchart.pdf>] [8] [9] [10] [11]
+[7 <D:/MA/plots//2-2_md-flowchart.pdf>]
+<D:/MA/plots//2-1_osm_coverage.pdf, id=47, 844.15375pt x 597.23125pt>
+File: D:/MA/plots//2-1_osm_coverage.pdf Graphic file (type pdf)
+<use D:/MA/plots//2-1_osm_coverage.pdf>
+Package pdftex.def Info: D:/MA/plots//2-1_osm_coverage.pdf  used on input line 
+276.
+(pdftex.def)             Requested size: 483.69687pt x 342.22061pt.
 
-LaTeX Warning: Reference `•' on page 12 undefined on input line 441.
+
+LaTeX Font Warning: Command \large invalid in math mode on input line 292.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 293.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 293.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 293.
+LaTeX Font Info:    Calculating math sizes for size <> on input line 293.
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <> not available
+(Font)              size <5> substituted on input line 293.
 
 
-LaTeX Warning: Reference `•' on page 12 undefined on input line 447.
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.7> not available
+(Font)              size <5> substituted on input line 293.
 
-[12] [13] (MA.bbl [14]) [15]
-Underfull \hbox (badness 10000) in paragraph at lines 520--521
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.5> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.7> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.5> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.7> not available
+(Font)              size <5> substituted on input line 293.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.5> not available
+(Font)              size <5> substituted on input line 293.
+
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <> on input line 293.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <0.7> on input line 293.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <0.5> on input line 293.
+[8]
+
+LaTeX Font Warning: Command \large invalid in math mode on input line 307.
+
+[9 <D:/MA/plots//2-1_osm_coverage.pdf>]
+<D:/MA/plots//3-1_ls_di_plot.pdf, id=68, 597.23125pt x 844.15375pt>
+File: D:/MA/plots//3-1_ls_di_plot.pdf Graphic file (type pdf)
+<use D:/MA/plots//3-1_ls_di_plot.pdf>
+Package pdftex.def Info: D:/MA/plots//3-1_ls_di_plot.pdf  used on input line 36
+1.
+(pdftex.def)             Requested size: 435.32422pt x 615.31259pt.
+
+
+LaTeX Warning: Float too large for page by 20.47395pt on input line 364.
+
+<D:/MA/plots//wien.pdf, id=69, 289.08pt x 289.08pt>
+File: D:/MA/plots//wien.pdf Graphic file (type pdf)
+<use D:/MA/plots//wien.pdf>
+Package pdftex.def Info: D:/MA/plots//wien.pdf  used on input line 370.
+(pdftex.def)             Requested size: 193.47578pt x 193.47527pt.
+<D:/MA/plots//lissabon.pdf, id=70, 289.08pt x 289.08pt>
+File: D:/MA/plots//lissabon.pdf Graphic file (type pdf)
+<use D:/MA/plots//lissabon.pdf>
+Package pdftex.def Info: D:/MA/plots//lissabon.pdf  used on input line 370.
+(pdftex.def)             Requested size: 193.47578pt x 193.47527pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[10] [11 <D:/MA/plots//3-1_ls_di_plot.pdf>] [12 <D:/MA/plots//wien.pdf> <D:/MA/
+plots//lissabon.pdf>]
+<D:/MA/plots//3-3a_di_map+plot.pdf, id=102, 597.23125pt x 844.15375pt>
+File: D:/MA/plots//3-3a_di_map+plot.pdf Graphic file (type pdf)
+<use D:/MA/plots//3-3a_di_map+plot.pdf>
+Package pdftex.def Info: D:/MA/plots//3-3a_di_map+plot.pdf  used on input line 
+433.
+(pdftex.def)             Requested size: 386.95897pt x 546.95454pt.
+<D:/MA/plots//3-2c_di_pop_lvp.pdf, id=103, 337.26pt x 187.70125pt>
+File: D:/MA/plots//3-2c_di_pop_lvp.pdf Graphic file (type pdf)
+<use D:/MA/plots//3-2c_di_pop_lvp.pdf>
+Package pdftex.def Info: D:/MA/plots//3-2c_di_pop_lvp.pdf  used on input line 4
+44.
+(pdftex.def)             Requested size: 201.3226pt x 112.04593pt.
+<D:/MA/plots//3-3b_ls_map+plot.pdf, id=104, 597.23125pt x 844.15375pt>
+File: D:/MA/plots//3-3b_ls_map+plot.pdf Graphic file (type pdf)
+<use D:/MA/plots//3-3b_ls_map+plot.pdf>
+Package pdftex.def Info: D:/MA/plots//3-3b_ls_map+plot.pdf  used on input line 
+467.
+(pdftex.def)             Requested size: 483.69687pt x 561.74203pt.
+ [13 <D:/MA/plots//3-2c_di_pop_lvp.pdf>] [14 <D:/MA/plots//3-3a_di_map+plot.pdf
+>]
+
+LaTeX Warning: Reference `•' on page 15 undefined on input line 477.
+
+<D:/MA/plots//3-4_alternatives_plot.pdf, id=126, 597.23125pt x 844.15375pt>
+File: D:/MA/plots//3-4_alternatives_plot.pdf Graphic file (type pdf)
+<use D:/MA/plots//3-4_alternatives_plot.pdf>
+Package pdftex.def Info: D:/MA/plots//3-4_alternatives_plot.pdf  used on input 
+line 497.
+(pdftex.def)             Requested size: 459.51054pt x 649.49805pt.
+
+LaTeX Warning: Float too large for page by 16.71497pt on input line 500.
+
+[15] [16 <D:/MA/plots//3-3b_ls_map+plot.pdf>] [17 <D:/MA/plots//3-4_alternative
+s_plot.pdf>] (MA.bbl [18] [19]) [20]
+Underfull \hbox (badness 10000) in paragraph at lines 580--581
 
  []
 
-
-Package natbib Warning: There were undefined citations.
-
-[16
+[21
 
 ] (MA.aux)
+
+LaTeX Font Warning: Size substitutions with differences
+(Font)              up to 4.5pt have occurred.
+
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 3477 strings out of 478582
- 55884 string characters out of 2856069
- 381212 words of memory out of 3000000
- 21650 multiletter control sequences out of 15000+600000
- 472401 words of font info for 38 fonts, out of 8000000 for 9000
+ 3676 strings out of 478582
+ 60286 string characters out of 2856069
+ 382471 words of memory out of 3000000
+ 21826 multiletter control sequences out of 15000+600000
+ 474839 words of font info for 46 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,6n,62p,825b,246s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 55i,15n,62p,911b,318s stack positions out of 10000i,1000n,20000p,200000b,80000s
  <C:\Users\benja\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1000.pk><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><D:/Prog
 ramme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/Programme/MiKTeX/fon
-ts/type1/public/amsfonts/cm/cmr10.pfb><D:/Programme/MiKTeX/fonts/type1/public/a
-msfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.
-pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programm
-e/MiKTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on MA.pdf (16 pages, 358187 bytes).
+ts/type1/public/amsfonts/cm/cmmi10.pfb><D:/Programme/MiKTeX/fonts/type1/public/
+amsfonts/cm/cmmi12.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi
+8.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><D:/Program
+me/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmr17.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfo
+nts/cm/cmr8.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+<D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programme/Mi
+KTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
+Output written on MA.pdf (21 pages, 10588500 bytes).
 PDF statistics:
- 111 PDF objects out of 1000 (max. 8388607)
+ 226 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 52 words of extra memory for PDF output out of 10000 (max. 10000000)
 

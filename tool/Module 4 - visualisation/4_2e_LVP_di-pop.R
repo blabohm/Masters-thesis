@@ -37,4 +37,4 @@ p <- lvp_plot_df %>%
   xlim(c(.4, 1))
 
 ggsave(filename = paste0(github, "/plots/3-2c_di_pop_lvp.pdf"),
-         plot = p, height = 11.69 / 3,  width = 8.27)
+         plot = p, height = 11.69 / 4.5,  width = 11.69 / 2.5)

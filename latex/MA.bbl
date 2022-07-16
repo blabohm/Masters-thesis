@@ -178,14 +178,14 @@ UN (2017).
 \newblock In Rosa, W., editor, {\em A new era in global health}. {Springer
   Publishing Company LLC}, New York, NY.
 
-\bibitem[UN, 2018]{UN.2018}
-UN (2018).
-\newblock {\em World Urbanization Prospects: The 2018 Revision, Key Facts}.
-
 \bibitem[UN, 2019]{UN.2019}
 UN (2019).
 \newblock {\em World urbanization prospects: The 2018 revision}.
 \newblock {United Nations}, New York.
+
+\bibitem[{Urban Audit}, 2022]{UrbanAudit.2022}
+{Urban Audit} (2022).
+\newblock Urban audit - gisco - eurostat.
 
 \bibitem[{van der Meer} et~al., 2019]{vanderMeer.2019}
 {van der Meer}, L., Lovelace, R., and Abad, L. (2019).
@@ -206,6 +206,11 @@ Wolff, M. (2021).
 \bibitem[Wolff and Haase, 2020]{Wolff.2020b}
 Wolff, M. and Haase, A. (2020).
 \newblock {\em Dealing with trade-offs in comparative urban studies}.
+
+\bibitem[Wolff et~al., 2017]{Wolff.2017}
+Wolff, M., Haase, A., Haase, D., and Kabisch, N. (2017).
+\newblock The impact of urban regrowth on the built environment.
+\newblock {\em Urban Studies}, 54(12):2683--2700.
 
 \bibitem[Wolff and Haase, 2019]{Wolff.2019}
 Wolff, M. and Haase, D. (2019).
