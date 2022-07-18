@@ -82,10 +82,10 @@ Berlin, 15.07.2022
 
 In an increasingly urbanized world, peoples’ access to urban green spaces (UGS) is crucial. 
 Former studies have mostly focused on determining whether urban dwellers have access to UGS or not.
-We used network characteristics to analyze the walkable environment – the connecting area between green space demand and supply – of European cities. 
+We used OpenStreetMap (OSM) and Urban Atlas (UA) data to analyze the walkable environment – the connecting area between green space demand and supply – of European cities. 
+In this study, we i.) to developed a modeling approach that applies the Detour Index (DI) and Local Significance (LS) walkability indices, ii.) compared the results on a European scale, and iii.) implemented the indices by showing possible use cases for city planners.
 By employing the Local Significance (LS) index, we revealed potential overcrowding effects at UGS in southern Germany.
 With the Detour Index (DI), we could not only show how many urban residents have access to UGS within 500 meters network distance, but also estimate the efficiency of the routes people take. 
-To make the workflow replicable for future analysis, we used open source data and software.
 Future research should focus on i.) accounting for the number of UGS people can reach, ii.) augment our results with further environmental data and iii.) account for other means of transportation, like cycling or public transport.
 
 \vspace*{.5cm}
@@ -279,7 +279,7 @@ For more detailed information on this process see Appendix 2d.
 \begin{figure*}[t!]
 \centering
 \includegraphics[width=1\textwidth]{2-1_osm_coverage.pdf}
-\caption{Percentage of urban atlas residential class polygons (class 11100-11240) that contain at least one OpenStreetMap building polygon. Red colors represent a higher coverage - yellow and blue colors represent lower share of covered polygons.}
+\caption{Percentage of urban atlas residential class polygons (class 11100-11240) that contain at least one OpenStreetMap building polygon. Red colors represent a higher coverage - yellow and blue colors represent lower share of covered polygons. Our test case, the city of Leipzig is highlighted on the map.}
 \label{fig:osmcov}
 \end{figure*}
 
@@ -378,7 +378,7 @@ We then applied the DI and LS indices to the changed conditions.
 \label{fig:osmcovexample}
 \end{figure*}
 
-This study intended i.) to develop a modeling approach that applies the DI and LS walkability indices, ii.) to compare the results on a European scale, and iii.) to implement the indices by showing possible use cases for city planners.
+In this study, we i.) to developed a modeling approach that applies the DI and LS walkability indices, ii.) compared the results on a European scale, and iii.) implemented the indices by showing possible use cases for city planners.
 
 \subsection{Applying walkability indices}
 In this section, we present the results of applying the two walkability indices to the test case, the Lene Voigt Park (LVP) in Leipzig, Germany.
@@ -414,11 +414,11 @@ Lastly, we see that there are buildings close to UGS with high DI values but tha
 
 \subsection{Comparing walkability indices}
 Here, we present the results of the OSM data coverage assessment and, later, compare the two walkability indices across Europe.
-\ref{fig:osmcov} depicts the OSM coverage, i.e. the relative share of UA polygons that are covered by at least one OSM building polygon. 
+Figure \ref{fig:osmcov} depicts the OSM coverage, i.e. the relative share of UA polygons that are covered by at least one OSM building polygon. 
 Most cities in central Europe – in particular in Poland, the Czech Republic, Austria, Northern Italy, Switzerland, France, Belgium and the Netherlands – exhibit a very high OSM coverage of \textgreater 90\%. 
 In the UK, northern Spain and the southeast of Europe, we see more cities with an OSM coverage of around 50\%.
 In Portugal and the south of Spain few cities express an OSM coverage above 50\%, and most cities are around 25\% OSM coverage.
-In \ref{fig:osmcovexample} we see two exemplary cities – Vienna as an example for a high OSM coverage and Lisbon as an example for a low OSM coverage.
+In figure \ref{fig:osmcovexample} we see two exemplary cities – Vienna as an example for a high OSM coverage and Lisbon as an example for a low OSM coverage.
 The city of Vienna, Austria is a prime example for a high OSM coverage with 98.7\% of the UA residential building polygons covered by at least one OSM building.
 A source of error explaining a fraction of the imperfect coverage in most cities are misclassified UA polygons (see Appendix 1b).
 In another share of UA polygons, the population values might have been so small that none of the OSM buildings received a population count, so they got filtered out during the data cleaning process (see Appendix 2b).
@@ -940,6 +940,13 @@ The process of building preparation follows these steps: a) loading UA data, b) 
 \textit{Calculating building centroids:} Finally, to facilitate the integration of the building data into the network analysis, we transform the polygons into their respective centroids. For this step we decided to use the st\_point\_on\_surface function from the sf package, rather than a function taking a geometric centroid. The centroid of all points that make up a geometry can fall outside of the initial geometry. Since we want to use the resulting points to later estimate building entries, a point outside the initial geometry would be undesirable. The thus filtered building centroids will be written to file for use in the later analysis.
 
 \subsubsection{Appendix 2c – Green space entry detection}
+\begin{figure*}
+\centering
+\includegraphics[width=.8\textwidth]{viktoriapark.pdf}
+\caption{Validation data collected in the Viktoriapark, Berlin (red and yellow dots). UGS entry points detected with no buffer (green) 5 meter buffer (red) and 10 meter buffer (blue)}
+\ref{fig:viktoria}
+\end{figure*}
+
 %Why green space entry detection?
 To measure the distance from a building entry to the nearest green space, we need a fixed point that demarcates the nearest entry point to that green space.
 Unfortunately, the data that we have acquired does not provide reliable information on those entry points.
@@ -984,6 +991,11 @@ A negative buffer will in this case better detect the paths that are emerging fr
 Of cause, these results have to be taken with a grain of salt, since we only validated them in Berlin and only with a handful of green spaces.
 There is by far no guarantee, that these findings can be readily translated to other cities or countries.
 When looking into the outcome, this should always be considered.
+
+\begin{figure*}
+\includegraphics[width=1\textwidth, trim=0 0 0 5, clip]{5-appendix_accass.png}
+\caption{Selected statistics of the accuracy assessment.}
+\end{figure*}
 
 %Functionality
 In the data preparation workflow that we wrote in R, the greenSpacePrep function will assign at least one entry point to each green space of a city.
@@ -1053,7 +1065,7 @@ At this point data preparation is finished. The required data that we need to cr
 
 
 
-\subsubsection{Appendix 3 – Index building}
+\subsection{Appendix 3 – Index building}
 
 %Why index building?
 Now that all data necessary to create the Local Significance (LS) and Detour Index (DI) indices is ready to use, we can start calculating the two indices for the entire city.
@@ -1094,13 +1106,17 @@ After these steps, both indices have been calculated. We did not implement a ste
 
 Ich erkl\"are, dass ich die vorliegende Arbeit nicht f\"ur andere Pr\"ufungen eingereicht, selbst\"andig und nur unter Verwendung der angegebenen Literatur und Hilfsmittel angefertigt habe. S\"amtliche fremde Quellen inklusive Internetquellen, Grafiken, Tabellen und Bilder, die ich unver\"andert oder abgewandelt wiedergegeben habe, habe ich als solche kenntlich gemacht. Mit ist bekannt, dass Verst\"oße gegen diese Grunds\"atze als T\"auschungsversuch bzw. T\"auschung geahndet werden.
 
-Berlin, den 12.10.2018\\
 
-\begin{figure}
-\includegraphics[width=.5\columnwidth]{sig_0.jpg}
+\begin{figure}[H]
+\includegraphics[width=.3\columnwidth]{sig.png}
 \end{figure}
 
-Unterschrift
+Berlin, 18.07.2020
+
+
+\newpage
+\Large{Ackknowledgement}
+Thanks to my supervisors. 
 
 \end{document}
 

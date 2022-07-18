@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  18 JUL 2022 18:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  18 JUL 2022 19:42
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -409,19 +409,17 @@ Underfull \hbox (badness 1354) in paragraph at lines 136--140
  []
 
 [5]
-<D:/MA/plots//2-2_md-flowchart.pdf, id=328, 760.0395pt x 745.65576pt>
+<D:/MA/plots//2-2_md-flowchart.pdf, id=334, 760.0395pt x 745.65576pt>
 File: D:/MA/plots//2-2_md-flowchart.pdf Graphic file (type pdf)
 <use D:/MA/plots//2-2_md-flowchart.pdf>
 Package pdftex.def Info: D:/MA/plots//2-2_md-flowchart.pdf  used on input line 
 195.
 (pdftex.def)             Requested size: 290.22107pt x 284.72884pt.
- [6
-pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
- been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.227 
-      ]
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+[6]
 Underfull \hbox (badness 1990) in paragraph at lines 228--233
 \OT1/cmr/m/n/10 Europe-wide com-pa-ra-ble data for 788 Func-tional
  []
@@ -432,14 +430,20 @@ s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.248 
+      
+pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
+ been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.248 
        <D:/MA/plots//2-2_md-flowchart.pdf>]
-<D:/MA/plots//2-1_osm_coverage.pdf, id=369, 844.15375pt x 597.23125pt>
+<D:/MA/plots//2-1_osm_coverage.pdf, id=375, 844.15375pt x 597.23125pt>
 File: D:/MA/plots//2-1_osm_coverage.pdf Graphic file (type pdf)
 <use D:/MA/plots//2-1_osm_coverage.pdf>
 Package pdftex.def Info: D:/MA/plots//2-1_osm_coverage.pdf  used on input line 
 281.
 (pdftex.def)             Requested size: 483.69687pt x 342.22061pt.
-
+ [8]
 
 LaTeX Font Warning: Command \large invalid in math mode on input line 297.
 
@@ -492,7 +496,6 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <0.7> on input line 298.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <0.5> on input line 298.
-[8]
 
 LaTeX Font Warning: Command \large invalid in math mode on input line 312.
 
@@ -503,7 +506,7 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.328 
        <D:/MA/plots//2-1_osm_coverage.pdf>]
-<D:/MA/plots//3-1_ls_di_plot.pdf, id=409, 597.23125pt x 844.15375pt>
+<D:/MA/plots//3-1_ls_di_plot.pdf, id=415, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-1_ls_di_plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-1_ls_di_plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-1_ls_di_plot.pdf  used on input line 36
@@ -513,12 +516,12 @@ Package pdftex.def Info: D:/MA/plots//3-1_ls_di_plot.pdf  used on input line 36
 
 LaTeX Warning: Float too large for page by 20.47395pt on input line 369.
 
-<D:/MA/plots//wien.pdf, id=410, 289.08pt x 289.08pt>
+<D:/MA/plots//wien.pdf, id=416, 289.08pt x 289.08pt>
 File: D:/MA/plots//wien.pdf Graphic file (type pdf)
 <use D:/MA/plots//wien.pdf>
 Package pdftex.def Info: D:/MA/plots//wien.pdf  used on input line 375.
 (pdftex.def)             Requested size: 193.47578pt x 193.47527pt.
-<D:/MA/plots//lissabon.pdf, id=411, 289.08pt x 289.08pt>
+<D:/MA/plots//lissabon.pdf, id=417, 289.08pt x 289.08pt>
 File: D:/MA/plots//lissabon.pdf Graphic file (type pdf)
 <use D:/MA/plots//lissabon.pdf>
 Package pdftex.def Info: D:/MA/plots//lissabon.pdf  used on input line 375.
@@ -531,7 +534,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
 s been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.405 
+l.390 
        <D:/MA/plots//3-1_ls_di_plot.pdf>] [12
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) ha
 s been already used, duplicate ignored
@@ -539,13 +542,13 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.435 
        <D:/MA/plots//wien.pdf> <D:/MA/plots//lissabon.pdf>]
-<D:/MA/plots//3-3a_di_map+plot.pdf, id=453, 597.23125pt x 844.15375pt>
+<D:/MA/plots//3-3a_di_map+plot.pdf, id=459, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-3a_di_map+plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-3a_di_map+plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-3a_di_map+plot.pdf  used on input line 
 438.
 (pdftex.def)             Requested size: 386.95897pt x 546.95454pt.
-<D:/MA/plots//3-2c_di_pop_lvp.pdf, id=454, 337.26pt x 187.70125pt>
+<D:/MA/plots//3-2c_di_pop_lvp.pdf, id=460, 337.26pt x 187.70125pt>
 File: D:/MA/plots//3-2c_di_pop_lvp.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-2c_di_pop_lvp.pdf>
 Package pdftex.def Info: D:/MA/plots//3-2c_di_pop_lvp.pdf  used on input line 4
@@ -558,13 +561,13 @@ s been already used, duplicate ignored
                                                   \__shipout_drop_firstpage_...
 l.469 
        <D:/MA/plots//3-3a_di_map+plot.pdf>]
-<D:/MA/plots//3-3b_ls_map+plot.pdf, id=478, 597.23125pt x 844.15375pt>
+<D:/MA/plots//3-3b_ls_map+plot.pdf, id=484, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-3b_ls_map+plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-3b_ls_map+plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-3b_ls_map+plot.pdf  used on input line 
 472.
 (pdftex.def)             Requested size: 483.69687pt x 561.74203pt.
-<D:/MA/plots//3-4_alternatives_plot.pdf, id=482, 597.23125pt x 844.15375pt>
+<D:/MA/plots//3-4_alternatives_plot.pdf, id=488, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-4_alternatives_plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-4_alternatives_plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-4_alternatives_plot.pdf  used on input 
@@ -612,7 +615,7 @@ Underfull \hbox (badness 1097) in paragraph at lines 684--697
  []
 
 [21] (MA.bbl [22] [23] [24])
-<D:/MA/plots//5-appendix_flowchart_long.png, id=623, 711.4078pt x 425.33907pt>
+<D:/MA/plots//5-appendix_flowchart_long.png, id=629, 711.4078pt x 425.33907pt>
 File: D:/MA/plots//5-appendix_flowchart_long.png Graphic file (type png)
 <use D:/MA/plots//5-appendix_flowchart_long.png>
 Package pdftex.def Info: D:/MA/plots//5-appendix_flowchart_long.png  used on in
@@ -754,42 +757,70 @@ Underfull \hbox (badness 2941) in paragraph at lines 934--935
  []
 
 [31]
-Underfull \hbox (badness 1292) in paragraph at lines 949--955
+<D:/MA/plots//viktoriapark.pdf, id=693, 845.1575pt x 597.23125pt>
+File: D:/MA/plots//viktoriapark.pdf Graphic file (type pdf)
+<use D:/MA/plots//viktoriapark.pdf>
+Package pdftex.def Info: D:/MA/plots//viktoriapark.pdf  used on input line 945.
+
+(pdftex.def)             Requested size: 386.95897pt x 273.45389pt.
+
+
+LaTeX Warning: Reference `fig:viktoria' on page 32 undefined on input line 947.
+
+
+
+Underfull \hbox (badness 1292) in paragraph at lines 956--962
 \OT1/cmr/m/n/10 (31000) with the Open-StreetMap (OSM) net-work
  []
 
-[32] [33] [34]
-Underfull \hbox (badness 10000) in paragraph at lines 1050--1053
+[32]
+<D:/MA/plots//5-appendix_accass.png, id=698, 1053.9375pt x 306.54526pt>
+File: D:/MA/plots//5-appendix_accass.png Graphic file (type png)
+<use D:/MA/plots//5-appendix_accass.png>
+Package pdftex.def Info: D:/MA/plots//5-appendix_accass.png  used on input line
+ 996.
+(pdftex.def)             Requested size: 483.69687pt x 138.3864pt.
+ [33
+pdfTeX warning (ext4): destination with the same identifier (name{figure.9}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1005 
+        <D:/MA/plots//viktoriapark.pdf>] [34
+pdfTeX warning (ext4): destination with the same identifier (name{figure.10}) h
+as been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1011 
+        <D:/MA/plots//5-appendix_accass.png>] [35]
+Underfull \hbox (badness 10000) in paragraph at lines 1062--1065
 \OT1/cmtt/m/n/10 github . io / sfnetworks / articles / sfn03 _ join _
  []
 
-[35] [36] [37] [38
+[36] [37] [38]
+<D:/MA/plots//sig.png, id=749, 188.95593pt x 118.19156pt>
+File: D:/MA/plots//sig.png Graphic file (type png)
+<use D:/MA/plots//sig.png>
+Package pdftex.def Info: D:/MA/plots//sig.png  used on input line 1111.
+(pdftex.def)             Requested size: 145.11053pt x 90.76611pt.
+ [39
 
-]
-Underfull \hbox (badness 10000) in paragraph at lines 1097--1098
-
- []
-
-<sig_0.jpg, id=719, 1084.05pt x 1927.2pt>
-File: sig_0.jpg Graphic file (type jpg)
-<use sig_0.jpg>
-Package pdftex.def Info: sig_0.jpg  used on input line 1100.
-(pdftex.def)             Requested size: 241.84843pt x 429.92546pt.
-[39
-
- <./sig_0.jpg>] (MA.aux)
+ <D:/MA/plots//sig.png>] [40] (MA.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
 
+
+LaTeX Warning: There were undefined references.
+
 Package rerunfilecheck Info: File `MA.out' has not changed.
-(rerunfilecheck)             Checksum: B23053220902548AC979E550F334793D;4199.
+(rerunfilecheck)             Checksum: 635D67AD5F7C2E5E7412518AAD45D851;4189.
  ) 
 Here is how much of TeX's memory you used:
- 10474 strings out of 478582
- 166474 string characters out of 2856069
- 490116 words of memory out of 3000000
- 28394 multiletter control sequences out of 15000+600000
+ 10494 strings out of 478582
+ 167143 string characters out of 2856069
+ 489178 words of memory out of 3000000
+ 28410 multiletter control sequences out of 15000+600000
  475007 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  60i,15n,63p,2229b,536s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -805,9 +836,9 @@ nts/cm/cmr8.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 <D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programme/Mi
 KTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb><D:/Programme/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt10.pfb>
-Output written on MA.pdf (39 pages, 11122732 bytes).
+Output written on MA.pdf (40 pages, 12207067 bytes).
 PDF statistics:
- 816 PDF objects out of 1000 (max. 8388607)
- 127 named destinations out of 1000 (max. 500000)
- 246 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 852 PDF objects out of 1000 (max. 8388607)
+ 130 named destinations out of 1000 (max. 500000)
+ 262 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -110,7 +110,9 @@ ls_plot <- base_plot +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-  geom_sf_label(data = street_labs, aes(label = lab), color = "gray10") +
+  #geom_sf(data = street_labs, aes(shape = lab)) +
+  geom_sf_label(data = street_labs, aes(label = lab), color = "gray10",
+                nudge_y = 50, show.legend = TRUE) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
         axis.ticks = element_blank())
 
