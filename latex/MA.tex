@@ -80,15 +80,19 @@ Berlin, 15.07.2022
 
 \textbf{Abstract}
 
-In an increasingly urbanized world, peoples’ access to green spaces is crucial. We used network characteristics to analyze the walkable environment – the connecting area between green space demand and supply – of European cities. To make the workflow replicable for future analysis, we used open source data and software. Our results reveal a mismatch in … . Future research should focus on … .
+In an increasingly urbanized world, peoples’ access to urban green spaces (UGS) is crucial. 
+Former studies have mostly focused on determining whether urban dwellers have access to UGS or not.
+We used network characteristics to analyze the walkable environment – the connecting area between green space demand and supply – of European cities. 
+By employing the Local Significance (LS) index, we revealed potential overcrowding effects at UGS in southern Germany.
+With the Detour Index (DI), we could not only show how many urban residents have access to UGS within 500 meters network distance, but also estimate the efficiency of the routes people take. 
+To make the workflow replicable for future analysis, we used open source data and software.
+Future research should focus on i.) accounting for the number of UGS people can reach, ii.) augment our results with further environmental data and iii.) account for other means of transportation, like cycling or public transport.
 
 \vspace*{.5cm}
 
 \hrule
 
 \par\vspace{2ex}]
-
-
 
 \vspace{.5cm}
 
@@ -716,15 +720,29 @@ Especially overcrowding effects could be modeled with higher detail and even on 
 \bibliography{bibliography}
 %\bibliographystyle{apalike}
 
+\newpage
+
+
+\begin{figure*}[ht!]
+\centering
+\includegraphics[width=1\textwidth]{5-appendix_flowchart_long.png}
+\caption{Long version of the entire workflow: From data acquisition, to data preparation and index building.}
+\label{fig:fc}
+\end{figure*}
+
 \section{Appendix}
+In this section, we present all steps necessary to reproduce the results of the previous analysis.
+We describe the data that we have acquired (Appendix 1), the pre-processing steps (Appendix 2) and the index-building steps (Appendix 3).
 
 \subsection{Appendix 1 – Data acquisition}
 Data acquisition is a crucial part of geographic analysis. Reliable sources of data are key in producing reliable output, so it is wise to carefully select one’s data sources \citep{vanderMeer.2019}. To model the walkable environment of cities on a European level, we chose to create the Local Significance (LS) and Detour Index (ID) \citep{Esch.2014, Wolff.2021}. For the creation of the LS and DI on a European scale, we require data on i.) green spaces, their entry points and their area, ii.) residential buildings, their entry points and the number of residents inhabiting them, and iii.) the network that connects the residential buildings with the green spaces. Finding comparable data for a Europe-wide study can be a challenge in itself. There is a plethora of network, building and green space data provided on national or municipal levels. They are provided in different formats and quality and have different access restrictions. Gathering these data, city by city or country by country could potentially create a comprehensive source of data for our analysis. But overcoming all restriction barriers, finding comparable data, bringing all of the different formats into alignment would prove too difficult for this work. For the purpose of developing the workflow to create LS and DI for European cities, we have chosen to acquire Urban Atlas (UA) and OpenStreetMap (OSM) data. UA and OSM are both freely accessible and offer more or less comparable data on a European scale. We derive the green space data as well as the information on the city’s inhabitants from UA. From OSM we derive the network and the buildings. We estimate the locations of building and park entry points based on both datasets (see Appendix 2b and 2c). This chapter shows the measures we have taken to find and access data that covers as much of our area of interest as possible.
-\subsubsection{Appendix 1a – Data Acquisition: city boundaries}
-In order to facilitate the analysis of the service connecting areas in European cities, we need a spatial delimitation of the target cities. Urban Atlas data is mostly available for the functional urban areas (FUA) of the cities. But as described in the chapter before, the extent of the FUA can vary from large commuting zones to city cores. To be able to compare European cities in this analysis, we need a harmonized dataset of city boundaries. For this purpose, we chose to use the urban audit city administrative units \citep{EuropeanUnion2020, UrbanAudit.2022}.
 
 
-\subsubsection{Appendix 1b - Data acquisition: Download urban atlas (UA) data}
+\subsubsection{Appendix 1a – City boundaries}
+In order to facilitate the analysis of the service connecting areas in European cities, we need a spatial delimitation of the target cities. Urban Atlas data is mostly available for the functional urban areas (FUA) of the cities. But as described in the chapter before, the extent of the FUA can vary from large commuting zones to city cores. To be able to compare European cities in this analysis, we need a harmonized dataset of city boundaries. For this purpose, we chose to use the urban audit city administrative units \citep{EuropeanUnion.2020, UrbanAudit.2022}.
+
+
+\subsubsection{Appendix 1b - Download urban atlas (UA) data}
 %Why UA?
 For constructing the Local Significance index, we require reliable population estimates.
 UA provides exactly this with a minimum mapping unit of 0.25 ha, which turns out to be a 	convenient resolution of mostly city block level. 	
@@ -733,7 +751,23 @@ Furthermore, we can use UA data to implement another safety net for filtering th
 UA provides high-resolution urban land use data with a minimal mapping unit of 0.25 ha and 27 land use classes. The latest version of UA maps the 2018 urban land use of 788 European cities with more than 50.000 inhabitants according to the Functional Urban Area (FUA) as determined by the DG Regional and Urban Policy of the European Commission.  With version v13, the UA data from 2018 has received its latest update and received population estimates for each polygon. UA is mostly based on Earth Observation data and is backed by other reference data, like commercial data, OpenStreetMap data or topographic maps. Input data is automatically classified and validated afterwards. Thematic accuracy of the urban land use product is stated to be >85%, positional accuracy < +/- 5 meters \citep{EuropeanUnion2020}.
 
 %Downloading the data / pitfalls
-Copernicus, the data provider of UA does not offer an API for downloading the data required. Consequently, we either have to use the Copernicus web page to manually download the data for each city, or we use the interface to select all cities at once and, thus, create a download request. This process requires a registration for the Copernicus web page. Also, we 	can only download the latest version of the UA data \citep{EuropeanUnion2020}.
+Copernicus, the data provider of UA does not offer an API for downloading the data required. Consequently, we either have to use the Copernicus web page to manually download the data for each city, or we use the interface to select all cities at once and, thus, create a download request. This process requires a registration for the Copernicus web page. Also, we 	can only download the latest version of the UA data \citep{EuropeanUnion.2020}.
+
+\begin{table*}[]
+\resizebox{1\textwidth}{!}{%
+\begin{tabular}{lllll}
+\hline
+source              & version                     & coverage           & data                                                                     & specifics                                  \\ \hline
+Urban Audit         & 2020                        & 832 cities, Europe & city boundaries                                                          & urban kernel                               \\
+OpenStreetMap (OSM) & download: April -  May 2022 & global             & residential buildings                                                    & key: 'building’                            \\
+                    &                             &                    & network                                                                  & key: 'highway’                             \\
+Urban Atlas (UA)    & 2018 v13                    & 788 FUAs, Europe   & urban green spaces                                                       & classes: 14100, 31000                      \\
+                    &                             &                    & \begin{tabular}[c]{@{}l@{}}residential areas  \\ Population\end{tabular} & classes: 11100, 11210, 11220, 11230, 11240
+\end{tabular}%
+}
+\caption{Data overview table}
+\label{tab:overview}
+\end{table*}
 
 \subsubsection{Appendix 1c – Download OpenStreetMap (OSM) data}
 %Why OSM?
@@ -799,6 +833,7 @@ If the OSM data consisted of multiple layers with different geometry classes, th
 These steps will be repeated until the OSM data in each boundary box is downloaded.
 The individual subfunctions that are being called by the download\_OSM function can be called separately by a skilled user, as well. 
 
+
 \subsection{Appendix 2 – Data preparation}
 %Why data preparation?
 Real world data is unfortunately almost never ready to use.
@@ -807,7 +842,7 @@ In addition to cleaning, we also have to bring the data into the right format fo
 For creating the Detour Index (DI) and Local Significance (LS) index, data preparation will encompass the steps i.) network preparation, ii.) building preparation, iii.) green space entry detection and iv.) network blending.
 We have gathered these steps in the data preparation workflow.
 
-\subsubsection{Appendix 2a – Data preparation: Network cleaning}
+\subsubsection{Appendix 2a – Network cleaning}
 %Why network cleaning?
 OpenStreetMap (OSM) is a large and heterogeneous dataset that is being audited by the OSM community.
 Unfortunately, the immense amount of data and heterogeneity of the OSM contributors are a guarantee that the data is not ready to use.
@@ -853,19 +888,22 @@ Appending the individual tiles to the same layer of one file has proven the most
 Other ways of combination would include loading all network data into the RAM of the machine and combining it there, taking a larger amount of time.
 After all files of downloaded OSM network data are written to disk, the network data is ready for further cleaning steps.
 
-\textit{c) Cleaning the network}
-In the last part of the network cleaning workflow, the actual pitfalls of network data are being tackled.
+\textit{c) Cleaning the network:} In the last part of the network cleaning workflow, the actual pitfalls of network data are being tackled.
 The network cleaning script heavily relies on the tidygraph and the sfnetworks R-packages and loosely follows the sfnetworks pre-processing and cleaning tutorial by Lucas van der Meer, Lorena Abad, Andrea Gilardi and Robin Lovelace (\url{https://luukvdmeer.github.io/sfnetworks/articles/sfn02_preprocess_clean.html}).
 Further cleaning of the network dataset involves i.) removing double entries, ii.) rounding coordinates, iii.) subdividing edges, iv.) spatial smoothing, v.) removing unconnected edges and vi.) removing overlapping edges.
-Removing double entries: In the first cleaning step, all double entries in the now combined network dataset are being removed. This process uses the dplyr ‘distinct’ function which only removes double entries from the data frame without touching the geometries of the data. In this step there will not be removed any overlapping edges, yet.
-Rounding coordinates: Now we make sure all coordinates that make up the lines of the network data are exactly the same where lines are supposed to be connected. For this correction, we chose to reduce the precision of the network data. We did so by applying a rounding function to the coordinates of the line geometries. This process will implement a minor imprecision of a few centimeters in the network data.  And too much rounding can cause lines of zero length which will cause errors in later analyses.
+
+i.) Removing double entries: In the first cleaning step, all double entries in the now combined network dataset are being removed. This process uses the dplyr ‘distinct’ function which only removes double entries from the data frame without touching the geometries of the data. In this step there will not be removed any overlapping edges, yet.
+
+ii.) Rounding coordinates: Now we make sure all coordinates that make up the lines of the network data are exactly the same where lines are supposed to be connected. For this correction, we chose to reduce the precision of the network data. We did so by applying a rounding function to the coordinates of the line geometries. This process will implement a minor imprecision of a few centimeters in the network data.  And too much rounding can cause lines of zero length which will cause errors in later analyses.
 Subdividing edges: In the later analysis, we rely on the sfnetworks package. When creating a network from OSM network data with this package, the linestrings of which the network consists will make up the edges. The endpoints of these edges become the nodes of the network. Edges that share the same endpoint also share the same node – i.e. they are connected. An edge can still have interior points that define its shape but are not nodes of the network. If an edge shares exactly the same interior point with another edge but this point is not a node, they are not being considered connected in the network structure. To rule out any unconnected edges due to this error, we can split the overlapping edges at their common point. This point, in turn, becomes a node of the network and the edges are connected. The function to\_spatial\_subdivision of the sfnetworks package in combination with the tidygraph function convert does exactly this. All edges are be connected at shared interior nodes. Edges will not be connected if they are overlapping but do not have any shared nodes, reducing the danger of connecting bridges to the paths that are lying beneath them.
-Spatial smoothing: A spatial network might as well contain nodes that do not play any connecting role in the network structure. These nodes have only one incoming and one outgoing edge. These pseudo nodes would only increase the complexity of further analysis and, thus, increase the time it takes to compute the results. To remove pseudo nodes, the sfnetworks package offers the function to\_spatial\_smooth, which can be used with the tidygraph function convert. After removing a pseudo node, to\_spatial\_smooth will transform the two adjacent linestring geometries into a single edge. 
+
+iii.) Spatial smoothing: A spatial network might as well contain nodes that do not play any connecting role in the network structure. These nodes have only one incoming and one outgoing edge. These pseudo nodes would only increase the complexity of further analysis and, thus, increase the time it takes to compute the results. To remove pseudo nodes, the sfnetworks package offers the function to\_spatial\_smooth, which can be used with the tidygraph function convert. After removing a pseudo node, to\_spatial\_smooth will transform the two adjacent linestring geometries into a single edge. 
 Removing unconnected edges: Another common pitfall in the downloaded OSM network data are unconnected edges that form their own network structure. Edges can be unconnected from the rest of the network due to several reasons. They can, for example belong to paths that are located inside of a courtyard or atrium that has no publicly available connection the rest of the network. Leaving unconnected edges in the network dataset would in the later analysis cause unreachable areas of the city. E.g. residential building entries could be assumed to be located in these areas and thus vanish from the analysis. To counteract this source of errors, we filter the network data using the tidygraph group\_components function, which groups a network by its connected components. We use this function to keep only those edges that are connected to the largest component – i.e. the city network. 
-Removing overlapping edges: In the last step, we aim to remove any edges that are still overlapping from the network. An overlap could, for example, be an artifact of downloading the OSM network data in 2x2 km tiles. If a street is crossing the boundary between two of the tiles, part of it might be downloaded once for each tile. Downloading the street twice will result in two longer edges with ending parts that are overlapping. Overlapping edges would cause the same path to appear multiple times in the network. This could potentially cause the local significance index values, which are supposed to accumulate on the edges, to distribute across several overlapping edges. For removing overlapping edges, we have devised the remove\_overlap function. Remove\_overlap relies on the R- package sf and its st\_covers function. To remove overlapping edges, remove\_overlap will separate the network into those edges that cover multiple other edges and edges that only cover themselves. Consecutively, it will split the edges that are covering other edges and only keep those parts that form a unique spatial feature.
+
+iv.) Removing overlapping edges: In the last step, we aim to remove any edges that are still overlapping from the network. An overlap could, for example, be an artifact of downloading the OSM network data in 2x2 km tiles. If a street is crossing the boundary between two of the tiles, part of it might be downloaded once for each tile. Downloading the street twice will result in two longer edges with ending parts that are overlapping. Overlapping edges would cause the same path to appear multiple times in the network. This could potentially cause the local significance index values, which are supposed to accumulate on the edges, to distribute across several overlapping edges. For removing overlapping edges, we have devised the remove\_overlap function. Remove\_overlap relies on the R- package sf and its st\_covers function. To remove overlapping edges, remove\_overlap will separate the network into those edges that cover multiple other edges and edges that only cover themselves. Consecutively, it will split the edges that are covering other edges and only keep those parts that form a unique spatial feature.
 
 
-\subsubsection{Appendix 2b – Data preparation: Building preparation}
+\subsubsection{Appendix 2b – Building preparation}
 %Why building preparation?
 To create the Detour Index (DI) and the Local Significance (LS) index, we are only interested in the residential buildings.
 By downloading all buildings from OpenStreetMap (OSM) that are located inside a certain area, we have also downloaded buildings with non-residential function, though.
@@ -901,7 +939,7 @@ The process of building preparation follows these steps: a) loading UA data, b) 
  
 \textit{Calculating building centroids:} Finally, to facilitate the integration of the building data into the network analysis, we transform the polygons into their respective centroids. For this step we decided to use the st\_point\_on\_surface function from the sf package, rather than a function taking a geometric centroid. The centroid of all points that make up a geometry can fall outside of the initial geometry. Since we want to use the resulting points to later estimate building entries, a point outside the initial geometry would be undesirable. The thus filtered building centroids will be written to file for use in the later analysis.
 
-\subsubsection{Appendix 2c – Data preparation: Green space entry detection}
+\subsubsection{Appendix 2c – Green space entry detection}
 %Why green space entry detection?
 To measure the distance from a building entry to the nearest green space, we need a fixed point that demarcates the nearest entry point to that green space.
 Unfortunately, the data that we have acquired does not provide reliable information on those entry points.
@@ -961,7 +999,7 @@ The greenSpacePrep function follows the steps a.) checking the proximity to othe
 
 \textit{d) Rounding geometries:} Before writing the green space entries that we detected in the previous process to file, we round their geometries. This has proven to prevent R from randomly crashing during the further analysis. If not provided by the user, the greenSpacePrep will automatically generate an output file name and store the green space entries here for further use. 
 
-\subsubsection{Appendix 2d – Data preparation: Network blending}
+\subsubsection{Appendix 2d – Network blending}
 
 %Why network blending?
 After all data was acquired, and all necessary data cleaning, filtering and conversion steps have been carried out, we need to bring the data together.
@@ -1040,7 +1078,7 @@ All paths can be handed manually to the getIndices function or will be created a
 By default, the output will be written to the working directory if not specified otherwise.
 The index creation workflow follows these steps: a) listing the green space identifiers, b) inputting the data, c) calculating and saving the indices and d) joining the index values back to the network and buildings:
 
-\textit{a) Listing the green space identifiers:} Creating the indices is a computationally intensive process. Particularly the process called routing (i.e. finding the fastest route between two points in a network) can use lots of resources. To increase the speed of completing the LS and DI computation for an entire city and to speed up each computation itself, we use a number of methods. First, we use the UA identifiers that come with the UA data to facilitate parallelization of the process. During the previous steps we have kept these identifiers together with the green space entry points. By iterating through the object identifiers of the green spaces, we can distribute the computation across multiple computational cores. Similar to the snapping and blending process in the previous chapter, our function uses 75% of the available computation cores. Setting this number higher might not be recommended under certain circumstances. The green space identifiers are now used to set up the parallel processing.
+\textit{a) Listing the green space identifiers:} Creating the indices is a computationally intensive process. Particularly the process called routing (i.e. finding the fastest route between two points in a network) can use lots of resources. To increase the speed of completing the LS and DI computation for an entire city and to speed up each computation itself, we use a number of methods. First, we use the UA identifiers that come with the UA data to facilitate parallelization of the process. During the previous steps we have kept these identifiers together with the green space entry points. By iterating through the object identifiers of the green spaces, we can distribute the computation across multiple computational cores. Similar to the snapping and blending process in the previous chapter, our function uses 75\% of the available computation cores. Setting this number higher might not be recommended under certain circumstances. The green space identifiers are now used to set up the parallel processing.
 
 \textit{b) Inputting the data:} When we set up parallel processing in R on a Windows machine, we have to account for certain limitations. If run on Windows, each task that we hand to R to compute in parallel will start a new Windows process. Unfortunately, this means that we have to input all of our data separately into each of the processes, which can take up lots of memory. Particularly loading the spatial data into each process has to be planned meticulously to not overwhelm the machines memory and cause (not so) unforeseen crashes. On iterating through the green space identifiers, we first load the green space entries that are associated with the identifier via a SQL query from the nodes database directly into the memory. We then apply a buffer of the 500 meters distance (that we have chosen as a cutoff value) to the green space entries and convert them into a well-known-text (WKT) filter. The WKT filter we use to directly load only those building entries from the nodes dataset into memory that are needed for creating the DI and LS indices in a network distance of 500 meters from the green space entries. Similarly, we use the WKT to load the network data that is located inside the buffered area from the edges database. The data we have obtained for the analysis now is not yet a real representation of the 500 meters network distance, but a severe reduction of memory used. With all data necessary to calculate both, the DI and the LS indices for a single park, we can now proceed with the process.
 
@@ -1058,8 +1096,11 @@ Ich erkl\"are, dass ich die vorliegende Arbeit nicht f\"ur andere Pr\"ufungen ei
 
 Berlin, den 12.10.2018\\
 
-\par\bigskip
-\par\bigskip
+\begin{figure}
+\includegraphics[width=.5\columnwidth]{sig_0.jpg}
+\end{figure}
 
 Unterschrift
+
 \end{document}
+
