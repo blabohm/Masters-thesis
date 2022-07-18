@@ -1,5 +1,11 @@
 \begin{thebibliography}{}
 
+\bibitem[Barber et~al., 2021]{Barber.2021}
+Barber, A., Haase, D., and Wolff, M. (2021).
+\newblock Permeability of the city -- physical barriers of and in urban green
+  spaces in the city of halle, germany.
+\newblock {\em Ecological Indicators}, 125:107555.
+
 \bibitem[Bar{\'o} et~al., 2016]{Baro.2016}
 Bar{\'o}, F., Palomo, I., Zulian, G., Vizcaino, P., Haase, D., and
   G{\'o}mez-Baggethun, E. (2016).
@@ -12,6 +18,12 @@ Barth{\'e}lemy, M. (2018).
 \newblock {\em Morphogenesis of Spatial Networks}.
 \newblock SpringerLink B{\"u}cher. Springer, Cham.
 
+\bibitem[Biernacka and Kronenberg, 2018]{Biernacka.2018}
+Biernacka, M. and Kronenberg, J. (2018).
+\newblock Classification of institutional barriers affecting the availability,
+  accessibility and attractiveness of urban green spaces.
+\newblock {\em Urban Forestry {\&} Urban Greening}, 36:22--33.
+
 \bibitem[Biernacka and Kronenberg, 2019]{Biernacka.2019}
 Biernacka, M. and Kronenberg, J. (2019).
 \newblock Urban green space availability, accessibility and attractiveness, and
@@ -23,6 +35,17 @@ Biernacka, M., Kronenberg, J., and {\L}aszkiewicz, E. (2020).
 \newblock An integrated system of monitoring the availability, accessibility
   and attractiveness of urban parks and green squares.
 \newblock {\em Applied Geography}, 116:102152.
+
+\bibitem[Chiesura, 2004]{Chiesura.2004}
+Chiesura, A. (2004).
+\newblock The role of urban parks for the sustainable city.
+\newblock {\em Landscape and Urban Planning}, 68(1):129--138.
+
+\bibitem[Cortinovis et~al., 2022]{Cortinovis.2022}
+Cortinovis, C., Geneletti, D., and Haase, D. (2022).
+\newblock Higher immigration and lower land take rates are driving a new
+  densification wave in european cities.
+\newblock {\em npj Urban Sustainability}, 2(1):1--14.
 
 \bibitem[Dickinson and Hobbs, 2017]{Dickinson.2017}
 Dickinson, D.~C. and Hobbs, R.~J. (2017).
@@ -51,6 +74,10 @@ Esch, T., Marconcini, M., Marmanis, D., Zeidler, J., Elsayed, S., Metz, A.,
 \newblock Dimensioning urbanization -- an advanced procedure for characterizing
   human settlement properties and patterns using spatial network analysis.
 \newblock {\em Applied Geography}, 55:212--228.
+
+\bibitem[{European Union}, 2020]{EuropeanUnion.2020}
+{European Union} (2020).
+\newblock {\em Mapping Guide v6.2 for a European Urban Atlas}.
 
 \bibitem[Feltynowski et~al., 2018]{Feltynowski.2018}
 Feltynowski, M., Kronenberg, J., Bergier, T., Kabisch, N., {\L}aszkiewicz, E.,
@@ -126,6 +153,16 @@ Moseley, D., Marzano, M., Chetcuti, J., and Watts, K. (2013).
   support the planning and management of greenspace.
 \newblock {\em Landscape and Urban Planning}, 116:1--12.
 
+\bibitem[{OpenStreetMap Contributors}, 2020]{OpenStreetMapContributors.2020}
+{OpenStreetMap Contributors} (2020).
+\newblock {\em OpenStreetMap}.
+
+\bibitem[Padgham et~al., 2022]{Padgham.2022}
+Padgham, M., Rudis, B., Lovelace, R., and Salmon (2022).
+\newblock {\em Import 'OpenStreetMap' Data as Simple Features or Spatial
+  Objects [R package osmdata version 0.1.10]}.
+\newblock {Comprehensive R Archive Network (CRAN)}.
+
 \bibitem[PAFI et~al., 2016]{Pafi.2016}
 PAFI, M., SIRAGUSA, A., FERRI, S., and HALKIA, S. (2016).
 \newblock Measuring the accessibility of urban green areas: A comparison of the
@@ -142,6 +179,10 @@ Poelman, H. (2018).
 \newblock {\em a walk to the park? assessing access to green areas in europe's
   cities update using completed Copernicus urban atlas data}.
 
+\bibitem[{R Core Team}, 2022]{RcoreTeam.2022}
+{R Core Team} (2022).
+\newblock R: A language and environment for statistical.
+
 \bibitem[Richardson et~al., 2013]{Richardson.2013}
 Richardson, E.~A., Pearce, J., Mitchell, R., and Kingham, S. (2013).
 \newblock Role of physical activity in the relationship between urban green
@@ -154,6 +195,12 @@ Sander, H.~A., Ghosh, D., {van Riper}, D., and Manson, S.~M. (2010).
   open-space valuation.
 \newblock {\em Environment and Planning B: Planning and Design},
   37(5):874--894.
+
+\bibitem[S{\"a}umel et~al., 2021]{Saumel.2021}
+S{\"a}umel, I., Hogrefe, J., Battisti, L., Wachtel, T., and Larcher, F. (2021).
+\newblock The healthy green living room at one's doorstep? use and perception
+  of residential greenery in berlin, germany.
+\newblock {\em Urban Forestry {\&} Urban Greening}, 58:126949.
 
 \bibitem[Stadt-Leipzig, 2022]{StadtLeipzig.2022}
 Stadt-Leipzig (2022).
@@ -203,10 +250,6 @@ Wolff, M. (2021).
   blue area accessibility using spatial network analysis.
 \newblock {\em Ecological Indicators}, 126(5):107665.
 
-\bibitem[Wolff and Haase, 2020]{Wolff.2020b}
-Wolff, M. and Haase, A. (2020).
-\newblock {\em Dealing with trade-offs in comparative urban studies}.
-
 \bibitem[Wolff et~al., 2017]{Wolff.2017}
 Wolff, M., Haase, A., Haase, D., and Kabisch, N. (2017).
 \newblock The impact of urban regrowth on the built environment.
@@ -218,10 +261,29 @@ Wolff, M. and Haase, D. (2019).
   space supply in european cities.
 \newblock {\em Frontiers in Environmental Science}, 7:61.
 
-\bibitem[Wolff et~al., 2020]{Wolff.2020}
-Wolff, M., Scheuer, S., and Haase, D. (2020).
+\bibitem[Wolff et~al., 2020a]{Wolff.2020}
+Wolff, M., Scheuer, S., and Haase, D. (2020a).
+\newblock Looking beyond boundaries: Revisiting the rural-urban interface of
+  green space accessibility in europe.
+\newblock {\em Ecological Indicators}, 113(1):106245.
+
+\bibitem[Wolff et~al., 2020b]{Wolff.2020b}
+Wolff, M., Scheuer, S., and Haase, D. (2020b).
 \newblock Looking beyond boundaries: Revisiting the rural-urban interface of
   green space accessibility in europe.
 \newblock {\em Ecological Indicators}, 113:106245.
+
+\bibitem[Xu et~al., 2018]{Xu.2018}
+Xu, C., Haase, D., and Pauleit, S. (2018).
+\newblock The impact of different urban dynamics on green space availability: A
+  multiple scenario modeling approach for the region of munich, germany.
+\newblock {\em Ecological Indicators}, 93:1--12.
+
+\bibitem[Xu et~al., 2020]{Xu.2020}
+Xu, C., Haase, D., Su, M., Wang, Y., and Pauleit, S. (2020).
+\newblock Assessment of landscape changes under different urban dynamics based
+  on a multiple-scenario modeling approach.
+\newblock {\em Environment and Planning B: Urban Analytics and City Science},
+  47(8):1361--1379.
 
 \end{thebibliography}

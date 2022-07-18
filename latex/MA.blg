@@ -5,47 +5,49 @@ Reallocating 'name_of_file' (item size: 1) to 8 items.
 The style file: apalike.bst
 Reallocating 'name_of_file' (item size: 1) to 13 items.
 Database file #1: bibliography.bib
+Warning--I didn't find a database entry for "EuropeanUnion2020"
+Warning--empty publisher in EuropeanUnion.2020
+Warning--empty publisher in OpenStreetMapContributors.2020
 Warning--empty publisher in Poelman.2018
-Warning--empty publisher in Wolff.2020b
-You've used 38 entries,
+You've used 49 entries,
             1935 wiz_defined-function locations,
-            713 strings with 10727 characters,
-and the built_in function-call counts, 15148 in all, are:
-= -- 1454
-> -- 718
-< -- 19
-+ -- 258
-- -- 245
-* -- 1342
-:= -- 2713
-add.period$ -- 111
-call.type$ -- 38
-change.case$ -- 307
-chr.to.int$ -- 37
-cite$ -- 40
-duplicate$ -- 521
-empty$ -- 997
-format.name$ -- 301
-if$ -- 2868
-int.to.chr$ -- 2
+            772 strings with 12559 characters,
+and the built_in function-call counts, 19323 in all, are:
+= -- 1854
+> -- 897
+< -- 23
++ -- 325
+- -- 305
+* -- 1708
+:= -- 3458
+add.period$ -- 142
+call.type$ -- 49
+change.case$ -- 390
+chr.to.int$ -- 47
+cite$ -- 52
+duplicate$ -- 671
+empty$ -- 1285
+format.name$ -- 372
+if$ -- 3659
+int.to.chr$ -- 3
 int.to.str$ -- 0
-missing$ -- 40
-newline$ -- 188
-num.names$ -- 116
-pop$ -- 250
+missing$ -- 52
+newline$ -- 241
+num.names$ -- 149
+pop$ -- 321
 preamble$ -- 1
-purify$ -- 312
+purify$ -- 397
 quote$ -- 0
-skip$ -- 388
+skip$ -- 497
 stack$ -- 0
-substring$ -- 1024
-swap$ -- 35
+substring$ -- 1323
+swap$ -- 45
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 218
-warning$ -- 2
-while$ -- 122
+type$ -- 280
+warning$ -- 3
+while$ -- 157
 width$ -- 0
-write$ -- 481
-(There were 2 warnings)
+write$ -- 617
+(There were 4 warnings)

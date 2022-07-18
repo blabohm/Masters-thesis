@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  16 JUL 2022 17:27
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  18 JUL 2022 14:55
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -57,22 +57,145 @@ Package: setspace 2011/12/19 v6.7a set line spacing
 \Urlmuskip=\muskip16
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
+(D:\Programme\MiKTeX\tex/latex/hyperref\hyperref.sty
+Package: hyperref 2022-02-21 v7.00n Hypertext links for LaTeX
+
+(D:\Programme\MiKTeX\tex/generic/ltxcmds\ltxcmds.sty
+Package: ltxcmds 2020-05-10 v1.25 LaTeX kernel commands for general use (HO)
+)
+(D:\Programme\MiKTeX\tex/generic/pdftexcmds\pdftexcmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(D:\Programme\MiKTeX\tex/generic/infwarerr\infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(D:\Programme\MiKTeX\tex/generic/kvsetkeys\kvsetkeys.sty
+Package: kvsetkeys 2019/12/15 v1.18 Key value parser (HO)
+)
+(D:\Programme\MiKTeX\tex/generic/kvdefinekeys\kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+)
+(D:\Programme\MiKTeX\tex/generic/pdfescape\pdfescape.sty
+Package: pdfescape 2019/12/09 v1.15 Implements pdfTeX's escape features (HO)
+)
+(D:\Programme\MiKTeX\tex/latex/hycolor\hycolor.sty
+Package: hycolor 2020-01-27 v1.10 Color options for hyperref/bookmark (HO)
+)
+(D:\Programme\MiKTeX\tex/latex/letltxmacro\letltxmacro.sty
+Package: letltxmacro 2019/12/03 v1.6 Let assignment for LaTeX macros (HO)
+)
+(D:\Programme\MiKTeX\tex/latex/auxhook\auxhook.sty
+Package: auxhook 2019-12-17 v1.6 Hooks for auxiliary files (HO)
+)
+(D:\Programme\MiKTeX\tex/latex/kvoptions\kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+)
+\@linkdim=\dimen147
+\Hy@linkcounter=\count196
+\Hy@pagecounter=\count197
+
+(D:\Programme\MiKTeX\tex/latex/hyperref\pd1enc.def
+File: pd1enc.def 2022-02-21 v7.00n Hyperref: PDFDocEncoding definition (HO)
+Now handling font encoding PD1 ...
+... no UTF-8 mapping file for font encoding PD1
+)
+(D:\Programme\MiKTeX\tex/generic/intcalc\intcalc.sty
+Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
+)
+(D:\Programme\MiKTeX\tex/generic/etexcmds\etexcmds.sty
+Package: etexcmds 2019/12/15 v1.7 Avoid name clashes with e-TeX commands (HO)
+)
+\Hy@SavedSpaceFactor=\count198
+
+(D:\Programme\MiKTeX\tex/latex/hyperref\puenc.def
+File: puenc.def 2022-02-21 v7.00n Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
+Package hyperref Info: Hyper figures OFF on input line 4137.
+Package hyperref Info: Link nesting OFF on input line 4142.
+Package hyperref Info: Hyper index ON on input line 4145.
+Package hyperref Info: Plain pages OFF on input line 4152.
+Package hyperref Info: Backreferencing OFF on input line 4157.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4390.
+\c@Hy@tempcnt=\count199
+LaTeX Info: Redefining \url on input line 4749.
+\XeTeXLinkMargin=\dimen148
+
+(D:\Programme\MiKTeX\tex/generic/bitset\bitset.sty
+Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
+
+(D:\Programme\MiKTeX\tex/generic/bigintcalc\bigintcalc.sty
+Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO
+)
+))
+\Fld@menulength=\count266
+\Field@Width=\dimen149
+\Fld@charsize=\dimen150
+Package hyperref Info: Hyper figures OFF on input line 6027.
+Package hyperref Info: Link nesting OFF on input line 6032.
+Package hyperref Info: Hyper index ON on input line 6035.
+Package hyperref Info: backreferencing OFF on input line 6042.
+Package hyperref Info: Link coloring OFF on input line 6047.
+Package hyperref Info: Link coloring with OCG OFF on input line 6052.
+Package hyperref Info: PDF/A mode OFF on input line 6057.
+LaTeX Info: Redefining \ref on input line 6097.
+LaTeX Info: Redefining \pageref on input line 6101.
+
+(D:\Programme\MiKTeX\tex/latex/base\atbegshi-ltx.sty
+Package: atbegshi-ltx 2021/01/10 v1.0c Emulation of the original atbegshi
+package with kernel methods
+)
+\Hy@abspage=\count267
+\c@Item=\count268
+\c@Hfootnote=\count269
+)
+Package hyperref Info: Driver (autodetected): hpdftex.
+
+(D:\Programme\MiKTeX\tex/latex/hyperref\hpdftex.def
+File: hpdftex.def 2022-02-21 v7.00n Hyperref driver for pdfTeX
+
+(D:\Programme\MiKTeX\tex/latex/base\atveryend-ltx.sty
+Package: atveryend-ltx 2020/08/19 v1.0a Emulation of the original atveryend pac
+kage
+with kernel methods
+)
+\Fld@listcount=\count270
+\c@bookmark@seq@number=\count271
+
+(D:\Programme\MiKTeX\tex/latex/rerunfilecheck\rerunfilecheck.sty
+Package: rerunfilecheck 2022-07-10 v1.10 Rerun checks for auxiliary files (HO)
+
+(D:\Programme\MiKTeX\tex/generic/uniquecounter\uniquecounter.sty
+Package: uniquecounter 2019/12/15 v1.4 Provide unlimited unique counter (HO)
+)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+85.
+)
+\Hy@SectionHShift=\skip49
+)
 (D:\Programme\MiKTeX\tex/latex/natbib\natbib.sty
 Package: natbib 2010/09/13 8.31b (PWD, AO)
-\bibhang=\skip49
-\bibsep=\skip50
+\bibhang=\skip50
+\bibsep=\skip51
 LaTeX Info: Redefining \cite on input line 694.
-\c@NAT@ctr=\count196
+\c@NAT@ctr=\count272
 )
 (D:\Programme\MiKTeX\tex/generic/babel\babel.sty
 Package: babel 2022/02/26 3.73 The Babel package
-\babel@savecnt=\count197
-\U@D=\dimen147
+\babel@savecnt=\count273
+\U@D=\dimen151
 \l@unhyphenated=\language79
 
 (D:\Programme\MiKTeX\tex/generic/babel\txtbabel.def)
 \bbl@readstream=\read2
-\bbl@dirlevel=\count198
+\bbl@dirlevel=\count274
 
 *************************************
 * Local config file bblopts.cfg used
@@ -92,23 +215,23 @@ Package babel Info: Hyphen rules for 'newzealand' set to \l@ukenglish
 ))
 (D:\Programme\MiKTeX\tex/latex/booktabs\booktabs.sty
 Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
-\heavyrulewidth=\dimen148
-\lightrulewidth=\dimen149
-\cmidrulewidth=\dimen150
-\belowrulesep=\dimen151
-\belowbottomsep=\dimen152
-\aboverulesep=\dimen153
-\abovetopsep=\dimen154
-\cmidrulesep=\dimen155
-\cmidrulekern=\dimen156
-\defaultaddspace=\dimen157
-\@cmidla=\count199
-\@cmidlb=\count266
-\@aboverulesep=\dimen158
-\@belowrulesep=\dimen159
-\@thisruleclass=\count267
-\@lastruleclass=\count268
-\@thisrulewidth=\dimen160
+\heavyrulewidth=\dimen152
+\lightrulewidth=\dimen153
+\cmidrulewidth=\dimen154
+\belowrulesep=\dimen155
+\belowbottomsep=\dimen156
+\aboverulesep=\dimen157
+\abovetopsep=\dimen158
+\cmidrulesep=\dimen159
+\cmidrulekern=\dimen160
+\defaultaddspace=\dimen161
+\@cmidla=\count275
+\@cmidlb=\count276
+\@aboverulesep=\dimen162
+\@belowrulesep=\dimen163
+\@thisruleclass=\count277
+\@lastruleclass=\count278
+\@thisrulewidth=\dimen164
 )
 (D:\Programme\MiKTeX\tex/latex/graphics\graphicx.sty
 Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
@@ -127,12 +250,12 @@ Package graphics Info: Driver file: pdftex.def on input line 107.
 (D:\Programme\MiKTeX\tex/latex/graphics-def\pdftex.def
 File: pdftex.def 2020/10/05 v1.2a Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen161
-\Gin@req@width=\dimen162
+\Gin@req@height=\dimen165
+\Gin@req@width=\dimen166
 )
 (D:\Programme\MiKTeX\tex/latex/float\float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
-\c@float@type=\count269
+\c@float@type=\count279
 \float@exts=\toks18
 \float@box=\box50
 \@float@everytoks=\toks19
@@ -140,25 +263,29 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 )
 (D:\Programme\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-02-07 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count270
+\l__color_backend_stack_int=\count280
 \l__pdf_internal_box=\box52
 ) (MA.aux)
 \openout1 = `MA.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 23.
-LaTeX Font Info:    ... okay on input line 23.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 24.
+LaTeX Font Info:    ... okay on input line 24.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -194,18 +321,38 @@ LaTeX Font Info:    ... okay on input line 23.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-(D:\Programme\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
+Package hyperref Info: Link coloring OFF on input line 24.
+(D:\Programme\MiKTeX\tex/latex/hyperref\nameref.sty
+Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
+
+(D:\Programme\MiKTeX\tex/latex/refcount\refcount.sty
+Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
+)
+(D:\Programme\MiKTeX\tex/generic/gettitlestring\gettitlestring.sty
+Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
+)
+\c@section@level=\count281
+)
+LaTeX Info: Redefining \ref on input line 24.
+LaTeX Info: Redefining \pageref on input line 24.
+LaTeX Info: Redefining \nameref on input line 24.
+ (MA.out)
+(MA.out)
+\@outlinefile=\write3
+\openout3 = `MA.out'.
+
+ (D:\Programme\MiKTeX\tex/context/base/mkii\supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count271
-\scratchdimen=\dimen163
+\scratchcounter=\count282
+\scratchdimen=\dimen167
 \scratchbox=\box53
-\nofMPsegments=\count272
-\nofMParguments=\count273
+\nofMPsegments=\count283
+\nofMParguments=\count284
 \everyMPshowfont=\toks20
-\MPscratchCnt=\count274
-\MPscratchDim=\dimen164
-\MPnumerator=\count275
-\makeMPintoPDFobject=\count276
+\MPscratchCnt=\count285
+\MPscratchDim=\dimen168
+\MPnumerator=\count286
+\makeMPintoPDFobject=\count287
 \everyMPtoPDFconversion=\toks21
 ) (D:\Programme\MiKTeX\tex/latex/epstopdf-pkg\epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
@@ -215,12 +362,12 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 (D:\Programme\MiKTeX\tex/latex/00miktex\epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Underfull \hbox (badness 10000) in paragraph at lines 52--53
+Underfull \hbox (badness 10000) in paragraph at lines 53--54
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 59--60
+Underfull \hbox (badness 10000) in paragraph at lines 60--61
 
  []
 
@@ -229,12 +376,12 @@ Underfull \hbox (badness 10000) in paragraph at lines 59--60
 
 {C:/Users/benja/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] (MA.toc
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 3.
+(Font)              <7> on input line 5.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 3.
+(Font)              <5> on input line 5.
 )
-\tf@toc=\write3
-\openout3 = `MA.toc'.
+\tf@toc=\write4
+\openout4 = `MA.toc'.
 
 
 [2] (MA.lof
@@ -246,180 +393,387 @@ File: omlcmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OML/cmr/m/n' in size <10> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 6.
 )
-\tf@lof=\write4
-\openout4 = `MA.lof'.
+\tf@lof=\write5
+\openout5 = `MA.lof'.
 
  [3]
-Underfull \hbox (badness 10000) in paragraph at lines 88--88
+Underfull \hbox (badness 10000) in paragraph at lines 89--89
 
  []
 
 [4
 
 ]
-Underfull \hbox (badness 1354) in paragraph at lines 131--135
+Underfull \hbox (badness 1354) in paragraph at lines 132--136
 \OT1/cmr/m/n/10 green space ac-ces-si-bil-ity might lead to nu-mer-i-cal
  []
 
 [5]
-<D:/MA/plots//2-2_md-flowchart.pdf, id=25, 760.0395pt x 745.65576pt>
+<D:/MA/plots//2-2_md-flowchart.pdf, id=327, 760.0395pt x 745.65576pt>
 File: D:/MA/plots//2-2_md-flowchart.pdf Graphic file (type pdf)
 <use D:/MA/plots//2-2_md-flowchart.pdf>
 Package pdftex.def Info: D:/MA/plots//2-2_md-flowchart.pdf  used on input line 
-190.
+191.
 (pdftex.def)             Requested size: 290.22107pt x 284.72884pt.
- [6]
-Underfull \hbox (badness 1990) in paragraph at lines 223--228
+ [6
+pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
+ been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.223 
+      ]
+Underfull \hbox (badness 1990) in paragraph at lines 224--229
 \OT1/cmr/m/n/10 Europe-wide com-pa-ra-ble data for 788 Func-tional
  []
 
-[7 <D:/MA/plots//2-2_md-flowchart.pdf>]
-<D:/MA/plots//2-1_osm_coverage.pdf, id=47, 844.15375pt x 597.23125pt>
+[7
+pdfTeX warning (ext4): destination with the same identifier (name{figure.1}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.244 
+       <D:/MA/plots//2-2_md-flowchart.pdf>]
+<D:/MA/plots//2-1_osm_coverage.pdf, id=367, 844.15375pt x 597.23125pt>
 File: D:/MA/plots//2-1_osm_coverage.pdf Graphic file (type pdf)
 <use D:/MA/plots//2-1_osm_coverage.pdf>
 Package pdftex.def Info: D:/MA/plots//2-1_osm_coverage.pdf  used on input line 
-276.
+277.
 (pdftex.def)             Requested size: 483.69687pt x 342.22061pt.
 
 
-LaTeX Font Warning: Command \large invalid in math mode on input line 292.
+LaTeX Font Warning: Command \large invalid in math mode on input line 293.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 293.
+(Font)              <12> on input line 294.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 293.
+(Font)              <8> on input line 294.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 293.
-LaTeX Font Info:    Calculating math sizes for size <> on input line 293.
+(Font)              <6> on input line 294.
+LaTeX Font Info:    Calculating math sizes for size <> on input line 294.
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.7> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.5> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.7> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.5> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.7> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.5> not available
-(Font)              size <5> substituted on input line 293.
+(Font)              size <5> substituted on input line 294.
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <> on input line 293.
+(Font)              <> on input line 294.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <0.7> on input line 293.
+(Font)              <0.7> on input line 294.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <0.5> on input line 293.
+(Font)              <0.5> on input line 294.
 [8]
 
-LaTeX Font Warning: Command \large invalid in math mode on input line 307.
+LaTeX Font Warning: Command \large invalid in math mode on input line 308.
 
-[9 <D:/MA/plots//2-1_osm_coverage.pdf>]
-<D:/MA/plots//3-1_ls_di_plot.pdf, id=68, 597.23125pt x 844.15375pt>
+[9
+pdfTeX warning (ext4): destination with the same identifier (name{figure.2}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.336 
+       <D:/MA/plots//2-1_osm_coverage.pdf>]
+<D:/MA/plots//3-1_ls_di_plot.pdf, id=409, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-1_ls_di_plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-1_ls_di_plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-1_ls_di_plot.pdf  used on input line 36
-1.
+2.
 (pdftex.def)             Requested size: 435.32422pt x 615.31259pt.
 
 
-LaTeX Warning: Float too large for page by 20.47395pt on input line 364.
+LaTeX Warning: Float too large for page by 20.47395pt on input line 365.
 
-<D:/MA/plots//wien.pdf, id=69, 289.08pt x 289.08pt>
+<D:/MA/plots//wien.pdf, id=410, 289.08pt x 289.08pt>
 File: D:/MA/plots//wien.pdf Graphic file (type pdf)
 <use D:/MA/plots//wien.pdf>
-Package pdftex.def Info: D:/MA/plots//wien.pdf  used on input line 370.
+Package pdftex.def Info: D:/MA/plots//wien.pdf  used on input line 371.
 (pdftex.def)             Requested size: 193.47578pt x 193.47527pt.
-<D:/MA/plots//lissabon.pdf, id=70, 289.08pt x 289.08pt>
+<D:/MA/plots//lissabon.pdf, id=411, 289.08pt x 289.08pt>
 File: D:/MA/plots//lissabon.pdf Graphic file (type pdf)
 <use D:/MA/plots//lissabon.pdf>
-Package pdftex.def Info: D:/MA/plots//lissabon.pdf  used on input line 370.
+Package pdftex.def Info: D:/MA/plots//lissabon.pdf  used on input line 371.
 (pdftex.def)             Requested size: 193.47578pt x 193.47527pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[10] [11 <D:/MA/plots//3-1_ls_di_plot.pdf>] [12 <D:/MA/plots//wien.pdf> <D:/MA/
-plots//lissabon.pdf>]
-<D:/MA/plots//3-3a_di_map+plot.pdf, id=102, 597.23125pt x 844.15375pt>
+[10] [11
+pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.401 
+       <D:/MA/plots//3-1_ls_di_plot.pdf>] [12
+pdfTeX warning (ext4): destination with the same identifier (name{figure.4}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.431 
+       <D:/MA/plots//wien.pdf> <D:/MA/plots//lissabon.pdf>]
+<D:/MA/plots//3-3a_di_map+plot.pdf, id=451, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-3a_di_map+plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-3a_di_map+plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-3a_di_map+plot.pdf  used on input line 
-433.
+434.
 (pdftex.def)             Requested size: 386.95897pt x 546.95454pt.
-<D:/MA/plots//3-2c_di_pop_lvp.pdf, id=103, 337.26pt x 187.70125pt>
+<D:/MA/plots//3-2c_di_pop_lvp.pdf, id=452, 337.26pt x 187.70125pt>
 File: D:/MA/plots//3-2c_di_pop_lvp.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-2c_di_pop_lvp.pdf>
 Package pdftex.def Info: D:/MA/plots//3-2c_di_pop_lvp.pdf  used on input line 4
-44.
+45.
 (pdftex.def)             Requested size: 201.3226pt x 112.04593pt.
-<D:/MA/plots//3-3b_ls_map+plot.pdf, id=104, 597.23125pt x 844.15375pt>
+<D:/MA/plots//3-3b_ls_map+plot.pdf, id=454, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-3b_ls_map+plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-3b_ls_map+plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-3b_ls_map+plot.pdf  used on input line 
-467.
+468.
 (pdftex.def)             Requested size: 483.69687pt x 561.74203pt.
- [13 <D:/MA/plots//3-2c_di_pop_lvp.pdf>] [14 <D:/MA/plots//3-3a_di_map+plot.pdf
->]
-
-LaTeX Warning: Reference `•' on page 15 undefined on input line 477.
-
-<D:/MA/plots//3-4_alternatives_plot.pdf, id=126, 597.23125pt x 844.15375pt>
+ [13 <D:/MA/plots//3-2c_di_pop_lvp.pdf>] [14
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.471 \end{figure*}
+                    <D:/MA/plots//3-3a_di_map+plot.pdf>]
+<D:/MA/plots//3-4_alternatives_plot.pdf, id=480, 597.23125pt x 844.15375pt>
 File: D:/MA/plots//3-4_alternatives_plot.pdf Graphic file (type pdf)
 <use D:/MA/plots//3-4_alternatives_plot.pdf>
 Package pdftex.def Info: D:/MA/plots//3-4_alternatives_plot.pdf  used on input 
-line 497.
+line 498.
 (pdftex.def)             Requested size: 459.51054pt x 649.49805pt.
 
-LaTeX Warning: Float too large for page by 16.71497pt on input line 500.
 
-[15] [16 <D:/MA/plots//3-3b_ls_map+plot.pdf>] [17 <D:/MA/plots//3-4_alternative
-s_plot.pdf>] (MA.bbl [18] [19]) [20]
-Underfull \hbox (badness 10000) in paragraph at lines 580--581
+LaTeX Warning: Float too large for page by 16.71497pt on input line 501.
+
+[15] [16
+pdfTeX warning (ext4): destination with the same identifier (name{figure.6}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.529 
+       <D:/MA/plots//3-3b_ls_map+plot.pdf>] [17
+pdfTeX warning (ext4): destination with the same identifier (name{figure.7}) ha
+s been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.529 
+       <D:/MA/plots//3-4_alternatives_plot.pdf>] [18]
+Underfull \hbox (badness 1067) in paragraph at lines 575--580
+\OT1/cmr/m/n/10 UGS. His rep-re-sen-ta-tion of the in-dex en-ables an
+ []
+
+
+Underfull \hbox (badness 1845) in paragraph at lines 575--580
+\OT1/cmr/m/n/10 in-ten-sity with po-ten-tial for over-crowd-ing can be
+ []
+
+[19] [20]
+Underfull \hbox (badness 3612) in paragraph at lines 663--666
+[]\OT1/cmr/m/n/10 Alternative two ex-em-pli-fies one of the great-est
+ []
+
+
+Underfull \hbox (badness 1360) in paragraph at lines 663--666
+\OT1/cmr/m/n/10 we merely ac-count for the in-di-vid-ual tra-jec-to-ries
+ []
+
+
+Underfull \hbox (badness 1097) in paragraph at lines 680--693
+\OT1/cmr/m/n/10 to ap-proach UGS in greater dis-tances ([]Bier-nacka
+ []
+
+[21] (MA.bbl [22] [23]) [24]
+
+Package natbib Warning: Citation `EuropeanUnion2020' on page 25 undefined on in
+put line 724.
+
+
+Package natbib Warning: Citation `EuropeanUnion2020' on page 25 undefined on in
+put line 736.
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 738--738
+[]\OT1/cmr/bx/n/10 Appendix 1c { Down-load Open-
+ []
+
+
+Underfull \hbox (badness 1371) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 as-tic map-pers to GIS-professionals and en-gi-neers.
+ []
+
+
+Underfull \hbox (badness 2884) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 Reg-is-tra-tion is manda-tory for edit-ing the OSM
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 map ([]$\OT1/cmtt/m/n/10 https : / / www . openstreetmap . org 
+/ about$[]\OT1/cmr/m/n/10 ).
+ []
+
+
+Underfull \hbox (badness 1769) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 At the time of writ-ing this pa-per, the num-ber
+ []
+
+
+Underfull \hbox (badness 4416) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 of reg-is-tered OSM users is about 8.5 mil-lion.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 747--756
+\OT1/cmr/m/n/10 ([]$\OT1/cmtt/m/n/10 https : / / planet . openstreetmap . org /
+ statistics /
+ []
+
+[25]
+Underfull \hbox (badness 1968) in paragraph at lines 758--764
+\OT1/cmr/m/n/10 com-mu-nity of-fers the Over-pass API on dif-fer-ent
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 758--764
+\OT1/cmr/m/n/10 pub-lic in-stances ([]$\OT1/cmtt/m/n/10 https : / / wiki . open
+streetmap .
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 758--764
+\OT1/cmr/m/n/10 ([]$\OT1/cmtt/m/n/10 https : / / dev . overpass-[]api . de / ov
+erpass-[]doc /
+ []
+
+
+Underfull \hbox (badness 2980) in paragraph at lines 758--764
+\OT1/cmtt/m/n/10 en / preface / commons . html$[]\OT1/cmr/m/n/10 ). If over-use
+ of the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 758--764
+\OT1/cmr/m/n/10 ([]$\OT1/cmtt/m/n/10 https : / / dev . overpass-[]api . de / ov
+erpass-[]doc /
+ []
+
+
+Underfull \hbox (badness 2111) in paragraph at lines 758--764
+\OT1/cmtt/m/n/10 en / preface / commons . html$[]\OT1/cmr/m/n/10 ). To down-loa
+d OSM
+ []
+
+
+Underfull \hbox (badness 2512) in paragraph at lines 766--769
+[]\OT1/cmr/m/n/10 The downloading-workflow con-sists of the down-
+ []
+
+
+Underfull \hbox (badness 1112) in paragraph at lines 766--769
+\OT1/cmr/m/n/10 load[]OSM func-tion and var-i-ous sub-functions and
+ []
+
+
+Underfull \hbox (badness 1342) in paragraph at lines 766--769
+\OT1/cmr/m/n/10 re-lies heav-ily on the os-m-data pack-age ([]Padgham
+ []
+
+[26] [27]
+Underfull \hbox (badness 2205) in paragraph at lines 856--866
+\OT1/cmr/m/n/10 and loosely fol-lows the sfnet-works pre-processing
+ []
+
+
+Underfull \hbox (badness 3826) in paragraph at lines 856--866
+\OT1/cmr/m/n/10 and clean-ing tu-to-rial by Lu-cas van der Meer,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 856--866
+\OT1/cmr/m/n/10 ([]$\OT1/cmtt/m/n/10 https : / / luukvdmeer . github . io / sfn
+etworks /
+ []
+
+
+Underfull \hbox (badness 1314) in paragraph at lines 856--866
+\OT1/cmr/m/n/10 do not play any con-nect-ing role in the net-work
+ []
+
+[28] [29]
+Underfull \hbox (badness 1152) in paragraph at lines 896--897
+\OT1/cmr/m/n/10 pre-vent bro-ken ge-ome-tries from caus-ing er-rors in
+ []
+
+
+Underfull \hbox (badness 2941) in paragraph at lines 896--897
+\OT1/cmr/m/n/10 "garages", "hos-pi-tal", "park-ing", "sports[]centre",
+ []
+
+[30]
+Underfull \hbox (badness 1292) in paragraph at lines 911--917
+\OT1/cmr/m/n/10 (31000) with the Open-StreetMap (OSM) net-work
+ []
+
+[31] [32] [33]
+Underfull \hbox (badness 10000) in paragraph at lines 1012--1015
+\OT1/cmtt/m/n/10 github . io / sfnetworks / articles / sfn03 _ join _
+ []
+
+[34] [35] [36]
+Underfull \hbox (badness 10000) in paragraph at lines 1059--1060
 
  []
 
-[21
+
+Package natbib Warning: There were undefined citations.
+
+[37
 
 ] (MA.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
 
-
-LaTeX Warning: There were undefined references.
-
+Package rerunfilecheck Info: File `MA.out' has not changed.
+(rerunfilecheck)             Checksum: E89D30F002C22C92BFB56FE45571363D;4775.
  ) 
 Here is how much of TeX's memory you used:
- 3676 strings out of 478582
- 60286 string characters out of 2856069
- 382471 words of memory out of 3000000
- 21826 multiletter control sequences out of 15000+600000
- 474839 words of font info for 46 fonts, out of 8000000 for 9000
+ 10451 strings out of 478582
+ 165968 string characters out of 2856069
+ 490954 words of memory out of 3000000
+ 28379 multiletter control sequences out of 15000+600000
+ 475007 words of font info for 47 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 55i,15n,62p,911b,318s stack positions out of 10000i,1000n,20000p,200000b,80000s
+ 60i,15n,63p,2229b,498s stack positions out of 10000i,1000n,20000p,200000b,80000s
  <C:\Users\benja\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1000.pk><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx10.pfb><D:/Prog
 ramme/MiKTeX/fonts/type1/public/amsfonts/cm/cmbx12.pfb><D:/Programme/MiKTeX/fon
@@ -430,10 +784,11 @@ me/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><D:/Programme/MiKTeX/fonts/t
 ype1/public/amsfonts/cm/cmr17.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfo
 nts/cm/cmr8.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 <D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programme/Mi
-KTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb>
-Output written on MA.pdf (21 pages, 10588500 bytes).
+KTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb><D:/Programme/MiKTeX/fonts/type1/
+public/amsfonts/cm/cmtt10.pfb>
+Output written on MA.pdf (37 pages, 10766410 bytes).
 PDF statistics:
- 226 PDF objects out of 1000 (max. 8388607)
- 0 named destinations out of 1000 (max. 500000)
- 52 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 797 PDF objects out of 1000 (max. 8388607)
+ 123 named destinations out of 1000 (max. 500000)
+ 236 words of extra memory for PDF output out of 10000 (max. 10000000)
 
