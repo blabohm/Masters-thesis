@@ -54,10 +54,11 @@ lpz <- filter(city_sf, grepl("DE008", city_code)) %>% st_point_on_surface()
 
 osm_plot <- ggplot() +
   geom_sf(data = nuts, fill = "gray60") +
-  geom_sf(data = city_sf, aes(col = percent_coverage),
+  geom_sf(data = lpz, aes(fill = URAU_NAME),
+  #        shape = "\u2605",
+          size = 6) +
+  geom_sf(data = city_sf, aes(col = percent_coverage * 100),
           size = 3) +
-  geom_sf(data = lpz, aes(fill = URAU_NAME, color = percent_coverage),
-          shape = "\u2605", size = 15) +
   scale_fill_manual(name = "Leipzig", values = "green", label = "") +
   scale_color_distiller(palette = "RdYlBu") +
   geom_sf(data = st_cast(nuts, "MULTILINESTRING"),
