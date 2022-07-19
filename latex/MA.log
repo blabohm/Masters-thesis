@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  19 JUL 2022 09:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.3) (preloaded format=pdflatex 2022.7.13)  19 JUL 2022 10:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -845,13 +845,7 @@ File: D:/MA/plots//6-5b_di4.pdf Graphic file (type pdf)
 Package pdftex.def Info: D:/MA/plots//6-5b_di4.pdf  used on input line 1140.
 (pdftex.def)             Requested size: 386.95897pt x 273.77284pt.
  [42 <D:/MA/plots//6-5a_ls4.pdf> <D:/MA/plots//6-5b_di4.pdf>]
-<D:/MA/plots//sig.png, id=870, 188.95593pt x 118.19156pt>
-File: D:/MA/plots//sig.png Graphic file (type png)
-<use D:/MA/plots//sig.png>
-Package pdftex.def Info: D:/MA/plots//sig.png  used on input line 1151.
-(pdftex.def)             Requested size: 145.11053pt x 90.76611pt.
-
-[43 <D:/MA/plots//sig.png>] [44] (MA.aux)
+[43] [44] (MA.aux)
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
@@ -863,10 +857,10 @@ Package rerunfilecheck Info: File `MA.out' has not changed.
 (rerunfilecheck)             Checksum: 8379402B3309AEB37816F95BB686115D;5293.
  ) 
 Here is how much of TeX's memory you used:
- 10563 strings out of 478582
- 169032 string characters out of 2856069
+ 10555 strings out of 478582
+ 168855 string characters out of 2856069
  489245 words of memory out of 3000000
- 28463 multiletter control sequences out of 15000+600000
+ 28456 multiletter control sequences out of 15000+600000
  475314 words of font info for 48 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  60i,15n,63p,2229b,536s stack positions out of 10000i,1000n,20000p,200000b,80000s
@@ -882,9 +876,9 @@ nts/cm/cmr8.pfb><D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 <D:/Programme/MiKTeX/fonts/type1/public/amsfonts/cm/cmti10.pfb><D:/Programme/Mi
 KTeX/fonts/type1/public/amsfonts/cm/cmti9.pfb><D:/Programme/MiKTeX/fonts/type1/
 public/amsfonts/cm/cmtt10.pfb>
-Output written on MA.pdf (44 pages, 18748729 bytes).
+Output written on MA.pdf (44 pages, 18737339 bytes).
 PDF statistics:
- 975 PDF objects out of 1000 (max. 8388607)
+ 972 PDF objects out of 1000 (max. 8388607)
  139 named destinations out of 1000 (max. 500000)
- 337 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 332 words of extra memory for PDF output out of 10000 (max. 10000000)
 
