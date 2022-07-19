@@ -364,7 +364,8 @@ We then applied the DI and LS indices to the changed conditions.
 \begin{figure*}
 \centering
 \includegraphics[width=.9\textwidth]{3-1_ls_di_plot.pdf}
-\caption{The network colors depict the cumulative LS. A higher LS value is depicted by a darker red color, representing i.) more people taking this path, ii.) the people taking this path are living in closer proximity to the green space, and / or iii.) the path is leading to a larger green space. Since the LS values are cumulative, a higher value might also mean more paths from different buildings overlapping (See appendix 3 for further information). The building colors represent average DI calculated for all green spaces in a network distance of 500 meters from a building. The dark blue the color of a building is, the closer to one the DI value, the more direct can its residents travel to the closest green spaces. The opposite is the case if the color tends towards orange.}
+\caption{The network colors depict the cumulative LS. A higher LS value is depicted by a darker red color, representing i.) more people taking this path, ii.) the people taking this path are living in closer proximity to the green space, and / or iii.) the path is leading to a larger green space. Since the LS values are cumulative, a higher value might also mean more paths from different buildings overlapping (See appendix 3 for further information). The building colors represent average DI calculated for all green spaces in a network distance of 500 meters from a building. The darker blue the color of a building is, the closer to 1 the DI value, the more direct can its residents travel to the closest green spaces. The opposite is the case if the color tends towards orange.
+A = Josephinenstraße; B = Riebeckstraße; C = Leve-Voigt-Park}
 \label{fig:lsdi}
 \end{figure*}
 
@@ -384,7 +385,7 @@ In this study, we i.) to developed a modeling approach that applies the DI and L
 In this section, we present the results of applying the two walkability indices to the test case, the Lene Voigt Park (LVP) in Leipzig, Germany.
 Figure \ref{fig:lsdi}a displays the local significance (LS) values that we calculated for the city of Leipzig, Germany.
 The map shows the area east of the city center (top right corner of the map). 
-In the center of the map, highlighted with a darker green, is located the LVP. 
+In the center of the map, highlighted with a darker green, is located the LVP. .
 Other green spaces are depicted in a lighter green, buildings and the network in white and gray, respectively.
 Lower LS values are displayed in blue shades, higher values in red shades.
 
@@ -393,11 +394,9 @@ In general, LS values tend to grow towards green space entry points – i.e. hig
 Due to the cumulative nature of our LS representation, this effect symbolizes street segments with the potential for overcrowding.
 Furthermore, high LS values are associated with direct connections between parks and residential buildings.
 The highest LS values can be found at park entries adjacent to streets which connect UGS to areas with high population, indicating street segments that are highly visited for routes towards UGS. 
-The eastern part of the LVP close to the Riebeckstraße is a good example for this (marker A on the map). 
+The eastern part of the LVP close to the Riebeckstraße is a good example for this (marker B on the map). 
 Here, we find high LS values at those parts of the streets that lead to the residential areas in the north, east and south-east.
-At the same time, we see that the Riebeckstraße in this area is actually a bridge with two Tram and two car lanes and few possibilities for crossing (see picture …). 
-This circumstance is not represented in the street segment´s LS values.
-Furthermore, the Josephinenstraße (marker B) which connects the center of the LVP to the next larger park in the south, the Friedenspark (marker C), displays high LS values.
+Furthermore, the Josephinenstraße (marker A) which connects the center of the LVP to the next larger park in the south, the Friedenspark, displays high LS values.
 On the other hand, we can make out lower LS values at streets with residential buildings that are close to the cut-off threshold of 500 meters distance to the nearest green space.
 For example, in the southeast of the map, in many streets, the blue shade is getting brighter with each street segment until it switches over to red shades.
 With each building entry, more inhabitants are expected to take these routes towards the nearest green space.
@@ -419,11 +418,11 @@ Most cities in central Europe – in particular in Poland, the Czech Republic, A
 In the UK, northern Spain and the southeast of Europe, we see more cities with an OSM coverage of around 50\%.
 In Portugal and the south of Spain few cities express an OSM coverage above 50\%, and most cities are around 25\% OSM coverage.
 In figure \ref{fig:osmcovexample} we see two exemplary cities – Vienna as an example for a high OSM coverage and Lisbon as an example for a low OSM coverage.
-The city of Vienna, Austria is a prime example for a high OSM coverage with 98.7\% of the UA residential building polygons covered by at least one OSM building.
+The city of Vienna, Austria is a prime example for a high OSM coverage with 98.7\% of the UA residential building polygons covered by at least one OSM building (see figure \ref{fig:osmcovexample}a).
 A source of error explaining a fraction of the imperfect coverage in most cities are misclassified UA polygons (see Appendix 1b).
 In another share of UA polygons, the population values might have been so small that none of the OSM buildings received a population count, so they got filtered out during the data cleaning process (see Appendix 2b).
 In contrast, in Lisbon, Portugal 55.6\% of the UA polygons are covered by OSM buildings. 
-As we see in \ref{fig:osmcovexample}, the OSM building coverage in Lisbon is declining with higher distance from the city center.
+As we see in figure \ref{fig:osmcovexample}b, the OSM building coverage in Lisbon is declining with higher distance from the city center.
 Further in the south of the city, OSM coverage tends to be more incomplete, as well.
 Where OSM buildings are present, the workflow of generating LS and DI indices was still functional (see appendix 3).
 On the other hand, large parts of the residential areas of Lisbon have no OSM coverage and, thus did not get index values.
@@ -475,11 +474,11 @@ On the contrary, the curve of Norway has an early onset and a lower ending point
 \end{figure*}
 
 The average LS values at green space entry of the European cities also show a large variation.
-For example, in \ref{fig:lsmap} we can observe above average LS values at the green space entries in mid- to southwestern Germany.
+For example, in figure \ref{fig:lsmap} we can observe above average LS values at the green space entries in mid- to southwestern Germany.
 According to our results, in these areas the street segments at the UGS entries are highly visited, UGS are large and / or the population lives close to the UGS. 
 In contrast, most of the cities in France or at the eastern coast of Italy feature rather low LS values.  
 In Poland or the Netherlands, we find a mixed picture of cities with higher and lower LS values at green space entry.
-In figure \ref{fig:lsmap} we see the LS values aggregated on a country level. 
+In figure \ref{fig:lsmap} (bottom) we see the LS values aggregated on a country level. 
 Every point that is plotted behind the box-plots represents the average LS value at green space entry of one city.
 Accordingly, we see that the differences in the number of cities where our analysis was feasible vary substantially between countries.
 At the bottom and top ends of the chart, there are countries where relatively few cities are included in the final analysis, like Greece, Luxembourg or Norway.
@@ -528,11 +527,14 @@ For these buildings the DI values decreases, meaning the average trajectories to
 To apply these changes, we switched the former park entries into building entries and distributed among them population according to the former park’s size.
 figure \ref{fig:alt}c shows that overall, most of the LS values appear to decrease substantially. 
 Since the UGS disappeared, the trajectories of the people that traveled to them have disappeared as well, leading to decreased LS.
-Only on the paths connecting the newly built residential areas to the LVP and the former Johannes-cemetery in the west (marker A) can we see a substantial increase of LS values.
+Only on the paths connecting the newly built residential areas to the LVP and the former Johannes-cemetery in the west\\
+ can we see a substantial increase of LS val\\
+ ues.\\
+ 
 Overall, the reduction of the number of parks in the area seems to have a larger effect on the LS-index than the increase in population due to the newly “constructed” residential buildings. 
 
 In figure \ref{fig:alt}e we see DI values mostly increasing in the area. 
-Especially the buildings along the Heinrichstraße (marker B) that leads from the center of the LVP north experience a substantial DI increase.
+Especially the buildings along the Heinrichstraße that leads from the center of the LVP north experience a substantial DI increase.
 Again, a higher DI means more efficient routes to the nearest parks.
 Some areas in the east and north of the map express a decrease of DI values, representing less efficient trajectories towards the nearest UGS.
 South and west of the LVP we observe a mixed picture of minor de- and increases.
@@ -1066,7 +1068,6 @@ At this point data preparation is finished. The required data that we need to cr
 
 
 \subsection{Appendix 3 – Index building}
-
 %Why index building?
 Now that all data necessary to create the Local Significance (LS) and Detour Index (DI) indices is ready to use, we can start calculating the two indices for the entire city.
 The indices will be built on the city level during our index building workflow.
@@ -1099,9 +1100,48 @@ The index creation workflow follows these steps: a) listing the green space iden
 \textit{d) Joining the index values back to the network and buildings:} The output that we have generated so far is void of any spatial information. For most interpretation of the data we have produced (i.e. for making beautiful maps), we have to join the output back to its spatial counterparts. Additionally, we have no information on the average DI at the building level or the cumulative LS at a street level. Accordingly, we first list and read all csv files that contain the DI values. The building IDs and DI values are gathered in a data frame from which we can calculate the average DI per building ID. Afterwards, we load the building polygons and join the DI values to them according to the building ID.  Similarly, we gather all LS values from the csv files and sum them up via the individual edge IDs. After loading the edge database, we can now join the LS values to the network data. Finally, we can write both outputs to their geopackage databases and use them for plotting or further calculations. 
 After these steps, both indices have been calculated. We did not implement a step for deleting the intermediate output values of this processing workflow. Thus, enabling further analysis with the information on green space level: For each green space there are two csv files stored that is named after the UA identifier, containing the building and the edge IDs. This information can be further utilized to e.g. count the number of buildings (or if joined to the building polygons: population) in the service area of a particular green space.
 
-
 \onecolumn
+\subsection{Appendix 4 - Plots}
+\subsubsection{Alternative 1 - Unlimited access}
+\begin{figure}[ht!]
+\includegraphics[width=.8\textwidth]{6-2a_ls1.pdf}
+\end{figure}
+
+\begin{figure}[hb!]
+\includegraphics[width=.8\textwidth]{6-2b_di1.pdf}
+\end{figure}
+
 \newpage
+
+\subsubsection{Alternative 2 - Densification}
+\begin{figure}[ht!]
+\includegraphics[width=.8\textwidth]{6-3a_ls2.pdf}
+\end{figure}
+
+\begin{figure}[hb!]
+\includegraphics[width=.8\textwidth]{6-3b_di2.pdf}
+\end{figure}
+
+\newpage
+
+\subsubsection{Alternative 3 - Population increase}
+\begin{figure}[ht!]
+\includegraphics[width=.8\textwidth]{6-4a_ls3.pdf}
+\end{figure}
+
+\newpage
+
+\subsubsection{Alternative 4 - Ensemble model}
+\begin{figure}[ht!]
+\includegraphics[width=.8\textwidth]{6-5a_ls4.pdf}
+\end{figure}
+
+\begin{figure}[hb!]
+\includegraphics[width=.8\textwidth]{6-5b_di4.pdf}
+\end{figure}
+
+\newpage
+
 \large{Erkl\"arung}
 
 Ich erkl\"are, dass ich die vorliegende Arbeit nicht f\"ur andere Pr\"ufungen eingereicht, selbst\"andig und nur unter Verwendung der angegebenen Literatur und Hilfsmittel angefertigt habe. S\"amtliche fremde Quellen inklusive Internetquellen, Grafiken, Tabellen und Bilder, die ich unver\"andert oder abgewandelt wiedergegeben habe, habe ich als solche kenntlich gemacht. Mit ist bekannt, dass Verst\"oße gegen diese Grunds\"atze als T\"auschungsversuch bzw. T\"auschung geahndet werden.
@@ -1115,8 +1155,16 @@ Berlin, 18.07.2020
 
 
 \newpage
-\Large{Ackknowledgement}
-Thanks to my supervisors. 
+\huge{\textbf{Ackknowledgement}} \\
+\large{
+I would like to thank my supervisors, Dagmar and Manuel for always having an open ear and giving me support. 
+Thanks, as well to all my friends that didn't laugh even after the 6th time of me saying "I will hand in now".
+To all of those who laughed: See it? It's done, suckers! 
+Thanks to Rolf for giving all the help he could provide.
+Thanks to my Ma, my Dad and my brothers for being there.
+
+And finally, many dearest love goes out to Maria for having all the patience in the world with me. 
+}
 
 \end{document}
 

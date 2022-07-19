@@ -5,8 +5,8 @@ library(RColorBrewer)
 library(ggspatial)
 library(cowplot)
 
-github <- "C:/Users/labohben/Documents/GitHub/MA/"
-wd <- "C:/Users/labohben/Desktop/DE008/"
+#github <- "C:/Users/labohben/Documents/GitHub/MA/"
+#wd <- "C:/Users/labohben/Desktop/DE008/"
 DRIVE <- "D:/"
 github <- paste0(DRIVE, "MA/")
 wd <- paste0(DRIVE,"output/DE008/")
@@ -50,7 +50,7 @@ street_labs <- read_sf(paste0(wd, "lvp_osm.gpkg")) %>%
   group_by(name) %>%
   summarise() %>%
   st_union(by_feature = TRUE) %>%
-  st_point_on_surface() %>%
+  st_centroid() %>%
   bind_rows(lvp_label) %>%
   mutate(lab = LETTERS[1:nrow(.)])
 
@@ -104,17 +104,17 @@ ls_plot <- base_plot +
   mutate(ls = log(ls)) %>%
   arrange(ls) %>%
   geom_sf(data = ., aes(color = ls), size = 2) +
+  geom_sf(data = street_labs, aes(shape = name)) +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-  #geom_sf(data = street_labs, aes(shape = lab)) +
   geom_sf_label(data = street_labs, aes(label = lab), color = "gray10",
                 nudge_y = 50, show.legend = TRUE) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank())
+        axis.ticks = element_blank(), legend.title = "")
 
 
 di_plot <- base_plot +
