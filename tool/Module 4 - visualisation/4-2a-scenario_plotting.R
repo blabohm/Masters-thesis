@@ -59,7 +59,9 @@ street_labs <- read_sf(paste0(wd, "lvp_osm.gpkg")) %>%
   mutate(lab = LETTERS[1:nrow(.)])
 
 gs <- read_sf(gs_dir, query = gs_q, wkt_filter = bbox_filter)
-build_sf <- read_sf(build_poly, wkt_filter = bbox_filter) %>% select(geom)
+build_sf <- read_sf(build_poly, wkt_filter = bbox_filter) %>%
+  select(geom, population) %>%
+  mutate(population = ifelse(population > 50, 50, population))
 net_sf <- read_sf(edges, wkt_filter = bbox_filter) %>% select(geom)
 
 base_plot <- ggplot() +
@@ -172,6 +174,8 @@ mk_log <- function(numbers)
 
 ################################################################################
 ls1_plot <- base_plot +
+  geom_sf(data = build_sf, aes(fill = population)) +
+  scale_fill_distiller(palette = "Blues") +
   ls_values %>%
   select(d_ls1) %>%
   filter(!is.na(d_ls1), d_ls1 != 0) %>%
@@ -181,15 +185,10 @@ ls1_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "a)", color = expression(Delta ~ "LS")) +
+  labs(title = "a) Alternative 1: Unlimited Access (LS)", color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #ls1_plot
 
 bp <- brewer.pal(5, "RdBu")
@@ -206,16 +205,11 @@ di1_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 650, xmax - 400),
            ylim = c(ymin + 400, ymax - 300)) +
-  labs(title = "b)",
+  labs(title = "b) Alternative 1: Unlimited Access (DI)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #di1_plot
 
 # plot_grid(ls1_plot, di1_plot, nrow = 2) %>%
@@ -226,7 +220,9 @@ target_ids <- c("23502-DE008L2", "23493-DE008L2", "23485-DE008L2",
                 "23508-DE008L2", "23509-DE008L2")
 
 ls2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), aes(fill = "")) +
+  geom_sf(data = build_sf, aes(fill = population)) +
+  scale_fill_distiller(palette = "Blues") +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "grey30") +
   ls_values %>%
   select(d_ls2) %>%
   filter(!is.na(d_ls2), d_ls2 != 0) %>%
@@ -236,22 +232,15 @@ ls2_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "c)",
-       color = expression(Delta ~ "LS"),
-       fill = "Developed \ngreen spaces") +
-  scale_fill_manual(aesthetics = c(color = "brown2")) +
+  labs(title = "c) Alternative 2: Densification (LS)",
+       color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #ls2_plot
 
 di2_plot <- base_plot +
-  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "brown2") +
+  geom_sf(data = filter(gs, identifier %in% target_ids), fill = "grey30") +
   di_values %>%
   select(d_di2) %>%
   mutate(d_di2 = ifelse((d_di2 <= .005 & d_di2 >= -.005), 0, d_di2)) %>%
@@ -261,16 +250,11 @@ di2_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin + 600, xmax - 450),
            ylim = c(ymin + 700, ymax + 100)) +
-  labs(title = "d)",
+  labs(title = "e) Alternative 2: Densification (DI)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #di2_plot
 
 ################################################################################
@@ -281,8 +265,8 @@ pop_dat <- read_sf(paste0(wd, "scen3_be.gpkg")) %>%
   left_join(build) %>% st_as_sf()
 
 ls3_plot <- base_plot +
-# geom_sf(data = pop_dat, aes(fill = population)) +
-  scale_fill_distiller(palette = "RdBu") +
+  geom_sf(data = pop_dat, aes(fill = population)) +
+  scale_fill_distiller(palette = "Blues") +
   ls_values %>%
   select(d_ls3) %>%
   filter(!is.na(d_ls3), d_ls3 != 0) %>%
@@ -292,20 +276,17 @@ ls3_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "e)",
+  labs(title = "e) Alternative 3: Population increase (LS)",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #ls3_plot
 
 ################################################################################
 ls4_plot <- base_plot +
+  geom_sf(data = build_sf, aes(fill = population)) +
+  scale_fill_distiller(palette = "Blues") +
   ls_values %>%
   select(d_ls4) %>%
   filter(!is.na(d_ls4), d_ls4 != 0) %>%
@@ -315,16 +296,11 @@ ls4_plot <- base_plot +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "f)",
+  labs(title = "f) Alternative 4: Ensemble model (LS)",
        color = expression(Delta ~ "LS")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 #ls4_plot
 # ggplot() +
 #   coord_equal(xlim = c(0, 3), ylim = c(0, 1), expand = FALSE) +
@@ -345,16 +321,11 @@ di4_plot <- base_plot +
   scale_fill_steps2(low = bp[5], mid = bp[3], high = bp[1], midpoint = 0) +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
-  labs(title = "g)",
+  labs(title = "g) Alternative 4: Ensemble model (DI)",
        fill = expression(Delta ~ "DI"), color = expression(Delta ~ "DI")) +
   annotation_scale(aes(style = "ticks")) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        plot.title = element_text(hjust = 0, vjust = 1, margin = margin(b = -20)),
-        legend.position = c(1, 0),
-        legend.justification = c(1, 0),
-        legend.key.height = unit(.2, units = "cm"),
-        legend.key.width = unit(.05, units = "cm"))
+        axis.ticks = element_blank())
 
 
 plot_grid(ls1_plot, di1_plot,
@@ -392,22 +363,22 @@ plot_grid(ls1_plot, di1_plot,
 
 ggsave(filename = paste0(github, "/plots/3-1a_ls.pdf"),
        plot = ls_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-2a_ls1.pdf"),
+ggsave(filename = paste0(github, "/plots/6-2a_ls1.pdf"),
        plot = ls1_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-3a_ls2.pdf"),
+ggsave(filename = paste0(github, "/plots/6-3a_ls2.pdf"),
        plot = ls2_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-4a_ls3.pdf"),
+ggsave(filename = paste0(github, "/plots/6-4a_ls3.pdf"),
        plot = ls3_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-5a_ls4.pdf"),
+ggsave(filename = paste0(github, "/plots/6-5a_ls4.pdf"),
        plot = ls4_plot, width = 11.69, height = 8.27)
 
 ggsave(filename = paste0(github, "/plots/3-1b_di.pdf"),
        plot = di_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-2b_di1.pdf"),
+ggsave(filename = paste0(github, "/plots/6-2b_di1.pdf"),
        plot = di1_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-3b_di2.pdf"),
+ggsave(filename = paste0(github, "/plots/6-3b_di2.pdf"),
        plot = di2_plot, width = 11.69, height = 8.27)
-ggsave(filename = paste0(github, "/plots/3-5b_di4.pdf"),
+ggsave(filename = paste0(github, "/plots/6-5b_di4.pdf"),
        plot = di4_plot, width = 11.69, height = 8.27)
 
 # ggsave(filename = paste0(github, "/plots/ua3.pdf"),
