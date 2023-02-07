@@ -22,7 +22,7 @@
 #
 ################################################################################
 # INPUT DATA
-inputDir <- "Z:/input/"
+inputDir <- "Z:/MA_data/input/"
 out <- gsub("input/", "output/", inputDir)
 if (!dir.exists(out)) dir.create(out)
 

@@ -98,7 +98,8 @@ gatherDI <- function(building_polygons, index_dir, output_dir)
   di_out <-
     tmpDf %>%
     group_by(ID) %>%
-    summarise(di = mean(di))
+    #summarise(di = mean(di))
+    summarise(di = sum(di))
 
   building_polygons %>%
     st_read(quiet = TRUE) %>%
