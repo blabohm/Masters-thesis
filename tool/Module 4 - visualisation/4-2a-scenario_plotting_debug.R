@@ -9,7 +9,7 @@ library(cowplot)
 #wd <- "C:/Users/labohben/Desktop/DE008/"
 DRIVE <- "D:/"
 github <- paste0(DRIVE, "MA/")
-wd <- paste0(DRIVE,"output/DE008/")
+wd <- paste0(DRIVE,"MA/DE008/")
 edges <- paste0(wd, "edges.gpkg")
 id <- "23473-DE008L2"
 gs_dir <- paste0(wd, "DE008L2_LEIPZIG_UA2018_v012.gpkg")
@@ -103,18 +103,18 @@ ls_plot <- base_plot +
   filter(!is.na(ls)) %>%
   mutate(ls = log(ls)) %>%
   arrange(ls) %>%
-  geom_sf(data = ., aes(color = ls), size = 2) +
-  geom_sf(data = street_labs, aes(shape = name)) +
+  geom_sf(data = ., aes(color = ls), lwd = 1.2) +
+  #geom_sf(data = street_labs, aes(shape = name)) +
   scale_color_distiller(palette = "RdBu") +
   coord_sf(xlim = c(xmin, xmax),
            ylim = c(ymin, ymax)) +
   labs(title = "Local Significance (LS)",
        color = "LS") +
   annotation_scale(aes(style = "ticks")) +
-  geom_sf_label(data = street_labs, aes(label = lab), color = "gray10",
-                nudge_y = 50, show.legend = TRUE) +
+  #geom_sf_label(data = street_labs, aes(label = lab), color = "gray10",
+  #              nudge_y = 50, show.legend = TRUE) +
   theme(axis.title = element_blank(), axis.text = element_blank(),
-        axis.ticks = element_blank(), legend.title = "")
+        axis.ticks = element_blank(), legend.title = element_blank())
 
 
 di_plot <- base_plot +
@@ -139,7 +139,7 @@ di_plot <- base_plot +
         axis.ticks = element_blank())
 
 plot_grid(ls_plot, di_plot, nrow = 2) %>%
-  ggsave(plot = ., filename = paste0(github, "/plots/3-1_ls_di_plot.pdf"),
+  ggsave(plot = ., filename = paste0(github, "/3-1_ls_di_plot_no_labs.pdf"),
          width = 8.27, height = 11.69)
 ################################################################################
 # display.brewer.pal(5, "RdBu")
